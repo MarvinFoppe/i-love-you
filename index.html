@@ -307,23 +307,6 @@
     letter-spacing: 3px;
   }
 
-  .card-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    padding: 0 16px 12px;
-  }
-  .edit-btn {
-    background: none;
-    border: none;
-    color: #bbb;
-    cursor: pointer;
-    font-size: 0.8em;
-    padding: 4px 10px;
-    border-radius: 6px;
-    transition: all 0.2s;
-  }
-  .edit-btn:hover { color: var(--gold); background: #fef7f0; }
   .delete-btn {
     background: none;
     border: none;
@@ -564,20 +547,6 @@
     margin-top: 3px;
   }
 
-  /* ALPHABET DISPLAY */
-  .alphabet-display {
-    font-size: 1.05em;
-    letter-spacing: 2px;
-    line-height: 1.8;
-    word-break: break-all;
-    font-family: 'Playfair Display', serif;
-    color: var(--rose-dark);
-    background: var(--rose-light);
-    padding: 8px 12px;
-    border-radius: 8px;
-    margin-top: 4px;
-  }
-
   /* EMPTY STATE */
   .empty-state {
     text-align: center;
@@ -619,8 +588,51 @@
     font-size: 0.85em;
     color: var(--mid);
   }
+
+  .alphabet-display {
+    font-size: 1.05em;
+    letter-spacing: 2px;
+    line-height: 1.8;
+    word-break: break-all;
+    font-family: 'Playfair Display', serif;
+    color: var(--rose-dark);
+    background: var(--rose-light);
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-top: 4px;
+  }
+
+  .sync-status {
+    margin-top: 8px;
+    font-size: 0.8em;
+    color: #4caf50;
+    font-weight: 500;
+  }
+  .sync-status.offline {
+    color: var(--rose);
+  }
+
+  .card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 0 16px 12px;
+  }
+  .edit-btn {
+    background: none;
+    border: none;
+    color: #bbb;
+    cursor: pointer;
+    font-size: 0.8em;
+    padding: 4px 10px;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+  .edit-btn:hover { color: var(--gold); background: #fef7f0; }
 </style>
 </head>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <body>
 
 <header>
@@ -629,6 +641,7 @@
   <div class="counter">
     <strong id="entryCount">0</strong> Sprachen gesammelt
   </div>
+  <div class="sync-status" id="syncStatus">☁️ Synchronisiert</div>
 </header>
 
 <div class="add-section">
@@ -690,16 +703,15 @@
         <textarea id="manualScriptInfo" placeholder="z.B. Anzahl Buchstaben, Besonderheiten, Schreibrichtung..."></textarea>
       </div>
       <div class="form-group">
-        <label>Länder (mit Flaggen-Emoji)</label>
-        <input type="text" id="manualCountries" placeholder="z.B. 🇹🇿 Tansania, 🇰🇪 Kenia">
-        <div class="manual-hint">Kommagetrennt. Tipp: Flaggen-Emojis aus dem Emoji-Menü kopieren</div>
-      </div>
-      <div class="form-group">
         <label>Alphabet / Zeichensatz</label>
         <textarea id="manualAlphabet" placeholder="Buchstaben durch Leerzeichen getrennt, z.B. A B C D E F ..."></textarea>
         <div class="manual-hint">Alle Buchstaben des Alphabets, durch Leerzeichen getrennt</div>
       </div>
-      
+      <div class="form-group">
+        <label>Länder (mit Flaggen-Emoji)</label>
+        <input type="text" id="manualCountries" placeholder="z.B. 🇹🇿 Tansania, 🇰🇪 Kenia">
+        <div class="manual-hint">Kommagetrennt. Tipp: Flaggen-Emojis aus dem Emoji-Menü kopieren</div>
+      </div>
       <div class="form-group">
         <label>Über die Sprache</label>
         <textarea id="manualInfo" placeholder="Interessante Fakten: Sprecherzahl, Sprachfamilie, Geschichte, Besonderheiten..."></textarea>
@@ -739,6 +751,20 @@
 </div>
 
 <script>
+// ===== FIREBASE INIT =====
+const firebaseConfig = {
+  apiKey: "AIzaSyB3c7VvT9Cz_SnJv9Xxbj5UvCiTFJGkaX8",
+  authDomain: "i-love-you-d08d5.firebaseapp.com",
+  databaseURL: "https://i-love-you-d08d5-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "i-love-you-d08d5",
+  storageBucket: "i-love-you-d08d5.firebasestorage.app",
+  messagingSenderId: "653154418583",
+  appId: "1:653154418583:web:9fad8955216bd8c8234ed2"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const entriesRef = db.ref('entries');
+
 // ===== SPEECH LANGUAGE CODES =====
 const SPEECH_CODES = {
   "Afrikaans": "af", "Albanisch": "sq", "Amharisch": "am", "Arabisch": "ar",
@@ -772,771 +798,782 @@ const LANGUAGES = {
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Verwendet das lateinische Alphabet mit 26 Buchstaben, basierend auf dem Niederländischen.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
     countries: ["🇿🇦 Südafrika", "🇳🇦 Namibia"],
     flags: "🇿🇦🇳🇦",
-    info: "Afrikaans entstand im 17. Jahrhundert aus dem Niederländischen der Kapkolonie. Es ist eine der jüngsten Sprachen der Welt und wird von etwa 7 Millionen Muttersprachlern gesprochen.",
-    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+    info: "Afrikaans entstand im 17. Jahrhundert aus dem Niederländischen der Kapkolonie. Es ist eine der jüngsten Sprachen der Welt und wird von etwa 7 Millionen Muttersprachlern gesprochen."
   },
   "Albanisch": {
     translation: "Të dua",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Nutzt das lateinische Alphabet mit 36 Buchstaben, darunter Sonderzeichen wie ë, ç und Digraphen wie dh, gj, ll, nj, rr, sh, th, xh, zh.",
-    countries: ["🇦🇱 Albanien", "🇽🇰 Kosovo", "🇲🇰 Nordmazedonien"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Ç Dh Ë Gj Ll Nj Rr Sh Th Xh Zh"countries: ["🇦🇱 Albanien", "🇽🇰 Kosovo", "🇲🇰 Nordmazedonien"],
     flags: "🇦🇱🇽🇰🇲🇰",
-    info: "Albanisch ist eine eigenständige Sprachfamilie innerhalb der indoeuropäischen Sprachen. Es wird von ca. 7,5 Millionen Menschen gesprochen und hat zwei Hauptdialekte: Gegisch und Toskisch.",
-    alphabet: "A B C Ç D DH E Ë F G GJ H I J K L LL M N NJ O P Q R RR S SH T TH U V X XH Y Z ZH"
+    info: "Albanisch ist eine eigenständige Sprachfamilie innerhalb der indoeuropäischen Sprachen. Es wird von ca. 7,5 Millionen Menschen gesprochen und hat zwei Hauptdialekte: Gegisch und Toskisch."
   },
   "Amharisch": {
     translation: "እወድሃለሁ / እወድሻለሁ",
     transliteration: "Ēwedihālehu / Ēwedishālehu",
     script: "Ge'ez-Schrift (Äthiopisches Alphabet)",
     scriptInfo: "Die Ge'ez-Schrift ist eine Abugida mit über 200 Zeichen. Jedes Zeichen repräsentiert eine Konsonant-Vokal-Kombination. Sie wird von links nach rechts geschrieben.",
-    countries: ["🇪🇹 Äthiopien"],
+    ,
+    alphabet: "ሀ ሁ ሂ ሃ ሄ ህ ሆ ሇ ለ ሉ ሊ ላ ሌ ል ሎ ሏ ሐ ሑ ሒ ሓ ሔ ሕ ሖ ሗ መ ሙ ሚ ማ ሜ ም ሞ ሟ"countries: ["🇪🇹 Äthiopien"],
     flags: "🇪🇹",
-    info: "Amharisch ist die offizielle Arbeitssprache Äthiopiens und gehört zu den semitischen Sprachen. Mit über 30 Millionen Muttersprachlern ist es nach Arabisch die am meisten gesprochene semitische Sprache.",
-    alphabet: "ሀ ሁ ሂ ሃ ሄ ህ ሆ ለ ሉ ሊ ላ ሌ ል ሎ ሏ ሐ ሒ ሓ ሔ ሕ ሖ ሗ መ ሙ ሚ ማ ሜ ም ሞ ሟ"
+    info: "Amharisch ist die offizielle Arbeitssprache Äthiopiens und gehört zu den semitischen Sprachen. Mit über 30 Millionen Muttersprachlern ist es nach Arabisch die am meisten gesprochene semitische Sprache."
   },
   "Arabisch": {
     translation: "أحبك",
     transliteration: "Uhibbuka / Uhibbuki",
     script: "Arabisches Alphabet",
     scriptInfo: "Das arabische Alphabet besteht aus 28 Buchstaben und wird von rechts nach links geschrieben. Es ist eine Konsonantenschrift (Abdschad), Vokale werden meist nicht geschrieben.",
-    countries: ["🇸🇦 Saudi-Arabien", "🇪🇬 Ägypten", "🇲🇦 Marokko", "🇮🇶 Irak", "🇯🇴 Jordanien", "🇱🇧 Libanon", "🇦🇪 VAE", "🇹🇳 Tunesien"],
+    ,
+    alphabet: "ا ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ي"countries: ["🇸🇦 Saudi-Arabien", "🇪🇬 Ägypten", "🇲🇦 Marokko", "🇮🇶 Irak", "🇯🇴 Jordanien", "🇱🇧 Libanon", "🇦🇪 VAE", "🇹🇳 Tunesien"],
     flags: "🇸🇦🇪🇬🇲🇦🇮🇶🇯🇴🇱🇧🇦🇪🇹🇳",
-    info: "Arabisch ist die Muttersprache von über 300 Millionen Menschen und Liturgiesprache des Islam. Es gibt zahlreiche Dialekte, die sich stark unterscheiden können. Modernes Standardarabisch dient als überregionale Schriftsprache.",
-    alphabet: "ا ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ي"
+    info: "Arabisch ist die Muttersprache von über 300 Millionen Menschen und Liturgiesprache des Islam. Es gibt zahlreiche Dialekte, die sich stark unterscheiden können. Modernes Standardarabisch dient als überregionale Schriftsprache."
   },
   "Armenisch": {
     translation: "Ես սիրում եմ քdelays",
     transliteration: "Yes sirum em kez",
     script: "Armenisches Alphabet",
     scriptInfo: "Das armenische Alphabet wurde 405 n. Chr. von Mesrop Maschtoz erfunden. Es umfasst 38 (ursprünglich 36) Buchstaben und ist ein einzigartiges Schriftsystem.",
-    countries: ["🇦🇲 Armenien"],
+    ,
+    alphabet: "Ա Բ Գ Դ Ե Զ Է Ը Թ Ժ Ի Լ Խ Ծ Կ Հ Ձ Ղ Ճ Մ Յ Ն Շ Ո Չ Պ Ջ Ռ Ս Վ Տ Ր Ց Ւ Փ Ք Օ Ֆ"countries: ["🇦🇲 Armenien"],
     flags: "🇦🇲",
-    info: "Armenisch ist eine eigenständige Sprachfamilie innerhalb der indoeuropäischen Sprachen. Es wird von etwa 6 Millionen Menschen gesprochen und hat eine reiche literarische Tradition seit dem 5. Jahrhundert.",
-    alphabet: "Ա Բ Գ Դ Ե Զ Է Ը Թ Ժ Ի Լ Խ Ծ Կ Հ Ձ Ղ Ճ Մ Յ Ն Շ Ո Չ Պ Ջ Ռ Ս Վ Տ Ր Ց Ւ Փ Ք Օ Ֆ"
+    info: "Armenisch ist eine eigenständige Sprachfamilie innerhalb der indoeuropäischen Sprachen. Es wird von etwa 6 Millionen Menschen gesprochen und hat eine reiche literarische Tradition seit dem 5. Jahrhundert."
   },
   "Aserbaidschanisch": {
     translation: "Səni sevirəm",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Verwendet das lateinische Alphabet mit speziellen Zeichen wie ə, ğ, ı, ö, ş, ü. Bis 1991 wurde die kyrillische Schrift verwendet.",
-    countries: ["🇦🇿 Aserbaidschan", "🇮🇷 Iran (Südaserbaidschan)"],
+    ,
+    alphabet: "A B C Ç D E Ə F G Ğ H I İ J K Q L M N O Ö P R S Ş T U Ü V W X Y Z"countries: ["🇦🇿 Aserbaidschan", "🇮🇷 Iran (Südaserbaidschan)"],
     flags: "🇦🇿🇮🇷",
-    info: "Aserbaidschanisch ist eine Turksprache mit etwa 25 Millionen Sprechern. Im Iran wird es meist in arabischer Schrift geschrieben, in Aserbaidschan seit 1991 in lateinischer Schrift.",
-    alphabet: "A B C Ç D E Ə F G Ğ H I İ J K Q L M N O Ö P R S Ş T U Ü V X Y Z"
+    info: "Aserbaidschanisch ist eine Turksprache mit etwa 25 Millionen Sprechern. Im Iran wird es meist in arabischer Schrift geschrieben, in Aserbaidschan seit 1991 in lateinischer Schrift."
   },
   "Baskisch": {
     translation: "Maite zaitut",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Nutzt das lateinische Alphabet. Baskisch verwendet keine Buchstaben wie c, q, v, w, y (außer in Fremdwörtern) und hat den Digraphen tx, ts, tz.",
-    countries: ["🇪🇸 Spanien (Baskenland)", "🇫🇷 Frankreich (Baskenland)"],
+    ,
+    alphabet: "A B D E F G H I J K L M N O P R S T U X Z"countries: ["🇪🇸 Spanien (Baskenland)", "🇫🇷 Frankreich (Baskenland)"],
     flags: "🇪🇸🇫🇷",
-    info: "Baskisch (Euskara) ist eine Sprachisolat – es ist mit keiner anderen bekannten Sprache verwandt. Es wird von ca. 750.000 Menschen im Baskenland gesprochen und ist eine der ältesten noch lebenden Sprachen Europas.",
-    alphabet: "A B C D E F G H I J K L M N O P R S T U V X Y Z"
+    info: "Baskisch (Euskara) ist eine Sprachisolat – es ist mit keiner anderen bekannten Sprache verwandt. Es wird von ca. 750.000 Menschen im Baskenland gesprochen und ist eine der ältesten noch lebenden Sprachen Europas."
   },
   "Bengali": {
     translation: "আমি তোমাকে ভালোবাসি",
     transliteration: "Āmi tomāke bhālobāsi",
     script: "Bengalische Schrift",
     scriptInfo: "Die bengalische Schrift ist eine Abugida mit 11 Vokal- und 39 Konsonantenzeichen. Sie stammt von der Brahmi-Schrift ab und wird von links nach rechts geschrieben.",
-    countries: ["🇧🇩 Bangladesch", "🇮🇳 Indien (Westbengalen)"],
+    ,
+    alphabet: "অ আ ই ঈ উ ঊ ঋ এ ঐ ও ঔ ক খ গ ঘ ঙ চ ছ জ ঝ ঞ ট ঠ ড ঢ ণ ত থ দ ধ ন প ফ ব ভ ম য র ল শ ষ স হ"countries: ["🇧🇩 Bangladesch", "🇮🇳 Indien (Westbengalen)"],
     flags: "🇧🇩🇮🇳",
-    info: "Bengali wird von über 230 Millionen Muttersprachlern gesprochen und ist damit die siebtmeistgesprochene Sprache der Welt. Die bengalische Nationalhymne ist auch die Nationalhymne Indiens.",
-    alphabet: "অ আ ই ঈ উ ঊ ঋ ঌ এ ঐ ও ঔ ক খ গ ঘ ঙ চ ছ জ ঝ ঞ ট ঠ ড ঢ ণ ত থ দ ধ ন প ফ ব ভ ম য র ল শ ষ স হ"
+    info: "Bengali wird von über 230 Millionen Muttersprachlern gesprochen und ist damit die siebtmeistgesprochene Sprache der Welt. Die bengalische Nationalhymne ist auch die Nationalhymne Indiens."
   },
   "Bosnisch": {
     translation: "Volim te",
     transliteration: "",
     script: "Lateinisches Alphabet (auch Kyrillisch)",
     scriptInfo: "Bosnisch verwendet sowohl das lateinische als auch das kyrillische Alphabet. Im Alltag dominiert die lateinische Schrift mit Sonderzeichen wie č, ć, đ, š, ž.",
-    countries: ["🇧🇦 Bosnien und Herzegowina"],
+    ,
+    alphabet: "A B C Č D Đ E F G H I J K L M N O P Q R S Š T U V W X Y Z Ž"countries: ["🇧🇦 Bosnien und Herzegowina"],
     flags: "🇧🇦",
-    info: "Bosnisch ist eine südslawische Sprache und ist mit Kroatisch, Serbisch und Montenegrinisch weitgehend gegenseitig verständlich. Es hat etwa 2,5 Millionen Muttersprachler.",
-    alphabet: "A B C Č D Đ E F G H I J K L M N O P Q R S Š T U V W X Y Z Ž"
+    info: "Bosnisch ist eine südslawische Sprache und ist mit Kroatisch, Serbisch und Montenegrinisch weitgehend gegenseitig verständlich. Es hat etwa 2,5 Millionen Muttersprachler."
   },
   "Bulgarisch": {
     translation: "Обичам те",
     transliteration: "Obicham te",
     script: "Kyrillisches Alphabet",
     scriptInfo: "Das bulgarische kyrillische Alphabet hat 30 Buchstaben. Bulgarien ist der Ursprungsort der kyrillischen Schrift, die im 9. Jahrhundert von Schülern von Kyrill und Method entwickelt wurde.",
-    countries: ["🇧🇬 Bulgarien"],
+    ,
+    alphabet: "А Б В Г Д Е Ё Ж З И Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я"countries: ["🇧🇬 Bulgarien"],
     flags: "🇧🇬",
-    info: "Bulgarisch ist die älteste dokumentierte slawische Sprache. Es hat als einzige slawische Sprache den bestimmten Artikel, der an das Wort angehängt wird, und hat die Kasusflexion fast vollständig verloren.",
-    alphabet: "А Б В Г Д Е Ё Ж З И Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я"
+    info: "Bulgarisch ist die älteste dokumentierte slawische Sprache. Es hat als einzige slawische Sprache den bestimmten Artikel, der an das Wort angehängt wird, und hat die Kasusflexion fast vollständig verloren."
   },
   "Chinesisch (Mandarin)": {
     translation: "我爱你",
     transliteration: "Wǒ ài nǐ",
     script: "Chinesische Schriftzeichen (Hanzi)",
     scriptInfo: "Chinesisch nutzt logographische Schriftzeichen. Es gibt über 50.000 Zeichen, wobei man ca. 3.000 für den Alltag benötigt. Vereinfachte Zeichen werden in Festlandchina verwendet, traditionelle in Taiwan und Hongkong.",
-    countries: ["🇨🇳 China", "🇹🇼 Taiwan", "🇸🇬 Singapur", "🇲🇾 Malaysia"],
+    ,
+    alphabet: "一 丨 丿 丶 乛 亅 二 亖 人 亠 儿 入 力 冂 几 凵 刀 刁 刂 刃 刄 刅 分 切 刈 刉 刊"countries: ["🇨🇳 China", "🇹🇼 Taiwan", "🇸🇬 Singapur", "🇲🇾 Malaysia"],
     flags: "🇨🇳🇹🇼🇸🇬🇲🇾",
-    info: "Mandarin-Chinesisch ist mit über 900 Millionen Muttersprachlern die meistgesprochene Sprache der Welt. Es ist eine Tonsprache mit vier Tönen, die die Bedeutung eines Wortes verändern.",
-    alphabet: "(Logographische Schrift – Grundstriche: 一 丨 丿 丶 乛)"
+    info: "Mandarin-Chinesisch ist mit über 900 Millionen Muttersprachlern die meistgesprochene Sprache der Welt. Es ist eine Tonsprache mit vier Tönen, die die Bedeutung eines Wortes verändern."
   },
   "Dänisch": {
     translation: "Jeg elsker dig",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Dänisch verwendet das lateinische Alphabet mit den zusätzlichen Buchstaben æ, ø und å. Das Alphabet hat insgesamt 29 Buchstaben.",
-    countries: ["🇩🇰 Dänemark", "🇬🇱 Grönland", "🇫🇴 Färöer"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Æ Ø Å"countries: ["🇩🇰 Dänemark", "🇬🇱 Grönland", "🇫🇴 Färöer"],
     flags: "🇩🇰🇬🇱🇫🇴",
-    info: "Dänisch wird von etwa 6 Millionen Menschen gesprochen. Es ist bekannt für seine schwierige Aussprache – viele Konsonanten werden weich oder gar nicht ausgesprochen, was es selbst für andere Skandinavier schwer verständlich macht.",
-    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Æ Ø Å"
+    info: "Dänisch wird von etwa 6 Millionen Menschen gesprochen. Es ist bekannt für seine schwierige Aussprache – viele Konsonanten werden weich oder gar nicht ausgesprochen, was es selbst für andere Skandinavier schwer verständlich macht."
   },
   "Deutsch": {
     translation: "Ich liebe dich",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Deutsch nutzt das lateinische Alphabet mit 26 Grundbuchstaben plus die Umlaute ä, ö, ü und das Eszett ß. Substantive werden großgeschrieben.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Ä Ö Ü ß",
     countries: ["🇩🇪 Deutschland", "🇦🇹 Österreich", "🇨🇭 Schweiz", "🇱🇮 Liechtenstein", "🇱🇺 Luxemburg"],
     flags: "🇩🇪🇦🇹🇨🇭🇱🇮🇱🇺",
-    info: "Deutsch ist die meistgesprochene Muttersprache in der EU mit rund 100 Millionen Sprechern. Es ist bekannt für seine langen zusammengesetzten Wörter und sein Kasussystem mit vier Fällen.",
-    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Ä Ö Ü ß"
+    info: "Deutsch ist die meistgesprochene Muttersprache in der EU mit rund 100 Millionen Sprechern. Es ist bekannt für seine langen zusammengesetzten Wörter und sein Kasussystem mit vier Fällen."
   },
   "Englisch": {
     translation: "I love you",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Englisch nutzt das lateinische Alphabet mit 26 Buchstaben ohne Sonderzeichen oder Akzente (außer in Lehnwörtern).",
-    countries: ["🇬🇧 Großbritannien", "🇺🇸 USA", "🇦🇺 Australien", "🇨🇦 Kanada", "🇮🇪 Irland", "🇳🇿 Neuseeland"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"countries: ["🇬🇧 Großbritannien", "🇺🇸 USA", "🇦🇺 Australien", "🇨🇦 Kanada", "🇮🇪 Irland", "🇳🇿 Neuseeland"],
     flags: "🇬🇧🇺🇸🇦🇺🇨🇦🇮🇪🇳🇿",
-    info: "Englisch ist die meistgesprochene Sprache der Welt (Muttersprachler + Zweitsprachler: ca. 1,5 Milliarden). Es ist die globale Lingua franca in Wissenschaft, Wirtschaft und Technologie.",
-    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+    info: "Englisch ist die meistgesprochene Sprache der Welt (Muttersprachler + Zweitsprachler: ca. 1,5 Milliarden). Es ist die globale Lingua franca in Wissenschaft, Wirtschaft und Technologie."
   },
   "Esperanto": {
     translation: "Mi amas vin",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Esperanto nutzt das lateinische Alphabet mit 28 Buchstaben, darunter Sonderzeichen mit Zirkumflex: ĉ, ĝ, ĥ, ĵ, ŝ und ŭ mit Breve.",
-    countries: [],
+    ,
+    alphabet: "A B C Ĉ D E F G Ĝ H Ĥ I J Ĵ K L M N O P R S Ŝ T U Ŭ V Z"countries: [],
     flags: "🌍",
-    info: "Esperanto wurde 1887 von L.L. Zamenhof als internationale Plansprache erschaffen. Es wird von schätzungsweise 100.000–2 Millionen Menschen weltweit gesprochen. Die Grammatik ist völlig regelmäßig mit 16 Grundregeln ohne Ausnahmen.",
-    alphabet: "A B C Ĉ D E F G Ĝ H Ĥ I J Ĵ K L M N O P R S Ŝ T U Ŭ V Z"
+    info: "Esperanto wurde 1887 von L.L. Zamenhof als internationale Plansprache erschaffen. Es wird von schätzungsweise 100.000–2 Millionen Menschen weltweit gesprochen. Die Grammatik ist völlig regelmäßig mit 16 Grundregeln ohne Ausnahmen."
   },
   "Estnisch": {
     translation: "Ma armastan sind",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Estnisch verwendet das lateinische Alphabet mit den Zusatzbuchstaben ä, ö, ü, õ und š, ž. Es hat 27 Buchstaben.",
-    countries: ["🇪🇪 Estland"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N O P Q R S Š Z Ž T U V W X Y"countries: ["🇪🇪 Estland"],
     flags: "🇪🇪",
-    info: "Estnisch gehört zur finno-ugrischen Sprachfamilie und ist eng mit Finnisch verwandt. Es hat 14 Kasus und keine grammatischen Geschlechter. Die Sprache hat ca. 1,1 Millionen Sprecher.",
-    alphabet: "A B C D E F G H I J K L M N O P Q R S Š T U V W X Y Z Ž Õ Ä Ö Ü"
+    info: "Estnisch gehört zur finno-ugrischen Sprachfamilie und ist eng mit Finnisch verwandt. Es hat 14 Kasus und keine grammatischen Geschlechter. Die Sprache hat ca. 1,1 Millionen Sprecher."
   },
   "Filipino / Tagalog": {
     translation: "Mahal kita",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Filipino nutzt das lateinische Alphabet mit 28 Buchstaben, inklusive der spanischen ñ und ng als eigenständigem Buchstaben. Historisch wurde die Baybayin-Schrift verwendet.",
-    countries: ["🇵🇭 Philippinen"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Ng"countries: ["🇵🇭 Philippinen"],
     flags: "🇵🇭",
-    info: "Filipino/Tagalog wird von über 28 Millionen Muttersprachlern und als Zweitsprache von den meisten der 110 Millionen Filipinos gesprochen. Es hat viele spanische und englische Lehnwörter.",
-    alphabet: "A B C D E F G H I J K L M N Ng O P Q R S T U V W X Y Z Ñ"
+    info: "Filipino/Tagalog wird von über 28 Millionen Muttersprachlern und als Zweitsprache von den meisten der 110 Millionen Filipinos gesprochen. Es hat viele spanische und englische Lehnwörter."
   },
   "Finnisch": {
     translation: "Minä rakastan sinua",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Finnisch nutzt das lateinische Alphabet mit den Zusatzbuchstaben ä und ö. Die Buchstaben b, c, f, q, w, x, z kommen nur in Lehnwörtern vor.",
-    countries: ["🇫🇮 Finnland"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N O P Q R S Š T U V W X Y Z Ž Ä Ö"countries: ["🇫🇮 Finnland"],
     flags: "🇫🇮",
-    info: "Finnisch gehört zur finno-ugrischen Sprachfamilie und ist nicht mit den meisten europäischen Sprachen verwandt. Es hat 15 Kasus, kennt kein grammatisches Geschlecht und wird fast genau so geschrieben wie gesprochen.",
-    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Ä Ö"
+    info: "Finnisch gehört zur finno-ugrischen Sprachfamilie und ist nicht mit den meisten europäischen Sprachen verwandt. Es hat 15 Kasus, kennt kein grammatisches Geschlecht und wird fast genau so geschrieben wie gesprochen."
   },
   "Französisch": {
     translation: "Je t'aime",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Französisch nutzt das lateinische Alphabet mit Akzenten: accent aigu (é), accent grave (è, à, ù), accent circonflexe (ê, â, î, ô, û), tréma (ë, ï, ü) und cédille (ç).",
-    countries: ["🇫🇷 Frankreich", "🇧🇪 Belgien", "🇨🇭 Schweiz", "🇨🇦 Kanada", "🇸🇳 Senegal", "🇨🇮 Elfenbeinküste"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z À Â Æ Ç É È Ê Ë Î Ï Ô Œ Ù Û Ü Ÿ"countries: ["🇫🇷 Frankreich", "🇧🇪 Belgien", "🇨🇭 Schweiz", "🇨🇦 Kanada", "🇸🇳 Senegal", "🇨🇮 Elfenbeinküste"],
     flags: "🇫🇷🇧🇪🇨🇭🇨🇦🇸🇳🇨🇮",
-    info: "Französisch wird von etwa 320 Millionen Menschen weltweit gesprochen und ist Amtssprache in 29 Ländern. Es galt jahrhundertelang als Sprache der Diplomatie und ist eine der sechs UN-Amtssprachen.",
-    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z À Â Æ Ç É È Ê Ë Î Ï Ô Œ Ù Û Ü Ÿ"
+    info: "Französisch wird von etwa 320 Millionen Menschen weltweit gesprochen und ist Amtssprache in 29 Ländern. Es galt jahrhundertelang als Sprache der Diplomatie und ist eine der sechs UN-Amtssprachen."
   },
   "Georgisch": {
     translation: "მიყვარხარ",
     transliteration: "Miq'varkhar",
     script: "Georgisches Alphabet (Mchedruli)",
     scriptInfo: "Das georgische Alphabet ist eines der 14 einzigartigen Schriftsysteme der Welt. Mchedruli hat 33 Buchstaben, kennt keine Groß- und Kleinschreibung und wurde seit dem 11. Jahrhundert verwendet.",
-    countries: ["🇬🇪 Georgien"],
+    ,
+    alphabet: "ა ბ გ დ ე ვ ზ თ ი კ ლ მ ნ ო პ ჟ რ ს ტ უ ფ ქ ღ ყ შ ჩ ც ძ წ ჭ ხ ჰ"countries: ["🇬🇪 Georgien"],
     flags: "🇬🇪",
-    info: "Georgisch gehört zur kartwelischen Sprachfamilie und ist mit keiner größeren Sprachfamilie verwandt. Es erlaubt Konsonantencluster von bis zu acht Konsonanten und hat eine literarische Tradition seit dem 5. Jahrhundert.",
-    alphabet: "ა ბ გ დ ე ვ ზ თ ი კ ლ მ ნ ო პ ჟ რ ს ტ უ ფ ქ ღ ყ შ ჩ ც ძ წ ჭ ხ ჯ"
+    info: "Georgisch gehört zur kartwelischen Sprachfamilie und ist mit keiner größeren Sprachfamilie verwandt. Es erlaubt Konsonantencluster von bis zu acht Konsonanten und hat eine literarische Tradition seit dem 5. Jahrhundert."
   },
   "Griechisch": {
     translation: "Σ'αγαπώ",
     transliteration: "S'agapó",
     script: "Griechisches Alphabet",
     scriptInfo: "Das griechische Alphabet hat 24 Buchstaben (α bis ω) und ist das älteste Alphabet, das Vokale als eigenständige Buchstaben einführte. Es entstand um 800 v. Chr. und ist die Grundlage für das lateinische und kyrillische Alphabet.",
-    countries: ["🇬🇷 Griechenland", "🇨🇾 Zypern"],
+    ,
+    alphabet: "Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω"countries: ["🇬🇷 Griechenland", "🇨🇾 Zypern"],
     flags: "🇬🇷🇨🇾",
-    info: "Griechisch hat die längste dokumentierte Geschichte aller indoeuropäischen Sprachen – über 3.400 Jahre. Es wird von etwa 13 Millionen Menschen gesprochen und hat Wissenschaft, Philosophie und westliche Kultur tiefgreifend beeinflusst.",
-    alphabet: "Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω"
+    info: "Griechisch hat die längste dokumentierte Geschichte aller indoeuropäischen Sprachen – über 3.400 Jahre. Es wird von etwa 13 Millionen Menschen gesprochen und hat Wissenschaft, Philosophie und westliche Kultur tiefgreifend beeinflusst."
   },
   "Gujarati": {
     translation: "હું તને પ્રેમ કરું છું",
     transliteration: "Huṁ tane prem karuṁ chuṁ",
     script: "Gujarati-Schrift",
     scriptInfo: "Die Gujarati-Schrift stammt von der Devanagari ab, hat aber keine obere Linie (Shirorekha). Sie hat 47 Grundzeichen und wird von links nach rechts geschrieben.",
-    countries: ["🇮🇳 Indien (Gujarat)", "🇰🇪 Kenia", "🇹🇿 Tansania"],
+    ,
+    alphabet: "અ આ ઇ ઈ ઉ ઊ ઋ એ ઐ ઓ ઔ ક ખ ગ ઘ ઙ ચ છ જ ઝ ઞ ટ ઠ ડ ઢ ણ ત થ દ ધ ન પ ફ બ ભ મ ય ર લ ળ વ શ ષ સ હ"countries: ["🇮🇳 Indien (Gujarat)", "🇰🇪 Kenia", "🇹🇿 Tansania"],
     flags: "🇮🇳🇰🇪🇹🇿",
-    info: "Gujarati wird von etwa 55 Millionen Menschen gesprochen. Es ist die Muttersprache von Mahatma Gandhi. Gujarat ist eine der wirtschaftlich stärksten Regionen Indiens.",
-    alphabet: "અ આ ઇ ઈ ઉ ઊ ઋ એ ઐ ઑ ઒ ઓ ઔ ક ખ ગ ઘ ઙ ચ છ જ ઝ ઞ ટ ઠ ડ ઢ ણ ત થ દ ધ ન પ ફ બ ભ મ ય ર લ ળ વ શ ષ સ હ"
+    info: "Gujarati wird von etwa 55 Millionen Menschen gesprochen. Es ist die Muttersprache von Mahatma Gandhi. Gujarat ist eine der wirtschaftlich stärksten Regionen Indiens."
   },
   "Hawaiianisch": {
     translation: "Aloha wau iā ʻoe",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Das hawaiianische Alphabet hat nur 13 Buchstaben: 5 Vokale (a, e, i, o, u) und 8 Konsonanten (h, k, l, m, n, p, w) plus den ʻOkina (Glottalstop). Es ist eines der kleinsten Alphabete der Welt.",
-    countries: ["🇺🇸 Hawaii (USA)"],
+    ,
+    alphabet: "A E H I K L M N O P U W ʻ"countries: ["🇺🇸 Hawaii (USA)"],
     flags: "🇺🇸",
-    info: "Hawaiianisch ist eine polynesische Sprache, die fast ausgestorben war. Durch Revitalisierungsprogramme seit den 1980ern wächst die Sprecherzahl wieder. Es hat nur etwa 2.000 Muttersprachler, aber ca. 24.000 Sprecher insgesamt.",
-    alphabet: "A E H I K L M N O P U W ʻ"
+    info: "Hawaiianisch ist eine polynesische Sprache, die fast ausgestorben war. Durch Revitalisierungsprogramme seit den 1980ern wächst die Sprecherzahl wieder. Es hat nur etwa 2.000 Muttersprachler, aber ca. 24.000 Sprecher insgesamt."
   },
   "Hebräisch": {
     translation: "אני אוהב אותך / אני אוהבת אותך",
     transliteration: "Ani ohev otakh / Ani ohevet otkha",
     script: "Hebräisches Alphabet",
     scriptInfo: "Das hebräische Alphabet hat 22 Buchstaben und wird von rechts nach links geschrieben. Es ist eine Konsonantenschrift – Vokale werden durch optionale Punktierungen (Nikud) dargestellt.",
-    countries: ["🇮🇱 Israel"],
+    ,
+    alphabet: "א ב ג ד ה ו ז ח ט י כ ל מ נ ס ע פ צ ק ר ש ת"countries: ["🇮🇱 Israel"],
     flags: "🇮🇱",
-    info: "Hebräisch ist die einzige Sprache, die erfolgreich als Alltagssprache wiederbelebt wurde. Nach ca. 1.700 Jahren ohne Muttersprachler wurde es im 19./20. Jahrhundert revitalisiert und ist heute Muttersprache von 9 Millionen Menschen.",
-    alphabet: "א ב ג ד ה ו ז ח ט י כ ל מ נ ס ע פ צ ק ר ש ת"
+    info: "Hebräisch ist die einzige Sprache, die erfolgreich als Alltagssprache wiederbelebt wurde. Nach ca. 1.700 Jahren ohne Muttersprachler wurde es im 19./20. Jahrhundert revitalisiert und ist heute Muttersprache von 9 Millionen Menschen."
   },
   "Hindi": {
     translation: "मैं तुमसे प्यार करता/करती हूँ",
     transliteration: "Main tumse pyaar karta/karti hoon",
     script: "Devanagari-Schrift",
     scriptInfo: "Devanagari hat 47 Grundzeichen (14 Vokale, 33 Konsonanten) und wird von links nach rechts geschrieben. Jedes Zeichen hängt an einer oberen Linie (Shirorekha). Es ist eine Abugida-Schrift.",
-    countries: ["🇮🇳 Indien", "🇫🇯 Fidschi", "🇳🇵 Nepal"],
+    ,
+    alphabet: "अ आ इ ई उ ऊ ऋ ए ऐ ओ औ क ख ग घ ङ च छ ज झ ञ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह"countries: ["🇮🇳 Indien", "🇫🇯 Fidschi", "🇳🇵 Nepal"],
     flags: "🇮🇳🇫🇯🇳🇵",
-    info: "Hindi ist mit über 600 Millionen Sprechern (inkl. Zweitsprachler) eine der meistgesprochenen Sprachen der Welt. Es ist eng mit Urdu verwandt – gesprochen sind sie fast identisch, aber Hindi nutzt Devanagari und Urdu die arabische Schrift.",
-    alphabet: "अ आ इ ई उ ऊ ऋ ए ऐ ओ औ क ख ग घ ङ च छ ज झ ञ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह"
+    info: "Hindi ist mit über 600 Millionen Sprechern (inkl. Zweitsprachler) eine der meistgesprochenen Sprachen der Welt. Es ist eng mit Urdu verwandt – gesprochen sind sie fast identisch, aber Hindi nutzt Devanagari und Urdu die arabische Schrift."
   },
   "Indonesisch": {
     translation: "Aku mencintaimu",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Indonesisch nutzt das lateinische Alphabet mit 26 Buchstaben ohne Sonderzeichen. Die Rechtschreibung ist sehr regelmäßig und phonetisch.",
-    countries: ["🇮🇩 Indonesien"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"countries: ["🇮🇩 Indonesien"],
     flags: "🇮🇩",
-    info: "Indonesisch (Bahasa Indonesia) ist die Amtssprache des viertbevölkerungsreichsten Landes der Welt. Es basiert auf Malaiisch und dient als Lingua franca für über 270 Millionen Menschen, die zu Hause über 700 verschiedene Sprachen sprechen.",
-    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+    info: "Indonesisch (Bahasa Indonesia) ist die Amtssprache des viertbevölkerungsreichsten Landes der Welt. Es basiert auf Malaiisch und dient als Lingua franca für über 270 Millionen Menschen, die zu Hause über 700 verschiedene Sprachen sprechen."
   },
   "Irisch (Gaeilge)": {
     translation: "Tá grá agam duit",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Irisch nutzt das lateinische Alphabet mit 18 Buchstaben (j, k, q, v, w, x, y, z fehlen). Es verwendet Lenition (Séimhiú) und Eklipsis (Urú) – Konsonantenmutationen, die am Wortanfang sichtbar werden.",
-    countries: ["🇮🇪 Irland"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"countries: ["🇮🇪 Irland"],
     flags: "🇮🇪",
-    info: "Irisch ist die erste Amtssprache Irlands und eine keltische Sprache. Trotz Förderprogrammen sprechen nur ca. 70.000 Menschen es täglich. Die Gaeltacht-Gebiete an der Westküste sind die letzten natürlichen Sprachgebiete.",
-    alphabet: "A B C D E F G H I L M N O P R S T U"
+    info: "Irisch ist die erste Amtssprache Irlands und eine keltische Sprache. Trotz Förderprogrammen sprechen nur ca. 70.000 Menschen es täglich. Die Gaeltacht-Gebiete an der Westküste sind die letzten natürlichen Sprachgebiete."
   },
   "Isländisch": {
     translation: "Ég elska þig",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Isländisch nutzt das lateinische Alphabet mit Sonderzeichen: á, é, í, ó, ú, ý, ð (eth), þ (thorn), æ, ö. Die Buchstaben c, q, w, z werden nicht verwendet.",
-    countries: ["🇮🇸 Island"],
+    ,
+    alphabet: "A Á B C D Ð E É F G H I Í J K L M N O Ó P Q R S T U Ú V W X Y Ý Z Þ Æ Ö"countries: ["🇮🇸 Island"],
     flags: "🇮🇸",
-    info: "Isländisch hat sich seit dem Mittelalter kaum verändert – Isländer können die altnordischen Sagas aus dem 13. Jahrhundert noch lesen. Es hat nur ca. 350.000 Sprecher, pflegt aber aktive Sprachpflege und erfindet lieber eigene Wörter als Fremdwörter zu übernehmen.",
-    alphabet: "A Á B C D Ð E É F G H I Í J K L M N O Ó P Q R S T U Ú V W X Y Ý Z Þ Æ Ö"
+    info: "Isländisch hat sich seit dem Mittelalter kaum verändert – Isländer können die altnordischen Sagas aus dem 13. Jahrhundert noch lesen. Es hat nur ca. 350.000 Sprecher, pflegt aber aktive Sprachpflege und erfindet lieber eigene Wörter als Fremdwörter zu übernehmen."
   },
   "Italienisch": {
     translation: "Ti amo",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Italienisch nutzt das lateinische Alphabet mit 21 Grundbuchstaben (j, k, w, x, y nur in Fremdwörtern) und Akzenten: à, è, é, ì, ò, ó, ù.",
-    countries: ["🇮🇹 Italien", "🇨🇭 Schweiz (Tessin)", "🇸🇲 San Marino", "🇻🇦 Vatikan"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"countries: ["🇮🇹 Italien", "🇨🇭 Schweiz (Tessin)", "🇸🇲 San Marino", "🇻🇦 Vatikan"],
     flags: "🇮🇹🇨🇭🇸🇲🇻🇦",
-    info: "Italienisch wird von etwa 67 Millionen Muttersprachlern gesprochen. Es gilt als eine der musikalischsten Sprachen und ist die Sprache der Oper, der Kunst und der Kulinarik. Es ist dem Lateinischen am nächsten.",
-    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z À È É Ì Ò Ù"
+    info: "Italienisch wird von etwa 67 Millionen Muttersprachlern gesprochen. Es gilt als eine der musikalischsten Sprachen und ist die Sprache der Oper, der Kunst und der Kulinarik. Es ist dem Lateinischen am nächsten."
   },
   "Japanisch": {
     translation: "愛してる",
     transliteration: "Ai shiteru",
     script: "Kanji, Hiragana, Katakana",
     scriptInfo: "Japanisch verwendet drei Schriftsysteme gleichzeitig: Kanji (chinesische Zeichen für Bedeutung), Hiragana (46 Zeichen für japanische Wörter/Grammatik) und Katakana (46 Zeichen für Fremdwörter). Dazu kommt Rōmaji (lateinische Umschrift).",
-    countries: ["🇯🇵 Japan"],
+    ,
+    alphabet: "あ い う え お か き く け こ さ し す せ そ た ち つ て と な に ぬ ね の は ひ ふ へ ほ ま み む め も や ゆ よ ら り る れ ろ わ を ん"countries: ["🇯🇵 Japan"],
     flags: "🇯🇵",
-    info: "Japanisch wird von 125 Millionen Menschen gesprochen und ist eine Sprachisolat. Es hat ein komplexes Höflichkeitssystem (Keigo) mit verschiedenen Sprachebenen und ist grammatisch völlig anders als Chinesisch, obwohl es Kanji übernommen hat.",
-    alphabet: "あ い う え お か き く け こ さ し す せ そ た ち つ て と な に ぬ ね の は ひ ふ へ ほ ま み む め も や ゆ よ ら り る れ ろ わ を ん"
+    info: "Japanisch wird von 125 Millionen Menschen gesprochen und ist eine Sprachisolat. Es hat ein komplexes Höflichkeitssystem (Keigo) mit verschiedenen Sprachebenen und ist grammatisch völlig anders als Chinesisch, obwohl es Kanji übernommen hat."
   },
   "Kannada": {
     translation: "ನಾನು ನಿನ್ನನ್ನು ಪ್ರೀತಿಸುತ್ತೇನೆ",
     transliteration: "Nānu ninnannu prītisuttēne",
     script: "Kannada-Schrift",
     scriptInfo: "Die Kannada-Schrift ist eine Abugida mit runden, geschwungenen Formen. Sie hat 49 Grundzeichen und stammt von der Kadamba-Schrift ab. Sie wird von links nach rechts geschrieben.",
-    countries: ["🇮🇳 Indien (Karnataka)"],
+    ,
+    alphabet: "ಅ ಆ ಇ ಈ ಉ ಊ ಋ ಌ ಎ ಏ ಐ ಒ ಓ ಔ ಕ ಖ ಗ ಘ ಙ ಚ ಛ ಜ ಝ ಞ ಟ ಠ ಡ ಢ ಣ ತ ಥ ದ ಧ ನ ಪ ಫ ಬ ಭ ಮ ಯ ರ ಲ ವ ಶ ಷ ಸ ಹ"countries: ["🇮🇳 Indien (Karnataka)"],
     flags: "🇮🇳",
-    info: "Kannada wird von etwa 44 Millionen Menschen in Karnataka, Südindien, gesprochen. Es hat eine über 2.000 Jahre alte literarische Tradition. Die Halebidu- und Belur-Tempel zeigen historische Kannada-Inschriften.",
-    alphabet: "ಅ ಆ ಇ ಈ ಉ ಊ ಋ ಌ ಎ ಏ ಐ ಒ ಓ ಔ ಕ ಖ ಗ ಘ ಙ ಚ ಛ ಜ ಝ ಞ ಟ ಠ ಡ ಢ ಣ ತ ಥ ದ ಧ ನ ಪ ಫ ಬ ಭ ಮ ಯ ರ ಲ ವ ಶ ಷ ಸ ಹ"
+    info: "Kannada wird von etwa 44 Millionen Menschen in Karnataka, Südindien, gesprochen. Es hat eine über 2.000 Jahre alte literarische Tradition. Die Halebidu- und Belur-Tempel zeigen historische Kannada-Inschriften."
   },
   "Katalanisch": {
     translation: "T'estimo",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Katalanisch nutzt das lateinische Alphabet mit Akzenten (à, é, è, í, ó, ò, ú), dem Mittelpunkt (l·l für geminiertes l), der Cedille (ç) und dem Trema (ü).",
-    countries: ["🇪🇸 Spanien (Katalonien, Valencia, Balearen)", "🇦🇩 Andorra", "🇫🇷 Frankreich (Roussillon)"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z À È É Í Ï Ò Ó Ú Ü Ŀ Ç"countries: ["🇪🇸 Spanien (Katalonien, Valencia, Balearen)", "🇦🇩 Andorra", "🇫🇷 Frankreich (Roussillon)"],
     flags: "🇪🇸🇦🇩🇫🇷",
-    info: "Katalanisch ist die einzige Amtssprache Andorras und wird von ca. 10 Millionen Menschen verstanden. Es ist keine Mischung aus Spanisch und Französisch, sondern eine eigenständige romanische Sprache mit mittelalterlicher literarischer Tradition.",
-    alphabet: "A À B C Ç D E É È F G H I Í J K L L·L M N O Ó Ò P Q R S T U Ú Ü V W X Y Z"
+    info: "Katalanisch ist die einzige Amtssprache Andorras und wird von ca. 10 Millionen Menschen verstanden. Es ist keine Mischung aus Spanisch und Französisch, sondern eine eigenständige romanische Sprache mit mittelalterlicher literarischer Tradition."
   },
   "Khmer": {
     translation: "ខ្ញុំស្រឡាញ់អ្នក",
     transliteration: "Knyom srolanh nak",
     script: "Khmer-Schrift",
     scriptInfo: "Die Khmer-Schrift hat das größte Alphabet der Welt laut Guinness-Buch (74 Buchstaben). Es ist eine Abugida, die von der südindischen Pallava-Schrift abstammt. Sie wird von links nach rechts geschrieben.",
-    countries: ["🇰🇭 Kambodscha"],
+    ,
+    alphabet: "ក ខ គ ឃ ង ច ឆ ជ ឈ ញ ដ ឋ ឌ ឍ ណ ត ថ ទ ធ ន ប ផ ព ភ ម យ រ ល វ ស ហ ឡ អ"countries: ["🇰🇭 Kambodscha"],
     flags: "🇰🇭",
-    info: "Khmer ist die Amtssprache Kambodschas mit etwa 16 Millionen Sprechern. Anders als die Nachbarsprachen Thai und Vietnamesisch ist Khmer keine Tonsprache. Es hat eine reiche Tradition durch das Khmer-Reich von Angkor.",
-    alphabet: "ក ខ គ ឃ ង ច ឆ ជ ឈ ញ ដ ឋ ឌ ឍ ណ ត ថ ទ ធ ន ប ផ ព ភ ម យ រ ល វ ស ហ ឡ អ"
+    info: "Khmer ist die Amtssprache Kambodschas mit etwa 16 Millionen Sprechern. Anders als die Nachbarsprachen Thai und Vietnamesisch ist Khmer keine Tonsprache. Es hat eine reiche Tradition durch das Khmer-Reich von Angkor."
   },
   "Koreanisch": {
     translation: "사랑해요",
     transliteration: "Saranghaeyo",
     script: "Hangul",
     scriptInfo: "Hangul wurde 1443 von König Sejong dem Großen erfunden. Es hat 14 Konsonanten und 10 Vokale, die zu Silbenblöcken kombiniert werden. Es gilt als eines der wissenschaftlichsten und logischsten Schriftsysteme der Welt.",
-    countries: ["🇰🇷 Südkorea", "🇰🇵 Nordkorea"],
+    ,
+    alphabet: "ㄱ ㄲ ㄴ ㄷ ㄸ ㄹ ㅁ ㅂ ㅃ ㅅ ㅆ ㅇ ㅈ ㅉ ㅊ ㅋ ㅌ ㅍ ㅎ ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅗ ㅘ ㅙ ㅚ ㅛ ㅜ ㅝ ㅞ ㅟ ㅠ ㅡ ㅢ ㅣ"countries: ["🇰🇷 Südkorea", "🇰🇵 Nordkorea"],
     flags: "🇰🇷🇰🇵",
-    info: "Koreanisch wird von etwa 77 Millionen Menschen gesprochen. Hangul ist so logisch aufgebaut, dass es in wenigen Stunden erlernt werden kann. In Südkorea wird der Hangul-Tag als Feiertag gefeiert.",
-    alphabet: "ㄱ ㄲ ㄴ ㄷ ㄸ ㄹ ㅁ ㅂ ㅃ ㅅ ㅆ ㅇ ㅈ ㅉ ㅊ ㅋ ㅌ ㅍ ㅎ ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅗ ㅘ ㅙ ㅚ ㅛ ㅜ ㅝ ㅞ ㅟ ㅠ ㅡ ㅢ ㅣ"
+    info: "Koreanisch wird von etwa 77 Millionen Menschen gesprochen. Hangul ist so logisch aufgebaut, dass es in wenigen Stunden erlernt werden kann. In Südkorea wird der Hangul-Tag als Feiertag gefeiert."
   },
   "Kroatisch": {
     translation: "Volim te",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Kroatisch verwendet das lateinische Alphabet (Gajica) mit 30 Buchstaben, darunter č, ć, đ, š, ž und die Digraphen dž, lj, nj.",
-    countries: ["🇭🇷 Kroatien"],
+    ,
+    alphabet: "A B C Č D Đ E F G H I J K L M N O P Q R S Š T U V W X Y Z Ž"countries: ["🇭🇷 Kroatien"],
     flags: "🇭🇷",
-    info: "Kroatisch ist eine südslawische Sprache mit etwa 5,5 Millionen Sprechern. Es ist mit Serbisch, Bosnisch und Montenegrinisch weitgehend gegenseitig verständlich und wird manchmal als Teil des Serbokroatischen betrachtet.",
-    alphabet: "A B C Č D Đ E F G H I J K L M N O P Q R S Š T U V W X Y Z Ž"
+    info: "Kroatisch ist eine südslawische Sprache mit etwa 5,5 Millionen Sprechern. Es ist mit Serbisch, Bosnisch und Montenegrinisch weitgehend gegenseitig verständlich und wird manchmal als Teil des Serbokroatischen betrachtet."
   },
   "Kurdisch (Kurmandschi)": {
     translation: "Ez te hez dikim",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Kurmandschi verwendet das lateinische Alphabet mit Sonderzeichen: ç, ê, î, ş, û. Andere kurdische Dialekte nutzen die arabische oder kyrillische Schrift.",
-    countries: ["🇹🇷 Türkei", "🇮🇶 Irak", "🇮🇷 Iran", "🇸🇾 Syrien"],
+    ,
+    alphabet: "A B C Ç D E Ê F G H I Î J K L M N O P Q R S Ş T U Û V W X Y Z"countries: ["🇹🇷 Türkei", "🇮🇶 Irak", "🇮🇷 Iran", "🇸🇾 Syrien"],
     flags: "🇹🇷🇮🇶🇮🇷🇸🇾",
-    info: "Kurdisch wird von ca. 30 Millionen Menschen gesprochen und ist die Sprache des weltweit größten Volkes ohne eigenen Staat. Es gibt mehrere Dialektgruppen: Kurmandschi, Sorani und Südkurdisch.",
-    alphabet: "A B C Ç D E Ê F G H I Î J K L M N O P Q R S Ş T U Û V W X Y Z"
+    info: "Kurdisch wird von ca. 30 Millionen Menschen gesprochen und ist die Sprache des weltweit größten Volkes ohne eigenen Staat. Es gibt mehrere Dialektgruppen: Kurmandschi, Sorani und Südkurdisch."
   },
   "Lateinisch": {
     translation: "Te amo",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Das lateinische Alphabet wurde von den Römern aus dem etruskischen Alphabet entwickelt. Das klassische lateinische Alphabet hatte 23 Buchstaben (ohne J, U, W). Es ist die Basis der meisten westlichen Schriftsysteme.",
-    countries: ["🇻🇦 Vatikanstadt"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"countries: ["🇻🇦 Vatikanstadt"],
     flags: "🇻🇦",
-    info: "Latein ist die Mutter der romanischen Sprachen und war über 1.000 Jahre Wissenschafts- und Kirchensprache Europas. Obwohl es keine Muttersprachler mehr hat, lebt es in der Medizin, im Recht und in der Botanik weiter.",
-    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+    info: "Latein ist die Mutter der romanischen Sprachen und war über 1.000 Jahre Wissenschafts- und Kirchensprache Europas. Obwohl es keine Muttersprachler mehr hat, lebt es in der Medizin, im Recht und in der Botanik weiter."
   },
   "Lettisch": {
     translation: "Es tevi mīlu",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Lettisch nutzt das lateinische Alphabet mit Sonderzeichen: ā, č, ē, ģ, ī, ķ, ļ, ņ, š, ū, ž. Makrons (Längenzeichen) über Vokalen zeigen Langvokale an.",
-    countries: ["🇱🇻 Lettland"],
+    ,
+    alphabet: "A Ā B C Č D E Ē F G Ģ H I Ī J K Ķ L Ļ M N Ņ O P R S Š T U Ū V W Y Z Ž"countries: ["🇱🇻 Lettland"],
     flags: "🇱🇻",
-    info: "Lettisch ist eine baltische Sprache und gehört zusammen mit Litauisch zu den letzten überlebenden Sprachen dieser Sprachgruppe. Es hat ca. 1,5 Millionen Sprecher und bewahrt viele archaische indoeuropäische Merkmale.",
-    alphabet: "A B C Č D E Ē F G Ģ H I Ī J K Ķ L Ļ M N Ņ O P Q R S Š T U Ū V W X Y Z Ž"
+    info: "Lettisch ist eine baltische Sprache und gehört zusammen mit Litauisch zu den letzten überlebenden Sprachen dieser Sprachgruppe. Es hat ca. 1,5 Millionen Sprecher und bewahrt viele archaische indoeuropäische Merkmale."
   },
   "Litauisch": {
     translation: "Aš tave myliu",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Litauisch verwendet das lateinische Alphabet mit 32 Buchstaben, darunter ą, č, ę, ė, į, š, ų, ū, ž. Es nutzt Diakritika für Nasalvokale und Langvokale.",
-    countries: ["🇱🇹 Litauen"],
+    ,
+    alphabet: "A Ą B C Č D E Ę Ė F G Ģ H I Į Y J K L Ļ M N Ń O P R S Š T U Ų Ū V W X Z Ž"countries: ["🇱🇹 Litauen"],
     flags: "🇱🇹",
-    info: "Litauisch gilt als die konservativste lebende indoeuropäische Sprache. Es hat Merkmale bewahrt, die dem Sanskrit ähneln. Sprachwissenschaftler nutzen es, um die Ursprache zu rekonstruieren. Es hat ca. 3 Millionen Sprecher.",
-    alphabet: "A Ą B C Č D E Ė F G H I Į Y J K L M N O P R S Š T U Ų Ū V Z Ž"
+    info: "Litauisch gilt als die konservativste lebende indoeuropäische Sprache. Es hat Merkmale bewahrt, die dem Sanskrit ähneln. Sprachwissenschaftler nutzen es, um die Ursprache zu rekonstruieren. Es hat ca. 3 Millionen Sprecher."
   },
   "Luxemburgisch": {
     translation: "Ech hunn dech gär",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Luxemburgisch nutzt das lateinische Alphabet mit den deutschen Umlauten ä, ö, ü und dem é. Die Rechtschreibung wurde erst 1975 offiziell standardisiert.",
-    countries: ["🇱🇺 Luxemburg"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"countries: ["🇱🇺 Luxemburg"],
     flags: "🇱🇺",
-    info: "Luxemburgisch ist eine moselfränkische Varietät, die 1984 zur Nationalsprache Luxemburgs erklärt wurde. Fast alle 600.000 Einwohner Luxemburgs sprechen es, dazu auch Französisch und Deutsch.",
-    alphabet: "A Ä B C D E F G H I J K L M N O Ö P Q R S T U Ü V W X Y Z"
+    info: "Luxemburgisch ist eine moselfränkische Varietät, die 1984 zur Nationalsprache Luxemburgs erklärt wurde. Fast alle 600.000 Einwohner Luxemburgs sprechen es, dazu auch Französisch und Deutsch."
   },
   "Malaiisch": {
     translation: "Saya cintakan awak",
     transliteration: "",
     script: "Lateinisches Alphabet (Rumi)",
     scriptInfo: "Malaiisch nutzt heute das lateinische Alphabet (Rumi). Historisch wurde die arabische Schrift (Jawi) verwendet, die in Brunei und teilweise in Malaysia noch offiziell ist.",
-    countries: ["🇲🇾 Malaysia", "🇧🇳 Brunei", "🇸🇬 Singapur"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"countries: ["🇲🇾 Malaysia", "🇧🇳 Brunei", "🇸🇬 Singapur"],
     flags: "🇲🇾🇧🇳🇸🇬",
-    info: "Malaiisch ist die Grundlage für Indonesisch und wird in verschiedenen Formen von über 290 Millionen Menschen in Südostasien verstanden. Es war jahrhundertelang die Handelssprache der Region.",
-    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+    info: "Malaiisch ist die Grundlage für Indonesisch und wird in verschiedenen Formen von über 290 Millionen Menschen in Südostasien verstanden. Es war jahrhundertelang die Handelssprache der Region."
   },
   "Malayalam": {
     translation: "ഞാൻ നിന്നെ സ്നേഹിക്കുന്നു",
     transliteration: "Ñān ninne snēhikkunnu",
     script: "Malayalam-Schrift",
     scriptInfo: "Die Malayalam-Schrift hat sehr runde, geschwungene Formen und gehört zu den komplexesten indischen Schriften. Sie hat 53 Grundzeichen und zahlreiche Ligaturen.",
-    countries: ["🇮🇳 Indien (Kerala)"],
+    ,
+    alphabet: "അ ആ ഇ ഈ ഉ ഊ ഋ ഌ എ ഏ ഐ ഒ ഓ ഔ ക ഖ ഗ ഘ ങ ച ഛ ജ ഝ ഞ ട ഠ ഡ ഢ ണ ത ഥ ദ ധ ന പ ഫ ബ ഭ മ യ ര ല വ ശ ഷ സ ഹ"countries: ["🇮🇳 Indien (Kerala)"],
     flags: "🇮🇳",
-    info: "Malayalam wird von 38 Millionen Menschen in Kerala, Südindien, gesprochen. Kerala hat die höchste Alphabetisierungsrate Indiens (96%). Die Sprache ist bekannt für ihr besonderes Palindrom: 'Malayalam' selbst.",
-    alphabet: "അ ആ ഇ ഈ ഉ ഊ ഋ ഌ എ ഏ ഐ ഒ ഓ ഔ ക ഖ ഗ ഘ ങ ച ഛ ജ ഝ ഞ ട ഠ ഡ ഢ ണ ത ഥ ദ ധ ന പ ഫ ബ ഭ മ യ ര ല വ ശ ഷ സ ഹ"
+    info: "Malayalam wird von 38 Millionen Menschen in Kerala, Südindien, gesprochen. Kerala hat die höchste Alphabetisierungsrate Indiens (96%). Die Sprache ist bekannt für ihr besonderes Palindrom: 'Malayalam' selbst."
   },
   "Maltesisch": {
     translation: "Inħobbok",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Maltesisch nutzt das lateinische Alphabet mit Sonderzeichen: ċ, ġ, għ, ħ, ie, ż. Es ist die einzige semitische Sprache, die in lateinischer Schrift geschrieben wird.",
-    countries: ["🇲🇹 Malta"],
+    ,
+    alphabet: "A B C D E F G Ġ G H Ħ I J K L M N O P Q R S T U V W X Y Z"countries: ["🇲🇹 Malta"],
     flags: "🇲🇹",
-    info: "Maltesisch ist die einzige semitische Amtssprache der EU. Es basiert auf dem Sizilianisch-Arabischen mit starkem italienischen und englischen Einfluss. Es hat nur ca. 520.000 Sprecher.",
-    alphabet: "A B Ċ C D E F Ġ G GH H Ħ I IE J K L M N O P Q R S T U V W X Y Z"
+    info: "Maltesisch ist die einzige semitische Amtssprache der EU. Es basiert auf dem Sizilianisch-Arabischen mit starkem italienischen und englischen Einfluss. Es hat nur ca. 520.000 Sprecher."
   },
   "Maori": {
     translation: "Kei te aroha au i a koe",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Maori nutzt das lateinische Alphabet mit nur 15 Buchstaben: a, e, h, i, k, m, n, ng, o, p, r, t, u, w, wh. Makrons zeigen lange Vokale an (ā, ē, ī, ō, ū).",
-    countries: ["🇳🇿 Neuseeland"],
+    ,
+    alphabet: "A E H I K M N O P R T U W"countries: ["🇳🇿 Neuseeland"],
     flags: "🇳🇿",
-    info: "Maori ist eine polynesische Sprache und offizielle Sprache Neuseelands. Nach einem dramatischen Rückgang wird sie seit den 1980ern durch Sprachnester (Kōhanga Reo) und Maori-TV aktiv revitalisiert.",
-    alphabet: "A E H I K M N O P R T U W"
+    info: "Maori ist eine polynesische Sprache und offizielle Sprache Neuseelands. Nach einem dramatischen Rückgang wird sie seit den 1980ern durch Sprachnester (Kōhanga Reo) und Maori-TV aktiv revitalisiert."
   },
   "Mongolisch": {
     translation: "Би чамд хайртай",
     transliteration: "Bi chamd khairtai",
     script: "Kyrillisches Alphabet",
     scriptInfo: "In der Mongolei wird heute kyrillische Schrift mit 35 Buchstaben verwendet. Die traditionelle mongolische Schrift (von oben nach unten, links nach rechts) wird in der Inneren Mongolei (China) noch genutzt.",
-    countries: ["🇲🇳 Mongolei", "🇨🇳 China (Innere Mongolei)"],
+    ,
+    alphabet: "А Б В Г Д Е Ё Ж З И Й К Л М Н О Ө П Р С Т У Ү Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я"countries: ["🇲🇳 Mongolei", "🇨🇳 China (Innere Mongolei)"],
     flags: "🇲🇳🇨🇳",
-    info: "Mongolisch wird von ca. 5,7 Millionen Menschen gesprochen. Die traditionelle mongolische Schrift ist die einzige vertikale Schrift, die von links nach rechts läuft. Die Mongolei plant die Wiedereinführung der traditionellen Schrift.",
-    alphabet: "А Б В Г Д Е Ё Ж З И Й К Л М Н О Ө П Р С Т У Ү Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я"
+    info: "Mongolisch wird von ca. 5,7 Millionen Menschen gesprochen. Die traditionelle mongolische Schrift ist die einzige vertikale Schrift, die von links nach rechts läuft. Die Mongolei plant die Wiedereinführung der traditionellen Schrift."
   },
   "Nepalesisch": {
     translation: "म तिमीलाई माया गर्छु",
     transliteration: "Ma timīlāī māyā garchu",
     script: "Devanagari-Schrift",
     scriptInfo: "Nepalesisch nutzt die gleiche Devanagari-Schrift wie Hindi mit 47 Grundzeichen. Jeder Buchstabe hängt an der oberen Shirorekha-Linie.",
-    countries: ["🇳🇵 Nepal", "🇮🇳 Indien (Sikkim, Westbengalen)"],
+    ,
+    alphabet: "अ आ इ ई उ ऊ ऋ ए ऐ ओ औ क ख ग घ ङ च छ ज झ ञ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह"countries: ["🇳🇵 Nepal", "🇮🇳 Indien (Sikkim, Westbengalen)"],
     flags: "🇳🇵🇮🇳",
-    info: "Nepalesisch (Nepali) wird von ca. 17 Millionen Muttersprachlern gesprochen. Es ist eng mit Hindi verwandt und die Amtssprache Nepals – des einzigen Landes mit einer nicht-rechteckigen Nationalflagge.",
-    alphabet: "अ आ इ ई उ ऊ ऋ ए ऐ ओ औ क ख ग घ ङ च छ ज झ ञ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह"
+    info: "Nepalesisch (Nepali) wird von ca. 17 Millionen Muttersprachlern gesprochen. Es ist eng mit Hindi verwandt und die Amtssprache Nepals – des einzigen Landes mit einer nicht-rechteckigen Nationalflagge."
   },
   "Niederländisch": {
     translation: "Ik hou van jou",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Niederländisch nutzt das lateinische Alphabet mit 26 Buchstaben. Typisch sind die Digraphen ij (manchmal als ein Buchstabe betrachtet), oe, eu, ui, ei.",
-    countries: ["🇳🇱 Niederlande", "🇧🇪 Belgien (Flandern)", "🇸🇷 Suriname", "🇨🇼 Curaçao", "🇦🇼 Aruba"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"countries: ["🇳🇱 Niederlande", "🇧🇪 Belgien (Flandern)", "🇸🇷 Suriname", "🇨🇼 Curaçao", "🇦🇼 Aruba"],
     flags: "🇳🇱🇧🇪🇸🇷🇨🇼🇦🇼",
-    info: "Niederländisch wird von ca. 25 Millionen Muttersprachlern gesprochen. Es steht zwischen Deutsch und Englisch und hat zahlreiche Diminutive (-je, -tje, -pje). Die niederländische Kolonialgeschichte hat Spuren in Sprachen wie Afrikaans und Indonesisch hinterlassen.",
-    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+    info: "Niederländisch wird von ca. 25 Millionen Muttersprachlern gesprochen. Es steht zwischen Deutsch und Englisch und hat zahlreiche Diminutive (-je, -tje, -pje). Die niederländische Kolonialgeschichte hat Spuren in Sprachen wie Afrikaans und Indonesisch hinterlassen."
   },
   "Norwegisch": {
     translation: "Jeg elsker deg",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Norwegisch nutzt das lateinische Alphabet mit den Zusatzbuchstaben æ, ø und å. Das Alphabet hat 29 Buchstaben.",
-    countries: ["🇳🇴 Norwegen"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Æ Ø Å"countries: ["🇳🇴 Norwegen"],
     flags: "🇳🇴",
-    info: "Norwegisch hat zwei offizielle Schriftformen: Bokmål (beeinflusst vom Dänischen) und Nynorsk (basierend auf norwegischen Dialekten). Etwa 5 Millionen Menschen sprechen es. Norwegisch, Schwedisch und Dänisch sind weitgehend gegenseitig verständlich.",
-    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Æ Ø Å"
+    info: "Norwegisch hat zwei offizielle Schriftformen: Bokmål (beeinflusst vom Dänischen) und Nynorsk (basierend auf norwegischen Dialekten). Etwa 5 Millionen Menschen sprechen es. Norwegisch, Schwedisch und Dänisch sind weitgehend gegenseitig verständlich."
   },
   "Persisch (Farsi)": {
     translation: "دوستت دارم",
     transliteration: "Duset dāram",
     script: "Persisch-arabisches Alphabet",
     scriptInfo: "Persisch nutzt eine modifizierte arabische Schrift mit 32 Buchstaben (4 mehr als Arabisch: پ, چ, ژ, گ). Es wird von rechts nach links geschrieben.",
-    countries: ["🇮🇷 Iran", "🇦🇫 Afghanistan (Dari)", "🇹🇯 Tadschikistan (Tadschikisch)"],
+    ,
+    alphabet: "ا ب پ ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن و ه ی"countries: ["🇮🇷 Iran", "🇦🇫 Afghanistan (Dari)", "🇹🇯 Tadschikistan (Tadschikisch)"],
     flags: "🇮🇷🇦🇫🇹🇯",
-    info: "Persisch ist eine der ältesten noch gesprochenen Sprachen mit einer über 2.500-jährigen Geschichte. Die persische Poesie (Rumi, Hafis, Ferdowsi) gehört zur Weltliteratur. Es wird von ca. 110 Millionen Menschen gesprochen.",
-    alphabet: "ا ب پ ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن و ه ی"
+    info: "Persisch ist eine der ältesten noch gesprochenen Sprachen mit einer über 2.500-jährigen Geschichte. Die persische Poesie (Rumi, Hafis, Ferdowsi) gehört zur Weltliteratur. Es wird von ca. 110 Millionen Menschen gesprochen."
   },
   "Polnisch": {
     translation: "Kocham cię",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Polnisch nutzt das lateinische Alphabet mit 9 Sonderzeichen: ą, ć, ę, ł, ń, ó, ś, ź, ż. Die Buchstaben q, v, x kommen nur in Fremdwörtern vor. Polnisch hat 32 Buchstaben.",
-    countries: ["🇵🇱 Polen"],
+    ,
+    alphabet: "A Ą B C Ć D E Ę F G H I J K L Ł M N Ń O Ó P Q R S Ś T U V W X Y Z Ź Ż"countries: ["🇵🇱 Polen"],
     flags: "🇵🇱",
-    info: "Polnisch wird von etwa 45 Millionen Menschen gesprochen. Es hat sieben Kasus, komplexe Konsonantencluster (wie in 'chrząszcz' = Käfer) und gehört zu den schwierigsten Sprachen für Deutschsprachige.",
-    alphabet: "A Ą B C Ć D E Ę F G H I J K L Ł M N Ń O Ó P Q R S Ś T U V W X Y Z Ź Ż"
+    info: "Polnisch wird von etwa 45 Millionen Menschen gesprochen. Es hat sieben Kasus, komplexe Konsonantencluster (wie in 'chrząszcz' = Käfer) und gehört zu den schwierigsten Sprachen für Deutschsprachige."
   },
   "Portugiesisch": {
     translation: "Eu te amo",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Portugiesisch nutzt das lateinische Alphabet mit 26 Buchstaben und Akzenten: á, â, ã, à, ç, é, ê, í, ó, ô, õ, ú. Die Tilde (~) über Vokalen zeigt Nasalierung an.",
-    countries: ["🇵🇹 Portugal", "🇧🇷 Brasilien", "🇦🇴 Angola", "🇲🇿 Mosambik", "🇨🇻 Kap Verde"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Ã Õ Á À Â É Ê Ó Ô Ü Ç"countries: ["🇵🇹 Portugal", "🇧🇷 Brasilien", "🇦🇴 Angola", "🇲🇿 Mosambik", "🇨🇻 Kap Verde"],
     flags: "🇵🇹🇧🇷🇦🇴🇲🇿🇨🇻",
-    info: "Portugiesisch wird von über 250 Millionen Muttersprachlern gesprochen und ist damit die sechstmeistgesprochene Sprache der Welt. Brasilianisches und europäisches Portugiesisch unterscheiden sich erheblich in Aussprache und teilweise Grammatik.",
-    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z À Á Â Ã Ç É Ê Ó Ô Õ Ü"
+    info: "Portugiesisch wird von über 250 Millionen Muttersprachlern gesprochen und ist damit die sechstmeistgesprochene Sprache der Welt. Brasilianisches und europäisches Portugiesisch unterscheiden sich erheblich in Aussprache und teilweise Grammatik."
   },
   "Punjabi": {
     translation: "ਮੈਂ ਤੈਨੂੰ ਪਿਆਰ ਕਰਦਾ/ਕਰਦੀ ਹਾਂ",
     transliteration: "Maiṁ tainūṁ piār kardā/kardī hāṁ",
     script: "Gurmukhi-Schrift",
     scriptInfo: "Die Gurmukhi-Schrift wurde im 16. Jahrhundert von Guru Angad für das Punjabi entwickelt. Sie hat 35 Grundkonsonanten und 10 Vokalzeichen. In Pakistan wird Punjabi in der Shahmukhi-Schrift (arabisch basiert) geschrieben.",
-    countries: ["🇮🇳 Indien (Punjab)", "🇵🇰 Pakistan (Punjab)"],
+    ,
+    alphabet: "ਅ ਆ ਇ ਈ ਉ ਊ ਏ ਐ ਓ ਔ ਕ ਖ ਗ ਘ ਙ ਚ ਛ ਜ ਝ ਞ ਟ ਠ ਡ ਢ ਣ ਤ ਥ ਦ ਧ ਨ ਪ ਫ ਬ ਭ ਮ ਯ ਰ ਲ ਵ ਸ ਹ"countries: ["🇮🇳 Indien (Punjab)", "🇵🇰 Pakistan (Punjab)"],
     flags: "🇮🇳🇵🇰",
-    info: "Punjabi wird von über 100 Millionen Muttersprachlern gesprochen und ist eine Tonsprache – ungewöhnlich für eine indoarische Sprache. Es ist die Sprache des Sikhismus und der Bhangra-Musik.",
-    alphabet: "ਅ ਆ ਇ ਈ ਉ ਊ ਏ ਐ ਓ ਔ ਕ ਖ ਗ ਘ ਙ ਚ ਛ ਜ ਝ ਞ ਟ ਠ ਡ ਢ ਣ ਤ ਥ ਦ ਧ ਨ ਪ ਫ ਬ ਭ ਮ ਯ ਰ ਲ ਵ ਸ ਹ"
+    info: "Punjabi wird von über 100 Millionen Muttersprachlern gesprochen und ist eine Tonsprache – ungewöhnlich für eine indoarische Sprache. Es ist die Sprache des Sikhismus und der Bhangra-Musik."
   },
   "Rumänisch": {
     translation: "Te iubesc",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Rumänisch nutzt das lateinische Alphabet mit 5 Sonderzeichen: ă, â, î, ș, ț. Es ist die einzige romanische Sprache in Osteuropa.",
-    countries: ["🇷🇴 Rumänien", "🇲🇩 Moldawien"],
+    ,
+    alphabet: "A Ă Â B C D E F G H I Î J K L M N O P Q R S Ș T Ț U V W X Y Z"countries: ["🇷🇴 Rumänien", "🇲🇩 Moldawien"],
     flags: "🇷🇴🇲🇩",
-    info: "Rumänisch ist die östlichste romanische Sprache und bewahrt Elemente des Lateinischen, die andere romanische Sprachen verloren haben, wie das Kasussystem. Es wird von ca. 24 Millionen Menschen gesprochen.",
-    alphabet: "A Ă Â B C D E F G H I Î J K L M N O P Q R S Ş T Ţ U V W X Y Z"
+    info: "Rumänisch ist die östlichste romanische Sprache und bewahrt Elemente des Lateinischen, die andere romanische Sprachen verloren haben, wie das Kasussystem. Es wird von ca. 24 Millionen Menschen gesprochen."
   },
   "Russisch": {
     translation: "Я тебя люблю",
     transliteration: "Ya tebya lyublyu",
     script: "Kyrillisches Alphabet",
     scriptInfo: "Das russische kyrillische Alphabet hat 33 Buchstaben, darunter das Weichheitszeichen (ь) und Härtezeichen (ъ). Es basiert auf der Arbeit der Mönche Kyrill und Method im 9. Jahrhundert.",
-    countries: ["🇷🇺 Russland", "🇧🇾 Belarus", "🇰🇿 Kasachstan", "🇰🇬 Kirgisistan"],
+    ,
+    alphabet: "А Б В Г Д Е Ё Ж З И Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я"countries: ["🇷🇺 Russland", "🇧🇾 Belarus", "🇰🇿 Kasachstan", "🇰🇬 Kirgisistan"],
     flags: "🇷🇺🇧🇾🇰🇿🇰🇬",
-    info: "Russisch wird von etwa 258 Millionen Menschen gesprochen und ist die meistgesprochene slawische Sprache. Die russische Literatur (Tolstoi, Dostojewski, Tschechow) gehört zum Kanon der Weltliteratur.",
-    alphabet: "А Б В Г Д Е Ё Ж З И Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я"
+    info: "Russisch wird von etwa 258 Millionen Menschen gesprochen und ist die meistgesprochene slawische Sprache. Die russische Literatur (Tolstoi, Dostojewski, Tschechow) gehört zum Kanon der Weltliteratur."
   },
   "Samoanisch": {
     translation: "Ou te alofa ia te oe",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Samoanisch nutzt das lateinische Alphabet mit 14 Buchstaben plus den Glottalstop (ʻ). Langvokale werden mit Makrons markiert (ā, ē, ī, ō, ū).",
-    countries: ["🇼🇸 Samoa", "🇦🇸 Amerikanisch-Samoa"],
+    ,
+    alphabet: "A E F G H I K L M N O P S T U V W"countries: ["🇼🇸 Samoa", "🇦🇸 Amerikanisch-Samoa"],
     flags: "🇼🇸🇦🇸",
-    info: "Samoanisch ist eine polynesische Sprache mit ca. 510.000 Sprechern. Es hat ein einzigartiges Höflichkeitssystem mit einer formellen Sprachebene (Gagana fa'aaloalo) für Häuptlinge und offizielle Anlässe.",
-    alphabet: "A E F G H I J K L M N O P S T U V"
+    info: "Samoanisch ist eine polynesische Sprache mit ca. 510.000 Sprechern. Es hat ein einzigartiges Höflichkeitssystem mit einer formellen Sprachebene (Gagana fa'aaloalo) für Häuptlinge und offizielle Anlässe."
   },
   "Schwedisch": {
     translation: "Jag älskar dig",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Schwedisch nutzt das lateinische Alphabet mit den Zusatzbuchstaben å, ä und ö. Das Alphabet hat 29 Buchstaben.",
-    countries: ["🇸🇪 Schweden", "🇫🇮 Finnland (als Minderheitssprache)"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Å Ä Ö"countries: ["🇸🇪 Schweden", "🇫🇮 Finnland (als Minderheitssprache)"],
     flags: "🇸🇪🇫🇮",
-    info: "Schwedisch wird von etwa 10 Millionen Menschen gesprochen. Es hat einen melodischen Tonakzent (Wortakzent), der Wörter gleicher Schreibweise unterscheidet. Schwedisch ist auch eine der Amtssprachen Finnlands.",
-    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Å Ä Ö"
+    info: "Schwedisch wird von etwa 10 Millionen Menschen gesprochen. Es hat einen melodischen Tonakzent (Wortakzent), der Wörter gleicher Schreibweise unterscheidet. Schwedisch ist auch eine der Amtssprachen Finnlands."
   },
   "Serbisch": {
     translation: "Волим те / Volim te",
     transliteration: "Volim te",
     script: "Kyrillisch und Lateinisch",
     scriptInfo: "Serbisch ist die einzige europäische Sprache, die offiziell zwei Alphabete gleichberechtigt nutzt: Kyrillisch (30 Buchstaben) und Lateinisch (30 Buchstaben). Im Alltag wird zunehmend Lateinisch verwendet.",
-    countries: ["🇷🇸 Serbien"],
+    ,
+    alphabet: "А Б В Г Д Е Ж З И Ј К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я"countries: ["🇷🇸 Serbien"],
     flags: "🇷🇸",
-    info: "Serbisch hat ca. 12 Millionen Sprecher. Die Digraphie (Nutzung zweier Schriften) ist einzigartig in Europa. Der Reformator Vuk Karadžić schuf im 19. Jahrhundert das Prinzip 'Schreib wie du sprichst'.",
-    alphabet: "А Б В Г Д Е Ё Ж З И Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я"
+    info: "Serbisch hat ca. 12 Millionen Sprecher. Die Digraphie (Nutzung zweier Schriften) ist einzigartig in Europa. Der Reformator Vuk Karadžić schuf im 19. Jahrhundert das Prinzip 'Schreib wie du sprichst'."
   },
   "Singhalesisch": {
     translation: "මම ඔයාට ආදරෙයි",
     transliteration: "Mama oyāṭa ādarei",
     script: "Singhalesische Schrift",
     scriptInfo: "Die singhalesische Schrift hat sehr runde, geschwungene Buchstaben und ist eine der ästhetischsten Schriften der Welt. Sie hat 60 Grundzeichen und stammt von der Brahmi-Schrift ab.",
-    countries: ["🇱🇰 Sri Lanka"],
+    ,
+    alphabet: "අ ආ ඇ ඈ ඉ ඊ උ ඌ ඍ ඎ ඏ ඐ එ ඒ ඓ ඔ ඕ ඖ ක ඛ គ ឃ ង ច ឆ ជ ឈ ញ ට ឞ ដ ඩ ණ ත ឨ ද ඩ ន ប ඵ බ භ ම ඹ ය ර ល ව ශ ෂ ස හ ළ"countries: ["🇱🇰 Sri Lanka"],
     flags: "🇱🇰",
-    info: "Singhalesisch wird von ca. 17 Millionen Menschen in Sri Lanka gesprochen. Die runden Buchstabenformen entstanden, weil man historisch auf Palmblätter schrieb – gerade Linien hätten die Blätter zerrissen.",
-    alphabet: "අ ආ ඇ ඈ ඉ ඊ උ ඌ ඍ ඎ ඏ ඐ එ ඒ ඓ ඔ ඕ ඖ ක ඛ ག ඝ ང ច ඡ ජ ඣ ඥ ට ඨ ඩ ඪ ණ ත ථ ද ධ න"
+    info: "Singhalesisch wird von ca. 17 Millionen Menschen in Sri Lanka gesprochen. Die runden Buchstabenformen entstanden, weil man historisch auf Palmblätter schrieb – gerade Linien hätten die Blätter zerrissen."
   },
   "Slowakisch": {
     translation: "Ľúbim ťa",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Slowakisch nutzt das lateinische Alphabet mit zahlreichen Diakritika: á, ä, č, ď, é, í, ĺ, ľ, ň, ó, ô, ŕ, š, ť, ú, ý, ž. Es hat 46 Buchstaben – eines der längsten lateinbasierten Alphabete.",
-    countries: ["🇸🇰 Slowakei"],
+    ,
+    alphabet: "A Á B C Č D Ď E É F G H Ch I Í J K L Ľ M N Ň O Ó P Q R Ŕ S Š T Ť U Ú V W X Y Ý Z Ž"countries: ["🇸🇰 Slowakei"],
     flags: "🇸🇰",
-    info: "Slowakisch wird von ca. 5 Millionen Menschen gesprochen. Es ist mit Tschechisch gegenseitig verständlich und hat eine besonders melodische Aussprache. Slowakisch hat syllabische Konsonanten – r und l können als Silbenkerne dienen.",
-    alphabet: "A Á B C Č D Ď E É F G H Ch I Í J K L Ľ Ł M N Ň O Ó Ô P Q R Ŕ S Š T Ť U Ú V W X Y Ý Z Ž"
+    info: "Slowakisch wird von ca. 5 Millionen Menschen gesprochen. Es ist mit Tschechisch gegenseitig verständlich und hat eine besonders melodische Aussprache. Slowakisch hat syllabische Konsonanten – r und l können als Silbenkerne dienen."
   },
   "Slowenisch": {
     translation: "Ljubim te",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Slowenisch nutzt das lateinische Alphabet mit 25 Buchstaben plus č, š, ž. Die Buchstaben q, w, x, y fehlen.",
-    countries: ["🇸🇮 Slowenien"],
+    ,
+    alphabet: "A B C Č D E F G H I J K L M N O P Q R S Š T U V W X Y Z Ž"countries: ["🇸🇮 Slowenien"],
     flags: "🇸🇮",
-    info: "Slowenisch ist einzigartig unter den slawischen Sprachen: Es hat als einzige den Dual (Zweizahl) neben Singular und Plural vollständig bewahrt. Etwa 2,5 Millionen Menschen sprechen es.",
-    alphabet: "A B C Č D E F G H I J K L M N O P Q R S Š T U V W X Y Z Ž"
+    info: "Slowenisch ist einzigartig unter den slawischen Sprachen: Es hat als einzige den Dual (Zweizahl) neben Singular und Plural vollständig bewahrt. Etwa 2,5 Millionen Menschen sprechen es."
   },
   "Spanisch": {
     translation: "Te quiero / Te amo",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Spanisch nutzt das lateinische Alphabet mit 27 Buchstaben – das ñ ist ein eigenständiger Buchstabe. Akzente (á, é, í, ó, ú) zeigen die Betonung an, die Diärese (ü) kommt in güe/güi vor.",
-    countries: ["🇪🇸 Spanien", "🇲🇽 Mexiko", "🇨🇴 Kolumbien", "🇦🇷 Argentinien", "🇵🇪 Peru", "🇨🇱 Chile"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N Ñ O P Q R S T U V W X Y Z"countries: ["🇪🇸 Spanien", "🇲🇽 Mexiko", "🇨🇴 Kolumbien", "🇦🇷 Argentinien", "🇵🇪 Peru", "🇨🇱 Chile"],
     flags: "🇪🇸🇲🇽🇨🇴🇦🇷🇵🇪🇨🇱",
-    info: "Spanisch ist mit ca. 500 Millionen Muttersprachlern die zweitmeistgesprochene Muttersprache der Welt (nach Chinesisch). Es ist Amtssprache in 20 Ländern und eine der sechs UN-Amtssprachen.",
-    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Á É Í Ó Ú Ü Ñ ¿ ¡"
+    info: "Spanisch ist mit ca. 500 Millionen Muttersprachlern die zweitmeistgesprochene Muttersprache der Welt (nach Chinesisch). Es ist Amtssprache in 20 Ländern und eine der sechs UN-Amtssprachen."
   },
   "Suaheli": {
     translation: "Nakupenda",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Suaheli nutzt heute das lateinische Alphabet mit 26 Buchstaben. Historisch wurde die arabische Schrift (Swahili Ajami) verwendet. Die Rechtschreibung ist sehr regelmäßig.",
-    countries: ["🇹🇿 Tansania", "🇰🇪 Kenia", "🇺🇬 Uganda", "🇨🇩 DR Kongo"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"countries: ["🇹🇿 Tansania", "🇰🇪 Kenia", "🇺🇬 Uganda", "🇨🇩 DR Kongo"],
     flags: "🇹🇿🇰🇪🇺🇬🇨🇩",
-    info: "Suaheli ist die meistgesprochene afrikanische Sprache mit über 100 Millionen Sprechern (meist als Zweitsprache). Es ist eine Bantusprache mit starkem arabischen Einfluss und dient als Lingua franca in Ostafrika.",
-    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+    info: "Suaheli ist die meistgesprochene afrikanische Sprache mit über 100 Millionen Sprechern (meist als Zweitsprache). Es ist eine Bantusprache mit starkem arabischen Einfluss und dient als Lingua franca in Ostafrika."
   },
   "Tamil": {
     translation: "நான் உன்னை காதலிக்கிறேன்",
     transliteration: "Nāṉ uṉṉai kādalikkiṟēṉ",
     script: "Tamil-Schrift",
     scriptInfo: "Die Tamil-Schrift hat 12 Vokale und 18 Konsonanten, die zu 216 Kombinationszeichen werden. Sie ist eine Abugida und eine der ältesten noch verwendeten Schriften der Welt.",
-    countries: ["🇮🇳 Indien (Tamil Nadu)", "🇱🇰 Sri Lanka", "🇸🇬 Singapur", "🇲🇾 Malaysia"],
+    ,
+    alphabet: "அ ஆ இ ஈ உ ஊ எ ஏ ஐ ஒ ஓ ஔ ஃ க ங ச ஞ ட ண த ந ப ம ய ர ற ல ள வ ழ"countries: ["🇮🇳 Indien (Tamil Nadu)", "🇱🇰 Sri Lanka", "🇸🇬 Singapur", "🇲🇾 Malaysia"],
     flags: "🇮🇳🇱🇰🇸🇬🇲🇾",
-    info: "Tamil ist eine der ältesten lebenden Sprachen der Welt mit einer über 2.000 Jahre alten Literatur. Es wird von 75 Millionen Menschen gesprochen und ist eine der klassischen Sprachen Indiens.",
-    alphabet: "அ ஆ இ ஈ உ ஊ எ ஏ ஐ ஒ ஓ ஔ க ங ச ஞ ட ண த ந ப ம ய ர ல வ ழ ள ற ன"
+    info: "Tamil ist eine der ältesten lebenden Sprachen der Welt mit einer über 2.000 Jahre alten Literatur. Es wird von 75 Millionen Menschen gesprochen und ist eine der klassischen Sprachen Indiens."
   },
   "Telugu": {
     translation: "నేను నిన్ను ప్రేమిస్తున్నాను",
     transliteration: "Nēnu ninnu prēmistunnānu",
     script: "Telugu-Schrift",
     scriptInfo: "Die Telugu-Schrift hat runde, elegante Formen mit 60 Grundsymbolen. Sie wird manchmal als 'italienisch des Ostens' bezeichnet wegen ihrer vokalreichen, melodischen Qualität.",
-    countries: ["🇮🇳 Indien (Andhra Pradesh, Telangana)"],
+    ,
+    alphabet: "అ ఆ ఇ ఈ ఉ ఊ ఋ ఌ ఎ ఏ ఐ ఒ ఓ ఔ క ఖ గ ఘ ఙ చ ఛ జ ఝ ఞ ట ఠ డ ఢ ణ త థ ద ధ న ప ఫ బ భ మ య ర ఱ ల ళ వ శ ష స హ"countries: ["🇮🇳 Indien (Andhra Pradesh, Telangana)"],
     flags: "🇮🇳",
-    info: "Telugu wird von etwa 82 Millionen Menschen gesprochen und ist die meistgesprochene dravidische Sprache. Tollywood (Telugu-Filmindustrie) ist nach Bollywood die größte Filmindustrie Indiens.",
-    alphabet: "అ ఆ ఇ ఈ ఉ ఊ ఋ ఌ ఎ ఏ ఐ ఒ ఓ ఔ క ఖ గ ఘ ఙ చ ఛ జ ఝ ఞ ట ఠ డ ఢ ణ త థ ద ధ న ప ఫ బ భ మ య ర ల వ శ ష స హ"
+    info: "Telugu wird von etwa 82 Millionen Menschen gesprochen und ist die meistgesprochene dravidische Sprache. Tollywood (Telugu-Filmindustrie) ist nach Bollywood die größte Filmindustrie Indiens."
   },
   "Thailändisch": {
     translation: "ฉันรักคุณ",
     transliteration: "Chan rak khun",
     script: "Thai-Schrift",
     scriptInfo: "Die Thai-Schrift hat 44 Konsonanten, 15 Vokalzeichen und 4 Tonzeichen. Sie wird ohne Wortabstände geschrieben und stammt von der Khmer-Schrift ab. Sie wurde 1283 von König Ramkhamhaeng erschaffen.",
-    countries: ["🇹🇭 Thailand"],
+    ,
+    alphabet: "ก ข ค ฅ ฆ ง จ ฉ ช ซ ฌ ญ ฎ ฏ ฐ ฑ ฒ ณ ด ต ถ ท ธ น บ ป ผ ฝ พ ฟ ภ ม ย ร ฤ ล ฦ ว ศ ษ ส ห ฬ อ ฮ"countries: ["🇹🇭 Thailand"],
     flags: "🇹🇭",
-    info: "Thailändisch ist eine Tonsprache mit fünf Tönen, die die Bedeutung von Wörtern verändern. Es wird von etwa 60 Millionen Menschen gesprochen und hat ein komplexes Höflichkeitssystem mit verschiedenen Höflichkeitspartikeln.",
-    alphabet: "ก ข ค ค ต ถ ท ธ น บ ป พ ฟ ม ย ร ล ว ส ห ฬ อ ฮ"
+    info: "Thailändisch ist eine Tonsprache mit fünf Tönen, die die Bedeutung von Wörtern verändern. Es wird von etwa 60 Millionen Menschen gesprochen und hat ein komplexes Höflichkeitssystem mit verschiedenen Höflichkeitspartikeln."
   },
   "Tibetisch": {
     translation: "ང་ཁྱོད་ལ་དགའ་པོ་ཡོད།",
     transliteration: "Nga khyod la dga' po yod",
     script: "Tibetische Schrift",
     scriptInfo: "Die tibetische Schrift wurde im 7. Jahrhundert vom indischen Brahmi-Alphabet abgeleitet. Sie hat 30 Konsonanten und 4 Vokalzeichen. Die Schreibweise entspricht oft nicht mehr der modernen Aussprache.",
-    countries: ["🇨🇳 China (Tibet)", "🇮🇳 Indien (Dharamsala)", "🇳🇵 Nepal"],
+    ,
+    alphabet: "ཀ ཁ ག གྷ ང ཅ ཆ ཇ ཉ ཏ ཐ ད ན པ ཕ བ བྷ མ ཙ ཚ ཛ ཝ ཞ ཟ འ ཡ ར ལ ཤ ཥ ས ཧ ཨ"countries: ["🇨🇳 China (Tibet)", "🇮🇳 Indien (Dharamsala)", "🇳🇵 Nepal"],
     flags: "🇨🇳🇮🇳🇳🇵",
-    info: "Tibetisch gehört zur sino-tibetischen Sprachfamilie und wird von ca. 6 Millionen Menschen gesprochen. Es ist die Liturgiesprache des tibetischen Buddhismus und hat eine reiche religiöse und philosophische Literatur.",
-    alphabet: "ཀ ཁ ག གྷ ང ཅ ཆ ཇ ཉ ཏ ཐ ད དྷ ན པ ཕ བ བྷ མ ཙ ཚ ཛ ཝ ཞ ཟ ཡ ར ལ ཤ ཥ ས ཧ ཨ"
+    info: "Tibetisch gehört zur sino-tibetischen Sprachfamilie und wird von ca. 6 Millionen Menschen gesprochen. Es ist die Liturgiesprache des tibetischen Buddhismus und hat eine reiche religiöse und philosophische Literatur."
   },
   "Tschechisch": {
     translation: "Miluji tě",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Tschechisch nutzt das lateinische Alphabet mit Háčky (Häkchen): č, ď, ě, ň, ř, š, ť, ž und Čárky (Strichen): á, é, í, ó, ú, ý. Der Buchstabe ř ist weltweit einzigartig.",
-    countries: ["🇨🇿 Tschechien"],
+    ,
+    alphabet: "A Á B C Č D Ď E É F G H Ch I Í J K L M N Ň O Ó P Q R Ř S Š T Ť U Ú V W X Y Ý Z Ž"countries: ["🇨🇿 Tschechien"],
     flags: "🇨🇿",
-    info: "Tschechisch wird von ca. 10,7 Millionen Menschen gesprochen. Es besitzt den Laut ř, der in keiner anderen Sprache als Phonem existiert. Der berühmte Satz 'Strč prst skrz krk' (Steck den Finger durch den Hals) kommt ohne einen einzigen Vokal aus.",
-    alphabet: "A Á B C Č D Ď E É Ě F G H Ch I Í J K L M N Ň O Ó P Q R Ř S Š T Ť U Ú Ů V W X Y Ý Z Ž"
+    info: "Tschechisch wird von ca. 10,7 Millionen Menschen gesprochen. Es besitzt den Laut ř, der in keiner anderen Sprache als Phonem existiert. Der berühmte Satz 'Strč prst skrz krk' (Steck den Finger durch den Hals) kommt ohne einen einzigen Vokal aus."
   },
   "Türkisch": {
     translation: "Seni seviyorum",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Türkisch nutzt seit 1928 das lateinische Alphabet mit 29 Buchstaben, darunter ç, ğ, ı, İ, ö, ş, ü. Zuvor wurde die arabische Schrift verwendet. Die Umstellung erfolgte unter Atatürk.",
-    countries: ["🇹🇷 Türkei", "🇨🇾 Nordzypern"],
+    ,
+    alphabet: "A B C Ç D E F G Ğ H I İ J K L M N O Ö P Q R S Ş T U Ü V W X Y Z"countries: ["🇹🇷 Türkei", "🇨🇾 Nordzypern"],
     flags: "🇹🇷🇨🇾",
-    info: "Türkisch wird von ca. 80 Millionen Muttersprachlern gesprochen. Es ist eine agglutinierende Sprache – Wörter werden durch Anfügen von Suffixen gebildet. Ein einzelnes Wort kann einen ganzen Satz ausdrücken.",
-    alphabet: "A B C Ç D E F G Ğ H I İ J K L M N O Ö P Q R S Ş T U Ü V W X Y Z"
+    info: "Türkisch wird von ca. 80 Millionen Muttersprachlern gesprochen. Es ist eine agglutinierende Sprache – Wörter werden durch Anfügen von Suffixen gebildet. Ein einzelnes Wort kann einen ganzen Satz ausdrücken."
   },
   "Ukrainisch": {
     translation: "Я тебе кохаю",
     transliteration: "Ya tebe kokhayu",
     script: "Kyrillisches Alphabet",
     scriptInfo: "Das ukrainische kyrillische Alphabet hat 33 Buchstaben, darunter die einzigartigen Buchstaben ґ, є, і, ї. Es unterscheidet sich deutlich vom russischen Kyrillisch.",
-    countries: ["🇺🇦 Ukraine"],
+    ,
+    alphabet: "А Б В Г Ґ Д Е Є Ж З И І Ї Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ь Ю Я"countries: ["🇺🇦 Ukraine"],
     flags: "🇺🇦",
-    info: "Ukrainisch wird von ca. 40 Millionen Muttersprachlern gesprochen. Es gilt als eine der melodischsten slawischen Sprachen. Die ukrainische Literatur hat eine reiche Tradition, besonders durch den Nationaldichter Taras Schewtschenko.",
-    alphabet: "А Б В Г Ґ Д Е Є Ж З И І Ї Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ь Ю Я"
+    info: "Ukrainisch wird von ca. 40 Millionen Muttersprachlern gesprochen. Es gilt als eine der melodischsten slawischen Sprachen. Die ukrainische Literatur hat eine reiche Tradition, besonders durch den Nationaldichter Taras Schewtschenko."
   },
   "Ungarisch": {
     translation: "Szeretlek",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Ungarisch nutzt das lateinische Alphabet mit 44 Buchstaben, darunter: á, é, í, ó, ö, ő, ú, ü, ű und Digraphen wie cs, gy, ly, ny, sz, ty, zs, dzs.",
-    countries: ["🇭🇺 Ungarn"],
+    ,
+    alphabet: "A B C Cs D E F G Gy H I J K L Ly M N Ny O Ö P Q R S Sz T Ty U Ü V W X Y Z Zs"countries: ["🇭🇺 Ungarn"],
     flags: "🇭🇺",
-    info: "Ungarisch ist eine finno-ugrische Sprache und mit keiner Nachbarsprache verwandt. 'Szeretlek' ist besonders: Es ist eine spezielle Verbform, die 'Ich-dich' gleichzeitig ausdrückt – eine Konjugationsform, die es nur im Ungarischen gibt.",
-    alphabet: "A Á B C D E É F G H I Í J K L M N O Ó Ö Ő P Q R S T U Ú Ü Ű V W X Y Z"
+    info: "Ungarisch ist eine finno-ugrische Sprache und mit keiner Nachbarsprache verwandt. 'Szeretlek' ist besonders: Es ist eine spezielle Verbform, die 'Ich-dich' gleichzeitig ausdrückt – eine Konjugationsform, die es nur im Ungarischen gibt."
   },
   "Urdu": {
     translation: "میں تم سے محبت کرتا/کرتی ہوں",
     transliteration: "Main tumse mohabbat karta/karti hoon",
     script: "Nastaliq (persisch-arabische Schrift)",
     scriptInfo: "Urdu wird in der Nastaliq-Kalligraphie geschrieben, einer besonders ästhetischen Form der arabischen Schrift. Sie hat 38 Buchstaben und wird von rechts nach links geschrieben.",
-    countries: ["🇵🇰 Pakistan", "🇮🇳 Indien"],
+    ,
+    alphabet: "ا آ ب پ ت ٹ ث ج چ ح خ د ڈ ذ ر ڑ ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن ں و ہ ء ی ے"countries: ["🇵🇰 Pakistan", "🇮🇳 Indien"],
     flags: "🇵🇰🇮🇳",
-    info: "Urdu ist die Amtssprache Pakistans und wird von ca. 230 Millionen Menschen gesprochen (inkl. Zweitsprachler). Gesprochen ist es fast identisch mit Hindi, verwendet aber die arabische Schrift und mehr persisch-arabische Lehnwörter.",
-    alphabet: "ا آ ب پ ت ٹ ث ج چ ح خ د ڈ ذ ر ڑ ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن ں و ہ ء ی ے"
+    info: "Urdu ist die Amtssprache Pakistans und wird von ca. 230 Millionen Menschen gesprochen (inkl. Zweitsprachler). Gesprochen ist es fast identisch mit Hindi, verwendet aber die arabische Schrift und mehr persisch-arabische Lehnwörter."
   },
   "Vietnamesisch": {
     translation: "Anh yêu em / Em yêu anh",
     transliteration: "",
     script: "Lateinisches Alphabet (Quốc Ngữ)",
     scriptInfo: "Vietnamesisch nutzt das lateinische Alphabet mit zahlreichen Diakritika für Töne und Vokalqualitäten: ă, â, đ, ê, ô, ơ, ư plus Tonzeichen (à, á, ả, ã, ạ). Es hat 29 Buchstaben.",
-    countries: ["🇻🇳 Vietnam"],
+    ,
+    alphabet: "A Ă Â B C D Đ E Ê G H I K L M N O Ô Ơ P Q R S T U Ư V X Y Z"countries: ["🇻🇳 Vietnam"],
     flags: "🇻🇳",
-    info: "Vietnamesisch ist eine Tonsprache mit sechs Tönen. Die lateinische Schrift (Quốc Ngữ) wurde im 17. Jahrhundert von portugiesischen Missionaren eingeführt und ersetzte die chinesischen Zeichen. Es hat ca. 85 Millionen Muttersprachler.",
-    alphabet: "A Ă Â B C D Đ E Ê G H I K L M N O Ô Ơ P Q R S T U Ư V X Y"
+    info: "Vietnamesisch ist eine Tonsprache mit sechs Tönen. Die lateinische Schrift (Quốc Ngữ) wurde im 17. Jahrhundert von portugiesischen Missionaren eingeführt und ersetzte die chinesischen Zeichen. Es hat ca. 85 Millionen Muttersprachler."
   },
   "Walisisch": {
     translation: "Rwy'n dy garu di",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Walisisch nutzt das lateinische Alphabet mit 29 Buchstaben, darunter 8 Digraphen: ch, dd, ff, ng, ll, ph, rh, th. Die Buchstaben k, q, v, x, z fehlen.",
-    countries: ["🇬🇧 Wales (Großbritannien)"],
+    ,
+    alphabet: "A B C Ch D Dd E F Ff G Ng H I J K L Ll M N Ng O P Ph Q R Rh S T Th U W Y"countries: ["🇬🇧 Wales (Großbritannien)"],
     flags: "🏴󠁧󠁢󠁷󠁬󠁳󠁿",
-    info: "Walisisch ist die lebendigste keltische Sprache mit ca. 880.000 Sprechern. Es hat Konsonantenmutationen am Wortanfang und das berühmte Dorf Llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch – der längste Ortsname Europas.",
-    alphabet: "A B C Ch D Dd E F Ff G Ng H I J K L Ll M N O P Ph Q R Rh S T Th U W Y"
+    info: "Walisisch ist die lebendigste keltische Sprache mit ca. 880.000 Sprechern. Es hat Konsonantenmutationen am Wortanfang und das berühmte Dorf Llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch – der längste Ortsname Europas."
   },
   "Zulu": {
     translation: "Ngiyakuthanda",
     transliteration: "",
     script: "Lateinisches Alphabet",
     scriptInfo: "Zulu nutzt das lateinische Alphabet mit 26 Buchstaben. Besondere Digraphen und Trigraphen repräsentieren die Klicklaute: c (dentaler Klick), q (alveolärer Klick), x (lateraler Klick).",
-    countries: ["🇿🇦 Südafrika"],
+    ,
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"countries: ["🇿🇦 Südafrika"],
     flags: "🇿🇦",
-    info: "Zulu ist die meistgesprochene Sprache Südafrikas mit ca. 12 Millionen Muttersprachlern. Es gehört zu den Bantusprachen und ist berühmt für seine drei Klicklaute, die aus den Khoisan-Sprachen übernommen wurden.",
-    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+    info: "Zulu ist die meistgesprochene Sprache Südafrikas mit ca. 12 Millionen Muttersprachlern. Es gehört zu den Bantusprachen und ist berühmt für seine drei Klicklaute, die aus den Khoisan-Sprachen übernommen wurden."
   }
 };
 
 // ===== STATE =====
 let entries = [];
 let pendingImage = null; // base64 data URL for the form
+let editingIndex = null; // For edit mode
+
+// ===== SAVE TO FIREBASE =====
+function saveToFirebase() {
+  entriesRef.set(entries);
+}
 
 // ===== INIT =====
 function init() {
-  // Load from localStorage
-  const saved = localStorage.getItem('iloveyou_entries');
-  if (saved) {
-    try { entries = JSON.parse(saved); } catch(e) { entries = []; }
-  }
-
   // Set today's date
   document.getElementById('inputDate').value = new Date().toISOString().split('T')[0];
 
   // Populate language dropdown
   const select = document.getElementById('inputLanguage');
-  const usedLanguages = new Set(entries.map(e => e.language));
 
   Object.keys(LANGUAGES).sort().forEach(lang => {
     const opt = document.createElement('option');
     opt.value = lang;
-    opt.textContent = usedLanguages.has(lang) ? `${lang} ✓` : lang;
-    if (usedLanguages.has(lang)) opt.style.color = '#999';
+    opt.textContent = lang;
     select.appendChild(opt);
   });
 
-  renderEntries();
+  // Listen to Firebase for real-time updates
+  entriesRef.on('value', (snapshot) => {
+    const data = snapshot.val();
+    entries = data ? Object.values(data) : [];
+    // Update dropdown markers
+    const usedLanguages = new Set(entries.map(e => e.language));
+    Array.from(select.options).forEach(opt => {
+      if (opt.value) {
+        opt.textContent = usedLanguages.has(opt.value) ? `${opt.value} ✓` : opt.value;
+        opt.style.color = usedLanguages.has(opt.value) ? '#999' : '';
+      }
+    });
+    renderEntries();
+  });
 }
 
 function resizeImage(dataUrl, maxWidth, maxHeight) {
@@ -1609,7 +1646,7 @@ function uploadCardImage(event, index) {
   reader.onload = async (e) => {
     const resized = await resizeImage(e.target.result, 800, 600);
     entries[index].image = resized;
-    localStorage.setItem('iloveyou_entries', JSON.stringify(entries));
+    saveToFirebase();
     renderEntries();
   };
   reader.readAsDataURL(file);
@@ -1617,7 +1654,7 @@ function uploadCardImage(event, index) {
 
 function removeCardImage(index) {
   delete entries[index].image;
-  localStorage.setItem('iloveyou_entries', JSON.stringify(entries));
+  saveToFirebase();
   renderEntries();
 }
 
@@ -1634,7 +1671,6 @@ function setMode(mode) {
 }
 
 function toggleForm() {
-  editingIndex = null;
   const form = document.getElementById('formCard');
   form.classList.toggle('visible');
   if (form.classList.contains('visible')) {
@@ -1643,8 +1679,9 @@ function toggleForm() {
     document.getElementById('previewBox').classList.remove('visible');
     resetFormImage();
     setMode('db');
+    editingIndex = null;
     // Clear manual fields
-    ['manualLanguage','manualTranslation','manualTranslit','manualScript','manualScriptInfo','manualCountries','manualInfo'].forEach(id => {
+    ['manualLanguage','manualTranslation','manualTranslit','manualScript','manualScriptInfo','manualAlphabet','manualCountries','manualInfo'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
@@ -1720,6 +1757,7 @@ function saveEntry() {
       transliteration: document.getElementById('manualTranslit').value.trim() || '',
       script: document.getElementById('manualScript').value.trim() || 'Nicht angegeben',
       scriptInfo: document.getElementById('manualScriptInfo').value.trim() || '',
+      alphabet: document.getElementById('manualAlphabet').value.trim() || '',
       countries,
       flags,
       info: document.getElementById('manualInfo').value.trim() || '',
@@ -1728,6 +1766,7 @@ function saveEntry() {
   }
 
   if (pendingImage) newEntry.image = pendingImage;
+
   if (editingIndex !== null) {
     entries[editingIndex] = newEntry;
     editingIndex = null;
@@ -1735,7 +1774,7 @@ function saveEntry() {
     entries.push(newEntry);
   }
 
-  localStorage.setItem('iloveyou_entries', JSON.stringify(entries));
+  saveToFirebase();
   toggleForm();
   renderEntries();
 
@@ -1754,24 +1793,20 @@ function saveEntry() {
 function deleteEntry(index) {
   if (confirm('Eintrag wirklich löschen?')) {
     entries.splice(index, 1);
-    localStorage.setItem('iloveyou_entries', JSON.stringify(entries));
+    saveToFirebase();
     renderEntries();
   }
 }
-
-let editingIndex = null;
 
 function editEntry(index) {
   const entry = entries[index];
   if (!entry) return;
   editingIndex = index;
-  
-  // Open form and set to manual mode
+
   const form = document.getElementById('formCard');
   if (!form.classList.contains('visible')) form.classList.add('visible');
   setMode('manual');
-  
-  // Fill in all fields
+
   document.getElementById('inputDate').value = entry.date || '';
   document.getElementById('manualLanguage').value = entry.language || '';
   document.getElementById('manualTranslation').value = entry.translation || '';
@@ -1781,8 +1816,7 @@ function editEntry(index) {
   document.getElementById('manualAlphabet').value = entry.alphabet || '';
   document.getElementById('manualCountries').value = (entry.countries || []).join(', ');
   document.getElementById('manualInfo').value = entry.info || '';
-  
-  // Handle image
+
   resetFormImage();
   if (entry.image) {
     pendingImage = entry.image;
@@ -1796,8 +1830,7 @@ function editEntry(index) {
     removeBtn.style.display = 'flex';
     area.classList.add('has-image');
   }
-  
-  // Scroll to form
+
   document.querySelector('.add-section').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -1861,7 +1894,7 @@ function renderEntries() {
   empty.style.display = 'none';
   filterBar.style.display = entries.length > 3 ? 'flex' : 'none';
 
-  // Sort by date descending
+  // Sort by date ascending (oldest first)
   const sorted = entries
     .map((e, i) => ({...e, originalIndex: i}))
     .filter(e => !search || e.language.toLowerCase().includes(search))
@@ -1918,14 +1951,14 @@ function renderEntries() {
             </div>
           </div>
           ${entry.alphabet ? `
-<div class="card-info-row">
-  <div class="info-icon">🔡</div>
-  <div class="info-content">
-    <div class="info-label">Alphabet</div>
-    <div class="info-value alphabet-display">${entry.alphabet}</div>
-  </div>
-</div>` : ''}
-${entry.transliteration ? `
+          <div class="card-info-row">
+            <div class="info-icon">🔡</div>
+            <div class="info-content">
+              <div class="info-label">Alphabet</div>
+              <div class="info-value alphabet-display">${entry.alphabet}</div>
+            </div>
+          </div>` : ''}
+          ${entry.transliteration ? `
           <div class="card-info-row">
             <div class="info-icon">🔤</div>
             <div class="info-content">
