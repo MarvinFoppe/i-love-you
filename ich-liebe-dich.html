@@ -1,0 +1,1964 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheyennes „Ich liebe Dich"-Album</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --rose: #e63946;
+    --rose-light: #fce4ec;
+    --rose-dark: #b71c1c;
+    --gold: #d4a574;
+    --cream: #fdf8f4;
+    --dark: #2d2d2d;
+    --mid: #666;
+    --light-border: #e8ddd4;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--cream);
+    color: var(--dark);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    text-align: center;
+    padding: 50px 20px 30px;
+    background: linear-gradient(135deg, #fff5f5 0%, #fdf8f4 50%, #fff0f0 100%);
+    border-bottom: 1px solid var(--light-border);
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8em;
+    color: var(--rose);
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+  header h1 .heart {
+    display: inline-block;
+    animation: pulse 1.5s ease-in-out infinite;
+    font-style: normal;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+  }
+  header p {
+    font-size: 1.1em;
+    color: var(--mid);
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+  }
+  .counter {
+    margin-top: 15px;
+    font-size: 0.95em;
+    color: var(--gold);
+    font-weight: 500;
+  }
+  .counter strong { font-size: 1.6em; color: var(--rose); vertical-align: middle; }
+
+  /* FORM SECTION */
+  .add-section {
+    max-width: 700px;
+    margin: 30px auto;
+    padding: 0 20px;
+  }
+  .add-toggle {
+    display: flex;
+    justify-content: center;
+  }
+  .add-toggle button {
+    background: var(--rose);
+    color: #fff;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-size: 1em;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(230,57,70,0.3);
+  }
+  .add-toggle button:hover {
+    background: var(--rose-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(230,57,70,0.4);
+  }
+
+  .form-card {
+    display: none;
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px;
+    margin-top: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    border: 1px solid var(--light-border);
+  }
+  .form-card.visible { display: block; animation: fadeIn 0.3s ease; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+  .form-group {
+    flex: 1;
+    min-width: 200px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 0.85em;
+    font-weight: 500;
+    color: var(--mid);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .form-group input, .form-group select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--light-border);
+    border-radius: 10px;
+    font-size: 1em;
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.2s;
+    background: #fff;
+  }
+  .form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: var(--rose);
+  }
+
+  .preview-box {
+    display: none;
+    background: var(--rose-light);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 15px;
+    text-align: center;
+  }
+  .preview-box.visible { display: block; animation: fadeIn 0.3s ease; }
+  .preview-translation {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8em;
+    color: var(--rose);
+    margin-bottom: 5px;
+  }
+  .preview-translit {
+    font-size: 0.95em;
+    color: var(--mid);
+    font-style: italic;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: flex-end;
+  }
+  .btn-save {
+    background: var(--rose);
+    color: #fff;
+    border: none;
+    padding: 10px 28px;
+    border-radius: 50px;
+    font-size: 0.95em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-save:hover { background: var(--rose-dark); }
+  .btn-cancel {
+    background: transparent;
+    color: var(--mid);
+    border: 1.5px solid var(--light-border);
+    padding: 10px 28px;
+    border-radius: 50px;
+    font-size: 0.95em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-cancel:hover { border-color: var(--mid); }
+
+  /* ENTRIES GRID */
+  .entries-section {
+    max-width: 1100px;
+    margin: 20px auto 60px;
+    padding: 0 20px;
+  }
+  .entries-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+
+  .entry-card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+    border: 1px solid var(--light-border);
+    transition: all 0.3s;
+    animation: fadeIn 0.4s ease;
+    position: relative;
+  }
+  .entry-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+  }
+  .entry-card .card-header {
+    background: linear-gradient(135deg, var(--rose), #c62828);
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+  }
+  .card-day-number {
+    position: absolute;
+    top: 10px;
+    left: 15px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8em;
+    font-weight: 600;
+  }
+  .card-date {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    font-size: 0.75em;
+    opacity: 0.85;
+  }
+  .card-translation {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7em;
+    margin-top: 5px;
+    line-height: 1.3;
+    word-break: break-word;
+  }
+  .card-translit {
+    font-size: 0.85em;
+    margin-top: 6px;
+    opacity: 0.85;
+    font-style: italic;
+  }
+  .card-language {
+    font-size: 0.9em;
+    margin-top: 8px;
+    font-weight: 500;
+    opacity: 0.9;
+  }
+
+  .card-body {
+    padding: 18px 20px;
+  }
+  .card-info-row {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    gap: 10px;
+  }
+  .card-info-row:last-child { margin-bottom: 0; }
+  .info-icon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    background: var(--rose-light);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85em;
+  }
+  .info-content {
+    flex: 1;
+  }
+  .info-label {
+    font-size: 0.7em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--mid);
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .info-value {
+    font-size: 0.88em;
+    color: var(--dark);
+    line-height: 1.4;
+  }
+  .flags {
+    font-size: 1.3em;
+    letter-spacing: 3px;
+  }
+
+  .card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 0 16px 12px;
+  }
+  .edit-btn {
+    background: none;
+    border: none;
+    color: #bbb;
+    cursor: pointer;
+    font-size: 0.8em;
+    padding: 4px 10px;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+  .edit-btn:hover { color: var(--gold); background: #fef7f0; }
+  .delete-btn {
+    background: none;
+    border: none;
+    color: #ccc;
+    cursor: pointer;
+    font-size: 0.8em;
+    padding: 4px 10px;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+  .delete-btn:hover { color: var(--rose); background: var(--rose-light); }
+
+  /* SPEAK BUTTON */
+  .speak-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    border: 1.5px solid rgba(255,255,255,0.4);
+    padding: 7px 16px;
+    border-radius: 50px;
+    font-size: 0.85em;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.25s;
+    backdrop-filter: blur(4px);
+  }
+  .speak-btn:hover {
+    background: rgba(255,255,255,0.35);
+    border-color: rgba(255,255,255,0.7);
+    transform: scale(1.05);
+  }
+  .speak-btn.speaking {
+    background: rgba(255,255,255,0.45);
+    border-color: #fff;
+    animation: speakPulse 1s ease-in-out infinite;
+  }
+  @keyframes speakPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
+  }
+  .speak-icon {
+    font-size: 1.1em;
+    line-height: 1;
+  }
+  .speak-waves {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    height: 14px;
+  }
+  .speak-waves span {
+    display: inline-block;
+    width: 3px;
+    height: 4px;
+    background: #fff;
+    border-radius: 2px;
+    animation: wave 0.8s ease-in-out infinite;
+  }
+  .speak-waves span:nth-child(2) { animation-delay: 0.1s; }
+  .speak-waves span:nth-child(3) { animation-delay: 0.2s; }
+  .speak-waves span:nth-child(4) { animation-delay: 0.3s; }
+  @keyframes wave {
+    0%, 100% { height: 4px; }
+    50% { height: 14px; }
+  }
+
+  /* IMAGE UPLOAD */
+  .image-upload-area {
+    margin-top: 15px;
+    border: 2px dashed var(--light-border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .image-upload-area:hover {
+    border-color: var(--rose);
+    background: var(--rose-light);
+  }
+  .image-upload-area.has-image {
+    border-style: solid;
+    border-color: var(--gold);
+    padding: 0;
+  }
+  .image-upload-area input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .upload-placeholder {
+    color: var(--mid);
+    font-size: 0.9em;
+  }
+  .upload-placeholder .upload-icon { font-size: 1.8em; margin-bottom: 6px; }
+  .upload-placeholder p { margin: 0; }
+  .upload-preview-img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    display: block;
+  }
+  .upload-remove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 0.8em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    z-index: 2;
+  }
+  .upload-remove:hover { background: var(--rose); }
+
+  /* CARD IMAGE */
+  .card-image-container {
+    position: relative;
+    width: 100%;
+    max-height: 220px;
+    overflow: hidden;
+  }
+  .card-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+  }
+  .card-image-upload {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px;
+    background: #f9f5f2;
+    border-top: 1px solid var(--light-border);
+    color: var(--mid);
+    font-size: 0.8em;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card-image-upload:hover {
+    background: var(--rose-light);
+    color: var(--rose);
+  }
+  .card-image-upload input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .card-image-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.4));
+  }
+  .card-img-remove {
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.75em;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .card-img-remove:hover { background: var(--rose); }
+
+  /* MODE TOGGLE */
+  .mode-toggle {
+    display: flex;
+    background: #f3ede8;
+    border-radius: 10px;
+    padding: 3px;
+    margin-bottom: 18px;
+  }
+  .mode-toggle button {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85em;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    background: transparent;
+    color: var(--mid);
+    transition: all 0.25s;
+  }
+  .mode-toggle button.active {
+    background: #fff;
+    color: var(--rose);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  /* MANUAL FIELDS */
+  .manual-fields {
+    display: none;
+  }
+  .manual-fields.visible { display: block; }
+  .manual-fields .form-group { margin-bottom: 12px; }
+  .manual-fields textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--light-border);
+    border-radius: 10px;
+    font-size: 0.95em;
+    font-family: 'Inter', sans-serif;
+    resize: vertical;
+    min-height: 60px;
+    transition: border-color 0.2s;
+  }
+  .manual-fields textarea:focus { outline: none; border-color: var(--rose); }
+  .manual-hint {
+    font-size: 0.75em;
+    color: #aaa;
+    margin-top: 3px;
+  }
+
+  /* ALPHABET DISPLAY */
+  .alphabet-display {
+    font-size: 1.05em;
+    letter-spacing: 2px;
+    line-height: 1.8;
+    word-break: break-all;
+    font-family: 'Playfair Display', serif;
+    color: var(--rose-dark);
+    background: var(--rose-light);
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-top: 4px;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--mid);
+  }
+  .empty-state .empty-heart { font-size: 3em; margin-bottom: 15px; opacity: 0.3; }
+  .empty-state p { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.1em; }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    header h1 { font-size: 2em; }
+    .entries-grid { grid-template-columns: 1fr; }
+    .card-translation { font-size: 1.4em; }
+  }
+
+  /* SEARCH / FILTER */
+  .filter-bar {
+    max-width: 1100px;
+    margin: 0 auto 20px;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .filter-bar input {
+    padding: 8px 16px;
+    border: 1.5px solid var(--light-border);
+    border-radius: 50px;
+    font-size: 0.9em;
+    font-family: 'Inter', sans-serif;
+    width: 250px;
+    transition: border-color 0.2s;
+  }
+  .filter-bar input:focus { outline: none; border-color: var(--rose); }
+  .sort-label {
+    font-size: 0.85em;
+    color: var(--mid);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span class="heart">❤</span> Cheyennes „Ich liebe Dich"-Album</h1>
+  <p>In allen Sprachen der Welt</p>
+  <div class="counter">
+    <strong id="entryCount">0</strong> Sprachen gesammelt
+  </div>
+</header>
+
+<div class="add-section">
+  <div class="add-toggle">
+    <button onclick="toggleForm()">+ Neue Sprache eintragen</button>
+  </div>
+  <div class="form-card" id="formCard">
+    <div class="mode-toggle">
+      <button class="active" id="modeDb" onclick="setMode('db')">Aus Datenbank</button>
+      <button id="modeManual" onclick="setMode('manual')">Händisch eintragen</button>
+    </div>
+
+    <!-- DATE (always visible) -->
+    <div class="form-row">
+      <div class="form-group">
+        <label>Datum</label>
+        <input type="date" id="inputDate">
+      </div>
+
+      <!-- DB mode: dropdown -->
+      <div class="form-group" id="dbLanguageGroup">
+        <label>Sprache auswählen</label>
+        <select id="inputLanguage" onchange="onLanguageSelect()">
+          <option value="">– Sprache wählen –</option>
+        </select>
+      </div>
+
+      <!-- Manual mode: text input for language name -->
+      <div class="form-group" id="manualLanguageGroup" style="display:none;">
+        <label>Sprache (Name)</label>
+        <input type="text" id="manualLanguage" placeholder="z.B. Swahili, Wolof, Quechua...">
+      </div>
+    </div>
+
+    <!-- DB preview -->
+    <div class="preview-box" id="previewBox">
+      <div class="preview-translation" id="previewText"></div>
+      <div class="preview-translit" id="previewTranslit"></div>
+    </div>
+
+    <!-- MANUAL FIELDS -->
+    <div class="manual-fields" id="manualFields">
+      <div class="form-group">
+        <label>„Ich liebe dich" in dieser Sprache</label>
+        <input type="text" id="manualTranslation" placeholder="z.B. Nakupenda">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Lateinische Umschrift</label>
+          <input type="text" id="manualTranslit" placeholder="Falls nötig (leer lassen wenn schon lateinisch)">
+        </div>
+        <div class="form-group">
+          <label>Schriftsystem</label>
+          <input type="text" id="manualScript" placeholder="z.B. Lateinisches Alphabet, Kyrillisch...">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Infos zum Schriftsystem</label>
+        <textarea id="manualScriptInfo" placeholder="z.B. Anzahl Buchstaben, Besonderheiten, Schreibrichtung..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Länder (mit Flaggen-Emoji)</label>
+        <input type="text" id="manualCountries" placeholder="z.B. 🇹🇿 Tansania, 🇰🇪 Kenia">
+        <div class="manual-hint">Kommagetrennt. Tipp: Flaggen-Emojis aus dem Emoji-Menü kopieren</div>
+      </div>
+      <div class="form-group">
+        <label>Alphabet / Zeichensatz</label>
+        <textarea id="manualAlphabet" placeholder="Buchstaben durch Leerzeichen getrennt, z.B. A B C D E F ..."></textarea>
+        <div class="manual-hint">Alle Buchstaben des Alphabets, durch Leerzeichen getrennt</div>
+      </div>
+      
+      <div class="form-group">
+        <label>Über die Sprache</label>
+        <textarea id="manualInfo" placeholder="Interessante Fakten: Sprecherzahl, Sprachfamilie, Geschichte, Besonderheiten..."></textarea>
+      </div>
+    </div>
+
+    <!-- IMAGE UPLOAD (always visible) -->
+    <div class="image-upload-area" id="imageUploadArea" onclick="document.getElementById('inputImage').click()">
+      <input type="file" id="inputImage" accept="image/*" onchange="onImageSelected(event)">
+      <div class="upload-placeholder" id="uploadPlaceholder">
+        <div class="upload-icon">📷</div>
+        <p><strong>Bild hochladen</strong> (optional)</p>
+        <p style="font-size:0.8em; margin-top:4px; opacity:0.7;">z.B. ein Foto, Handschrift, oder ein Bild passend zur Sprache</p>
+      </div>
+      <img class="upload-preview-img" id="uploadPreview" style="display:none;">
+      <button class="upload-remove" id="uploadRemove" onclick="removeFormImage(event)" style="display:none;" title="Bild entfernen">✕</button>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="toggleForm()">Abbrechen</button>
+      <button class="btn-save" onclick="saveEntry()">Eintragen ❤</button>
+    </div>
+  </div>
+</div>
+
+<div class="filter-bar" id="filterBar" style="display:none;">
+  <input type="text" id="searchInput" placeholder="Suche nach Sprache..." oninput="renderEntries()">
+  <span class="sort-label">Sortiert nach Datum (älteste zuerst)</span>
+</div>
+
+<div class="entries-section">
+  <div class="entries-grid" id="entriesGrid"></div>
+  <div class="empty-state" id="emptyState">
+    <div class="empty-heart">💕</div>
+    <p>Noch keine Sprachen eingetragen.<br>Starte deine Sammlung mit dem Button oben!</p>
+  </div>
+</div>
+
+<script>
+// ===== SPEECH LANGUAGE CODES =====
+const SPEECH_CODES = {
+  "Afrikaans": "af", "Albanisch": "sq", "Amharisch": "am", "Arabisch": "ar",
+  "Armenisch": "hy", "Aserbaidschanisch": "az", "Baskisch": "eu", "Bengali": "bn",
+  "Bosnisch": "bs", "Bulgarisch": "bg", "Chinesisch (Mandarin)": "zh-CN",
+  "Dänisch": "da", "Deutsch": "de", "Englisch": "en", "Esperanto": "eo",
+  "Estnisch": "et", "Filipino / Tagalog": "fil", "Finnisch": "fi",
+  "Französisch": "fr", "Georgisch": "ka", "Griechisch": "el", "Gujarati": "gu",
+  "Hawaiianisch": "haw", "Hebräisch": "he", "Hindi": "hi", "Indonesisch": "id",
+  "Irisch (Gaeilge)": "ga", "Isländisch": "is", "Italienisch": "it",
+  "Japanisch": "ja", "Kannada": "kn", "Katalanisch": "ca", "Khmer": "km",
+  "Koreanisch": "ko", "Kroatisch": "hr", "Kurdisch (Kurmandschi)": "ku",
+  "Lateinisch": "la", "Lettisch": "lv", "Litauisch": "lt",
+  "Luxemburgisch": "lb", "Malaiisch": "ms", "Malayalam": "ml",
+  "Maltesisch": "mt", "Maori": "mi", "Mongolisch": "mn", "Nepalesisch": "ne",
+  "Niederländisch": "nl", "Norwegisch": "no", "Persisch (Farsi)": "fa",
+  "Polnisch": "pl", "Portugiesisch": "pt", "Punjabi": "pa",
+  "Rumänisch": "ro", "Russisch": "ru", "Samoanisch": "sm",
+  "Schwedisch": "sv", "Serbisch": "sr", "Singhalesisch": "si",
+  "Slowakisch": "sk", "Slowenisch": "sl", "Spanisch": "es",
+  "Suaheli": "sw", "Tamil": "ta", "Telugu": "te", "Thailändisch": "th",
+  "Tibetisch": "bo", "Tschechisch": "cs", "Türkisch": "tr",
+  "Ukrainisch": "uk", "Ungarisch": "hu", "Urdu": "ur",
+  "Vietnamesisch": "vi", "Walisisch": "cy", "Zulu": "zu"
+};
+
+// ===== LANGUAGE DATABASE =====
+const LANGUAGES = {
+  "Afrikaans": {
+    translation: "Ek het jou lief",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Verwendet das lateinische Alphabet mit 26 Buchstaben, basierend auf dem Niederländischen.",
+    countries: ["🇿🇦 Südafrika", "🇳🇦 Namibia"],
+    flags: "🇿🇦🇳🇦",
+    info: "Afrikaans entstand im 17. Jahrhundert aus dem Niederländischen der Kapkolonie. Es ist eine der jüngsten Sprachen der Welt und wird von etwa 7 Millionen Muttersprachlern gesprochen.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+  },
+  "Albanisch": {
+    translation: "Të dua",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Nutzt das lateinische Alphabet mit 36 Buchstaben, darunter Sonderzeichen wie ë, ç und Digraphen wie dh, gj, ll, nj, rr, sh, th, xh, zh.",
+    countries: ["🇦🇱 Albanien", "🇽🇰 Kosovo", "🇲🇰 Nordmazedonien"],
+    flags: "🇦🇱🇽🇰🇲🇰",
+    info: "Albanisch ist eine eigenständige Sprachfamilie innerhalb der indoeuropäischen Sprachen. Es wird von ca. 7,5 Millionen Menschen gesprochen und hat zwei Hauptdialekte: Gegisch und Toskisch.",
+    alphabet: "A B C Ç D DH E Ë F G GJ H I J K L LL M N NJ O P Q R RR S SH T TH U V X XH Y Z ZH"
+  },
+  "Amharisch": {
+    translation: "እወድሃለሁ / እወድሻለሁ",
+    transliteration: "Ēwedihālehu / Ēwedishālehu",
+    script: "Ge'ez-Schrift (Äthiopisches Alphabet)",
+    scriptInfo: "Die Ge'ez-Schrift ist eine Abugida mit über 200 Zeichen. Jedes Zeichen repräsentiert eine Konsonant-Vokal-Kombination. Sie wird von links nach rechts geschrieben.",
+    countries: ["🇪🇹 Äthiopien"],
+    flags: "🇪🇹",
+    info: "Amharisch ist die offizielle Arbeitssprache Äthiopiens und gehört zu den semitischen Sprachen. Mit über 30 Millionen Muttersprachlern ist es nach Arabisch die am meisten gesprochene semitische Sprache.",
+    alphabet: "ሀ ሁ ሂ ሃ ሄ ህ ሆ ለ ሉ ሊ ላ ሌ ል ሎ ሏ ሐ ሒ ሓ ሔ ሕ ሖ ሗ መ ሙ ሚ ማ ሜ ም ሞ ሟ"
+  },
+  "Arabisch": {
+    translation: "أحبك",
+    transliteration: "Uhibbuka / Uhibbuki",
+    script: "Arabisches Alphabet",
+    scriptInfo: "Das arabische Alphabet besteht aus 28 Buchstaben und wird von rechts nach links geschrieben. Es ist eine Konsonantenschrift (Abdschad), Vokale werden meist nicht geschrieben.",
+    countries: ["🇸🇦 Saudi-Arabien", "🇪🇬 Ägypten", "🇲🇦 Marokko", "🇮🇶 Irak", "🇯🇴 Jordanien", "🇱🇧 Libanon", "🇦🇪 VAE", "🇹🇳 Tunesien"],
+    flags: "🇸🇦🇪🇬🇲🇦🇮🇶🇯🇴🇱🇧🇦🇪🇹🇳",
+    info: "Arabisch ist die Muttersprache von über 300 Millionen Menschen und Liturgiesprache des Islam. Es gibt zahlreiche Dialekte, die sich stark unterscheiden können. Modernes Standardarabisch dient als überregionale Schriftsprache.",
+    alphabet: "ا ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ي"
+  },
+  "Armenisch": {
+    translation: "Ես սիրում եմ քdelays",
+    transliteration: "Yes sirum em kez",
+    script: "Armenisches Alphabet",
+    scriptInfo: "Das armenische Alphabet wurde 405 n. Chr. von Mesrop Maschtoz erfunden. Es umfasst 38 (ursprünglich 36) Buchstaben und ist ein einzigartiges Schriftsystem.",
+    countries: ["🇦🇲 Armenien"],
+    flags: "🇦🇲",
+    info: "Armenisch ist eine eigenständige Sprachfamilie innerhalb der indoeuropäischen Sprachen. Es wird von etwa 6 Millionen Menschen gesprochen und hat eine reiche literarische Tradition seit dem 5. Jahrhundert.",
+    alphabet: "Ա Բ Գ Դ Ե Զ Է Ը Թ Ժ Ի Լ Խ Ծ Կ Հ Ձ Ղ Ճ Մ Յ Ն Շ Ո Չ Պ Ջ Ռ Ս Վ Տ Ր Ց Ւ Փ Ք Օ Ֆ"
+  },
+  "Aserbaidschanisch": {
+    translation: "Səni sevirəm",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Verwendet das lateinische Alphabet mit speziellen Zeichen wie ə, ğ, ı, ö, ş, ü. Bis 1991 wurde die kyrillische Schrift verwendet.",
+    countries: ["🇦🇿 Aserbaidschan", "🇮🇷 Iran (Südaserbaidschan)"],
+    flags: "🇦🇿🇮🇷",
+    info: "Aserbaidschanisch ist eine Turksprache mit etwa 25 Millionen Sprechern. Im Iran wird es meist in arabischer Schrift geschrieben, in Aserbaidschan seit 1991 in lateinischer Schrift.",
+    alphabet: "A B C Ç D E Ə F G Ğ H I İ J K Q L M N O Ö P R S Ş T U Ü V X Y Z"
+  },
+  "Baskisch": {
+    translation: "Maite zaitut",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Nutzt das lateinische Alphabet. Baskisch verwendet keine Buchstaben wie c, q, v, w, y (außer in Fremdwörtern) und hat den Digraphen tx, ts, tz.",
+    countries: ["🇪🇸 Spanien (Baskenland)", "🇫🇷 Frankreich (Baskenland)"],
+    flags: "🇪🇸🇫🇷",
+    info: "Baskisch (Euskara) ist eine Sprachisolat – es ist mit keiner anderen bekannten Sprache verwandt. Es wird von ca. 750.000 Menschen im Baskenland gesprochen und ist eine der ältesten noch lebenden Sprachen Europas.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V X Y Z"
+  },
+  "Bengali": {
+    translation: "আমি তোমাকে ভালোবাসি",
+    transliteration: "Āmi tomāke bhālobāsi",
+    script: "Bengalische Schrift",
+    scriptInfo: "Die bengalische Schrift ist eine Abugida mit 11 Vokal- und 39 Konsonantenzeichen. Sie stammt von der Brahmi-Schrift ab und wird von links nach rechts geschrieben.",
+    countries: ["🇧🇩 Bangladesch", "🇮🇳 Indien (Westbengalen)"],
+    flags: "🇧🇩🇮🇳",
+    info: "Bengali wird von über 230 Millionen Muttersprachlern gesprochen und ist damit die siebtmeistgesprochene Sprache der Welt. Die bengalische Nationalhymne ist auch die Nationalhymne Indiens.",
+    alphabet: "অ আ ই ঈ উ ঊ ঋ ঌ এ ঐ ও ঔ ক খ গ ঘ ঙ চ ছ জ ঝ ঞ ট ঠ ড ঢ ণ ত থ দ ধ ন প ফ ব ভ ম য র ল শ ষ স হ"
+  },
+  "Bosnisch": {
+    translation: "Volim te",
+    transliteration: "",
+    script: "Lateinisches Alphabet (auch Kyrillisch)",
+    scriptInfo: "Bosnisch verwendet sowohl das lateinische als auch das kyrillische Alphabet. Im Alltag dominiert die lateinische Schrift mit Sonderzeichen wie č, ć, đ, š, ž.",
+    countries: ["🇧🇦 Bosnien und Herzegowina"],
+    flags: "🇧🇦",
+    info: "Bosnisch ist eine südslawische Sprache und ist mit Kroatisch, Serbisch und Montenegrinisch weitgehend gegenseitig verständlich. Es hat etwa 2,5 Millionen Muttersprachler.",
+    alphabet: "A B C Č D Đ E F G H I J K L M N O P Q R S Š T U V W X Y Z Ž"
+  },
+  "Bulgarisch": {
+    translation: "Обичам те",
+    transliteration: "Obicham te",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Das bulgarische kyrillische Alphabet hat 30 Buchstaben. Bulgarien ist der Ursprungsort der kyrillischen Schrift, die im 9. Jahrhundert von Schülern von Kyrill und Method entwickelt wurde.",
+    countries: ["🇧🇬 Bulgarien"],
+    flags: "🇧🇬",
+    info: "Bulgarisch ist die älteste dokumentierte slawische Sprache. Es hat als einzige slawische Sprache den bestimmten Artikel, der an das Wort angehängt wird, und hat die Kasusflexion fast vollständig verloren.",
+    alphabet: "А Б В Г Д Е Ё Ж З И Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я"
+  },
+  "Chinesisch (Mandarin)": {
+    translation: "我爱你",
+    transliteration: "Wǒ ài nǐ",
+    script: "Chinesische Schriftzeichen (Hanzi)",
+    scriptInfo: "Chinesisch nutzt logographische Schriftzeichen. Es gibt über 50.000 Zeichen, wobei man ca. 3.000 für den Alltag benötigt. Vereinfachte Zeichen werden in Festlandchina verwendet, traditionelle in Taiwan und Hongkong.",
+    countries: ["🇨🇳 China", "🇹🇼 Taiwan", "🇸🇬 Singapur", "🇲🇾 Malaysia"],
+    flags: "🇨🇳🇹🇼🇸🇬🇲🇾",
+    info: "Mandarin-Chinesisch ist mit über 900 Millionen Muttersprachlern die meistgesprochene Sprache der Welt. Es ist eine Tonsprache mit vier Tönen, die die Bedeutung eines Wortes verändern.",
+    alphabet: "(Logographische Schrift – Grundstriche: 一 丨 丿 丶 乛)"
+  },
+  "Dänisch": {
+    translation: "Jeg elsker dig",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Dänisch verwendet das lateinische Alphabet mit den zusätzlichen Buchstaben æ, ø und å. Das Alphabet hat insgesamt 29 Buchstaben.",
+    countries: ["🇩🇰 Dänemark", "🇬🇱 Grönland", "🇫🇴 Färöer"],
+    flags: "🇩🇰🇬🇱🇫🇴",
+    info: "Dänisch wird von etwa 6 Millionen Menschen gesprochen. Es ist bekannt für seine schwierige Aussprache – viele Konsonanten werden weich oder gar nicht ausgesprochen, was es selbst für andere Skandinavier schwer verständlich macht.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Æ Ø Å"
+  },
+  "Deutsch": {
+    translation: "Ich liebe dich",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Deutsch nutzt das lateinische Alphabet mit 26 Grundbuchstaben plus die Umlaute ä, ö, ü und das Eszett ß. Substantive werden großgeschrieben.",
+    countries: ["🇩🇪 Deutschland", "🇦🇹 Österreich", "🇨🇭 Schweiz", "🇱🇮 Liechtenstein", "🇱🇺 Luxemburg"],
+    flags: "🇩🇪🇦🇹🇨🇭🇱🇮🇱🇺",
+    info: "Deutsch ist die meistgesprochene Muttersprache in der EU mit rund 100 Millionen Sprechern. Es ist bekannt für seine langen zusammengesetzten Wörter und sein Kasussystem mit vier Fällen.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Ä Ö Ü ß"
+  },
+  "Englisch": {
+    translation: "I love you",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Englisch nutzt das lateinische Alphabet mit 26 Buchstaben ohne Sonderzeichen oder Akzente (außer in Lehnwörtern).",
+    countries: ["🇬🇧 Großbritannien", "🇺🇸 USA", "🇦🇺 Australien", "🇨🇦 Kanada", "🇮🇪 Irland", "🇳🇿 Neuseeland"],
+    flags: "🇬🇧🇺🇸🇦🇺🇨🇦🇮🇪🇳🇿",
+    info: "Englisch ist die meistgesprochene Sprache der Welt (Muttersprachler + Zweitsprachler: ca. 1,5 Milliarden). Es ist die globale Lingua franca in Wissenschaft, Wirtschaft und Technologie.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+  },
+  "Esperanto": {
+    translation: "Mi amas vin",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Esperanto nutzt das lateinische Alphabet mit 28 Buchstaben, darunter Sonderzeichen mit Zirkumflex: ĉ, ĝ, ĥ, ĵ, ŝ und ŭ mit Breve.",
+    countries: [],
+    flags: "🌍",
+    info: "Esperanto wurde 1887 von L.L. Zamenhof als internationale Plansprache erschaffen. Es wird von schätzungsweise 100.000–2 Millionen Menschen weltweit gesprochen. Die Grammatik ist völlig regelmäßig mit 16 Grundregeln ohne Ausnahmen.",
+    alphabet: "A B C Ĉ D E F G Ĝ H Ĥ I J Ĵ K L M N O P R S Ŝ T U Ŭ V Z"
+  },
+  "Estnisch": {
+    translation: "Ma armastan sind",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Estnisch verwendet das lateinische Alphabet mit den Zusatzbuchstaben ä, ö, ü, õ und š, ž. Es hat 27 Buchstaben.",
+    countries: ["🇪🇪 Estland"],
+    flags: "🇪🇪",
+    info: "Estnisch gehört zur finno-ugrischen Sprachfamilie und ist eng mit Finnisch verwandt. Es hat 14 Kasus und keine grammatischen Geschlechter. Die Sprache hat ca. 1,1 Millionen Sprecher.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S Š T U V W X Y Z Ž Õ Ä Ö Ü"
+  },
+  "Filipino / Tagalog": {
+    translation: "Mahal kita",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Filipino nutzt das lateinische Alphabet mit 28 Buchstaben, inklusive der spanischen ñ und ng als eigenständigem Buchstaben. Historisch wurde die Baybayin-Schrift verwendet.",
+    countries: ["🇵🇭 Philippinen"],
+    flags: "🇵🇭",
+    info: "Filipino/Tagalog wird von über 28 Millionen Muttersprachlern und als Zweitsprache von den meisten der 110 Millionen Filipinos gesprochen. Es hat viele spanische und englische Lehnwörter.",
+    alphabet: "A B C D E F G H I J K L M N Ng O P Q R S T U V W X Y Z Ñ"
+  },
+  "Finnisch": {
+    translation: "Minä rakastan sinua",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Finnisch nutzt das lateinische Alphabet mit den Zusatzbuchstaben ä und ö. Die Buchstaben b, c, f, q, w, x, z kommen nur in Lehnwörtern vor.",
+    countries: ["🇫🇮 Finnland"],
+    flags: "🇫🇮",
+    info: "Finnisch gehört zur finno-ugrischen Sprachfamilie und ist nicht mit den meisten europäischen Sprachen verwandt. Es hat 15 Kasus, kennt kein grammatisches Geschlecht und wird fast genau so geschrieben wie gesprochen.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Ä Ö"
+  },
+  "Französisch": {
+    translation: "Je t'aime",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Französisch nutzt das lateinische Alphabet mit Akzenten: accent aigu (é), accent grave (è, à, ù), accent circonflexe (ê, â, î, ô, û), tréma (ë, ï, ü) und cédille (ç).",
+    countries: ["🇫🇷 Frankreich", "🇧🇪 Belgien", "🇨🇭 Schweiz", "🇨🇦 Kanada", "🇸🇳 Senegal", "🇨🇮 Elfenbeinküste"],
+    flags: "🇫🇷🇧🇪🇨🇭🇨🇦🇸🇳🇨🇮",
+    info: "Französisch wird von etwa 320 Millionen Menschen weltweit gesprochen und ist Amtssprache in 29 Ländern. Es galt jahrhundertelang als Sprache der Diplomatie und ist eine der sechs UN-Amtssprachen.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z À Â Æ Ç É È Ê Ë Î Ï Ô Œ Ù Û Ü Ÿ"
+  },
+  "Georgisch": {
+    translation: "მიყვარხარ",
+    transliteration: "Miq'varkhar",
+    script: "Georgisches Alphabet (Mchedruli)",
+    scriptInfo: "Das georgische Alphabet ist eines der 14 einzigartigen Schriftsysteme der Welt. Mchedruli hat 33 Buchstaben, kennt keine Groß- und Kleinschreibung und wurde seit dem 11. Jahrhundert verwendet.",
+    countries: ["🇬🇪 Georgien"],
+    flags: "🇬🇪",
+    info: "Georgisch gehört zur kartwelischen Sprachfamilie und ist mit keiner größeren Sprachfamilie verwandt. Es erlaubt Konsonantencluster von bis zu acht Konsonanten und hat eine literarische Tradition seit dem 5. Jahrhundert.",
+    alphabet: "ა ბ გ დ ე ვ ზ თ ი კ ლ მ ნ ო პ ჟ რ ს ტ უ ფ ქ ღ ყ შ ჩ ც ძ წ ჭ ხ ჯ"
+  },
+  "Griechisch": {
+    translation: "Σ'αγαπώ",
+    transliteration: "S'agapó",
+    script: "Griechisches Alphabet",
+    scriptInfo: "Das griechische Alphabet hat 24 Buchstaben (α bis ω) und ist das älteste Alphabet, das Vokale als eigenständige Buchstaben einführte. Es entstand um 800 v. Chr. und ist die Grundlage für das lateinische und kyrillische Alphabet.",
+    countries: ["🇬🇷 Griechenland", "🇨🇾 Zypern"],
+    flags: "🇬🇷🇨🇾",
+    info: "Griechisch hat die längste dokumentierte Geschichte aller indoeuropäischen Sprachen – über 3.400 Jahre. Es wird von etwa 13 Millionen Menschen gesprochen und hat Wissenschaft, Philosophie und westliche Kultur tiefgreifend beeinflusst.",
+    alphabet: "Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω"
+  },
+  "Gujarati": {
+    translation: "હું તને પ્રેમ કરું છું",
+    transliteration: "Huṁ tane prem karuṁ chuṁ",
+    script: "Gujarati-Schrift",
+    scriptInfo: "Die Gujarati-Schrift stammt von der Devanagari ab, hat aber keine obere Linie (Shirorekha). Sie hat 47 Grundzeichen und wird von links nach rechts geschrieben.",
+    countries: ["🇮🇳 Indien (Gujarat)", "🇰🇪 Kenia", "🇹🇿 Tansania"],
+    flags: "🇮🇳🇰🇪🇹🇿",
+    info: "Gujarati wird von etwa 55 Millionen Menschen gesprochen. Es ist die Muttersprache von Mahatma Gandhi. Gujarat ist eine der wirtschaftlich stärksten Regionen Indiens.",
+    alphabet: "અ આ ઇ ઈ ઉ ઊ ઋ એ ઐ ઑ ઒ ઓ ઔ ક ખ ગ ઘ ઙ ચ છ જ ઝ ઞ ટ ઠ ડ ઢ ણ ત થ દ ધ ન પ ફ બ ભ મ ય ર લ ળ વ શ ષ સ હ"
+  },
+  "Hawaiianisch": {
+    translation: "Aloha wau iā ʻoe",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Das hawaiianische Alphabet hat nur 13 Buchstaben: 5 Vokale (a, e, i, o, u) und 8 Konsonanten (h, k, l, m, n, p, w) plus den ʻOkina (Glottalstop). Es ist eines der kleinsten Alphabete der Welt.",
+    countries: ["🇺🇸 Hawaii (USA)"],
+    flags: "🇺🇸",
+    info: "Hawaiianisch ist eine polynesische Sprache, die fast ausgestorben war. Durch Revitalisierungsprogramme seit den 1980ern wächst die Sprecherzahl wieder. Es hat nur etwa 2.000 Muttersprachler, aber ca. 24.000 Sprecher insgesamt.",
+    alphabet: "A E H I K L M N O P U W ʻ"
+  },
+  "Hebräisch": {
+    translation: "אני אוהב אותך / אני אוהבת אותך",
+    transliteration: "Ani ohev otakh / Ani ohevet otkha",
+    script: "Hebräisches Alphabet",
+    scriptInfo: "Das hebräische Alphabet hat 22 Buchstaben und wird von rechts nach links geschrieben. Es ist eine Konsonantenschrift – Vokale werden durch optionale Punktierungen (Nikud) dargestellt.",
+    countries: ["🇮🇱 Israel"],
+    flags: "🇮🇱",
+    info: "Hebräisch ist die einzige Sprache, die erfolgreich als Alltagssprache wiederbelebt wurde. Nach ca. 1.700 Jahren ohne Muttersprachler wurde es im 19./20. Jahrhundert revitalisiert und ist heute Muttersprache von 9 Millionen Menschen.",
+    alphabet: "א ב ג ד ה ו ז ח ט י כ ל מ נ ס ע פ צ ק ר ש ת"
+  },
+  "Hindi": {
+    translation: "मैं तुमसे प्यार करता/करती हूँ",
+    transliteration: "Main tumse pyaar karta/karti hoon",
+    script: "Devanagari-Schrift",
+    scriptInfo: "Devanagari hat 47 Grundzeichen (14 Vokale, 33 Konsonanten) und wird von links nach rechts geschrieben. Jedes Zeichen hängt an einer oberen Linie (Shirorekha). Es ist eine Abugida-Schrift.",
+    countries: ["🇮🇳 Indien", "🇫🇯 Fidschi", "🇳🇵 Nepal"],
+    flags: "🇮🇳🇫🇯🇳🇵",
+    info: "Hindi ist mit über 600 Millionen Sprechern (inkl. Zweitsprachler) eine der meistgesprochenen Sprachen der Welt. Es ist eng mit Urdu verwandt – gesprochen sind sie fast identisch, aber Hindi nutzt Devanagari und Urdu die arabische Schrift.",
+    alphabet: "अ आ इ ई उ ऊ ऋ ए ऐ ओ औ क ख ग घ ङ च छ ज झ ञ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह"
+  },
+  "Indonesisch": {
+    translation: "Aku mencintaimu",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Indonesisch nutzt das lateinische Alphabet mit 26 Buchstaben ohne Sonderzeichen. Die Rechtschreibung ist sehr regelmäßig und phonetisch.",
+    countries: ["🇮🇩 Indonesien"],
+    flags: "🇮🇩",
+    info: "Indonesisch (Bahasa Indonesia) ist die Amtssprache des viertbevölkerungsreichsten Landes der Welt. Es basiert auf Malaiisch und dient als Lingua franca für über 270 Millionen Menschen, die zu Hause über 700 verschiedene Sprachen sprechen.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+  },
+  "Irisch (Gaeilge)": {
+    translation: "Tá grá agam duit",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Irisch nutzt das lateinische Alphabet mit 18 Buchstaben (j, k, q, v, w, x, y, z fehlen). Es verwendet Lenition (Séimhiú) und Eklipsis (Urú) – Konsonantenmutationen, die am Wortanfang sichtbar werden.",
+    countries: ["🇮🇪 Irland"],
+    flags: "🇮🇪",
+    info: "Irisch ist die erste Amtssprache Irlands und eine keltische Sprache. Trotz Förderprogrammen sprechen nur ca. 70.000 Menschen es täglich. Die Gaeltacht-Gebiete an der Westküste sind die letzten natürlichen Sprachgebiete.",
+    alphabet: "A B C D E F G H I L M N O P R S T U"
+  },
+  "Isländisch": {
+    translation: "Ég elska þig",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Isländisch nutzt das lateinische Alphabet mit Sonderzeichen: á, é, í, ó, ú, ý, ð (eth), þ (thorn), æ, ö. Die Buchstaben c, q, w, z werden nicht verwendet.",
+    countries: ["🇮🇸 Island"],
+    flags: "🇮🇸",
+    info: "Isländisch hat sich seit dem Mittelalter kaum verändert – Isländer können die altnordischen Sagas aus dem 13. Jahrhundert noch lesen. Es hat nur ca. 350.000 Sprecher, pflegt aber aktive Sprachpflege und erfindet lieber eigene Wörter als Fremdwörter zu übernehmen.",
+    alphabet: "A Á B C D Ð E É F G H I Í J K L M N O Ó P Q R S T U Ú V W X Y Ý Z Þ Æ Ö"
+  },
+  "Italienisch": {
+    translation: "Ti amo",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Italienisch nutzt das lateinische Alphabet mit 21 Grundbuchstaben (j, k, w, x, y nur in Fremdwörtern) und Akzenten: à, è, é, ì, ò, ó, ù.",
+    countries: ["🇮🇹 Italien", "🇨🇭 Schweiz (Tessin)", "🇸🇲 San Marino", "🇻🇦 Vatikan"],
+    flags: "🇮🇹🇨🇭🇸🇲🇻🇦",
+    info: "Italienisch wird von etwa 67 Millionen Muttersprachlern gesprochen. Es gilt als eine der musikalischsten Sprachen und ist die Sprache der Oper, der Kunst und der Kulinarik. Es ist dem Lateinischen am nächsten.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z À È É Ì Ò Ù"
+  },
+  "Japanisch": {
+    translation: "愛してる",
+    transliteration: "Ai shiteru",
+    script: "Kanji, Hiragana, Katakana",
+    scriptInfo: "Japanisch verwendet drei Schriftsysteme gleichzeitig: Kanji (chinesische Zeichen für Bedeutung), Hiragana (46 Zeichen für japanische Wörter/Grammatik) und Katakana (46 Zeichen für Fremdwörter). Dazu kommt Rōmaji (lateinische Umschrift).",
+    countries: ["🇯🇵 Japan"],
+    flags: "🇯🇵",
+    info: "Japanisch wird von 125 Millionen Menschen gesprochen und ist eine Sprachisolat. Es hat ein komplexes Höflichkeitssystem (Keigo) mit verschiedenen Sprachebenen und ist grammatisch völlig anders als Chinesisch, obwohl es Kanji übernommen hat.",
+    alphabet: "あ い う え お か き く け こ さ し す せ そ た ち つ て と な に ぬ ね の は ひ ふ へ ほ ま み む め も や ゆ よ ら り る れ ろ わ を ん"
+  },
+  "Kannada": {
+    translation: "ನಾನು ನಿನ್ನನ್ನು ಪ್ರೀತಿಸುತ್ತೇನೆ",
+    transliteration: "Nānu ninnannu prītisuttēne",
+    script: "Kannada-Schrift",
+    scriptInfo: "Die Kannada-Schrift ist eine Abugida mit runden, geschwungenen Formen. Sie hat 49 Grundzeichen und stammt von der Kadamba-Schrift ab. Sie wird von links nach rechts geschrieben.",
+    countries: ["🇮🇳 Indien (Karnataka)"],
+    flags: "🇮🇳",
+    info: "Kannada wird von etwa 44 Millionen Menschen in Karnataka, Südindien, gesprochen. Es hat eine über 2.000 Jahre alte literarische Tradition. Die Halebidu- und Belur-Tempel zeigen historische Kannada-Inschriften.",
+    alphabet: "ಅ ಆ ಇ ಈ ಉ ಊ ಋ ಌ ಎ ಏ ಐ ಒ ಓ ಔ ಕ ಖ ಗ ಘ ಙ ಚ ಛ ಜ ಝ ಞ ಟ ಠ ಡ ಢ ಣ ತ ಥ ದ ಧ ನ ಪ ಫ ಬ ಭ ಮ ಯ ರ ಲ ವ ಶ ಷ ಸ ಹ"
+  },
+  "Katalanisch": {
+    translation: "T'estimo",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Katalanisch nutzt das lateinische Alphabet mit Akzenten (à, é, è, í, ó, ò, ú), dem Mittelpunkt (l·l für geminiertes l), der Cedille (ç) und dem Trema (ü).",
+    countries: ["🇪🇸 Spanien (Katalonien, Valencia, Balearen)", "🇦🇩 Andorra", "🇫🇷 Frankreich (Roussillon)"],
+    flags: "🇪🇸🇦🇩🇫🇷",
+    info: "Katalanisch ist die einzige Amtssprache Andorras und wird von ca. 10 Millionen Menschen verstanden. Es ist keine Mischung aus Spanisch und Französisch, sondern eine eigenständige romanische Sprache mit mittelalterlicher literarischer Tradition.",
+    alphabet: "A À B C Ç D E É È F G H I Í J K L L·L M N O Ó Ò P Q R S T U Ú Ü V W X Y Z"
+  },
+  "Khmer": {
+    translation: "ខ្ញុំស្រឡាញ់អ្នក",
+    transliteration: "Knyom srolanh nak",
+    script: "Khmer-Schrift",
+    scriptInfo: "Die Khmer-Schrift hat das größte Alphabet der Welt laut Guinness-Buch (74 Buchstaben). Es ist eine Abugida, die von der südindischen Pallava-Schrift abstammt. Sie wird von links nach rechts geschrieben.",
+    countries: ["🇰🇭 Kambodscha"],
+    flags: "🇰🇭",
+    info: "Khmer ist die Amtssprache Kambodschas mit etwa 16 Millionen Sprechern. Anders als die Nachbarsprachen Thai und Vietnamesisch ist Khmer keine Tonsprache. Es hat eine reiche Tradition durch das Khmer-Reich von Angkor.",
+    alphabet: "ក ខ គ ឃ ង ច ឆ ជ ឈ ញ ដ ឋ ឌ ឍ ណ ត ថ ទ ធ ន ប ផ ព ភ ម យ រ ល វ ស ហ ឡ អ"
+  },
+  "Koreanisch": {
+    translation: "사랑해요",
+    transliteration: "Saranghaeyo",
+    script: "Hangul",
+    scriptInfo: "Hangul wurde 1443 von König Sejong dem Großen erfunden. Es hat 14 Konsonanten und 10 Vokale, die zu Silbenblöcken kombiniert werden. Es gilt als eines der wissenschaftlichsten und logischsten Schriftsysteme der Welt.",
+    countries: ["🇰🇷 Südkorea", "🇰🇵 Nordkorea"],
+    flags: "🇰🇷🇰🇵",
+    info: "Koreanisch wird von etwa 77 Millionen Menschen gesprochen. Hangul ist so logisch aufgebaut, dass es in wenigen Stunden erlernt werden kann. In Südkorea wird der Hangul-Tag als Feiertag gefeiert.",
+    alphabet: "ㄱ ㄲ ㄴ ㄷ ㄸ ㄹ ㅁ ㅂ ㅃ ㅅ ㅆ ㅇ ㅈ ㅉ ㅊ ㅋ ㅌ ㅍ ㅎ ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅗ ㅘ ㅙ ㅚ ㅛ ㅜ ㅝ ㅞ ㅟ ㅠ ㅡ ㅢ ㅣ"
+  },
+  "Kroatisch": {
+    translation: "Volim te",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Kroatisch verwendet das lateinische Alphabet (Gajica) mit 30 Buchstaben, darunter č, ć, đ, š, ž und die Digraphen dž, lj, nj.",
+    countries: ["🇭🇷 Kroatien"],
+    flags: "🇭🇷",
+    info: "Kroatisch ist eine südslawische Sprache mit etwa 5,5 Millionen Sprechern. Es ist mit Serbisch, Bosnisch und Montenegrinisch weitgehend gegenseitig verständlich und wird manchmal als Teil des Serbokroatischen betrachtet.",
+    alphabet: "A B C Č D Đ E F G H I J K L M N O P Q R S Š T U V W X Y Z Ž"
+  },
+  "Kurdisch (Kurmandschi)": {
+    translation: "Ez te hez dikim",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Kurmandschi verwendet das lateinische Alphabet mit Sonderzeichen: ç, ê, î, ş, û. Andere kurdische Dialekte nutzen die arabische oder kyrillische Schrift.",
+    countries: ["🇹🇷 Türkei", "🇮🇶 Irak", "🇮🇷 Iran", "🇸🇾 Syrien"],
+    flags: "🇹🇷🇮🇶🇮🇷🇸🇾",
+    info: "Kurdisch wird von ca. 30 Millionen Menschen gesprochen und ist die Sprache des weltweit größten Volkes ohne eigenen Staat. Es gibt mehrere Dialektgruppen: Kurmandschi, Sorani und Südkurdisch.",
+    alphabet: "A B C Ç D E Ê F G H I Î J K L M N O P Q R S Ş T U Û V W X Y Z"
+  },
+  "Lateinisch": {
+    translation: "Te amo",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Das lateinische Alphabet wurde von den Römern aus dem etruskischen Alphabet entwickelt. Das klassische lateinische Alphabet hatte 23 Buchstaben (ohne J, U, W). Es ist die Basis der meisten westlichen Schriftsysteme.",
+    countries: ["🇻🇦 Vatikanstadt"],
+    flags: "🇻🇦",
+    info: "Latein ist die Mutter der romanischen Sprachen und war über 1.000 Jahre Wissenschafts- und Kirchensprache Europas. Obwohl es keine Muttersprachler mehr hat, lebt es in der Medizin, im Recht und in der Botanik weiter.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+  },
+  "Lettisch": {
+    translation: "Es tevi mīlu",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Lettisch nutzt das lateinische Alphabet mit Sonderzeichen: ā, č, ē, ģ, ī, ķ, ļ, ņ, š, ū, ž. Makrons (Längenzeichen) über Vokalen zeigen Langvokale an.",
+    countries: ["🇱🇻 Lettland"],
+    flags: "🇱🇻",
+    info: "Lettisch ist eine baltische Sprache und gehört zusammen mit Litauisch zu den letzten überlebenden Sprachen dieser Sprachgruppe. Es hat ca. 1,5 Millionen Sprecher und bewahrt viele archaische indoeuropäische Merkmale.",
+    alphabet: "A B C Č D E Ē F G Ģ H I Ī J K Ķ L Ļ M N Ņ O P Q R S Š T U Ū V W X Y Z Ž"
+  },
+  "Litauisch": {
+    translation: "Aš tave myliu",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Litauisch verwendet das lateinische Alphabet mit 32 Buchstaben, darunter ą, č, ę, ė, į, š, ų, ū, ž. Es nutzt Diakritika für Nasalvokale und Langvokale.",
+    countries: ["🇱🇹 Litauen"],
+    flags: "🇱🇹",
+    info: "Litauisch gilt als die konservativste lebende indoeuropäische Sprache. Es hat Merkmale bewahrt, die dem Sanskrit ähneln. Sprachwissenschaftler nutzen es, um die Ursprache zu rekonstruieren. Es hat ca. 3 Millionen Sprecher.",
+    alphabet: "A Ą B C Č D E Ė F G H I Į Y J K L M N O P R S Š T U Ų Ū V Z Ž"
+  },
+  "Luxemburgisch": {
+    translation: "Ech hunn dech gär",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Luxemburgisch nutzt das lateinische Alphabet mit den deutschen Umlauten ä, ö, ü und dem é. Die Rechtschreibung wurde erst 1975 offiziell standardisiert.",
+    countries: ["🇱🇺 Luxemburg"],
+    flags: "🇱🇺",
+    info: "Luxemburgisch ist eine moselfränkische Varietät, die 1984 zur Nationalsprache Luxemburgs erklärt wurde. Fast alle 600.000 Einwohner Luxemburgs sprechen es, dazu auch Französisch und Deutsch.",
+    alphabet: "A Ä B C D E F G H I J K L M N O Ö P Q R S T U Ü V W X Y Z"
+  },
+  "Malaiisch": {
+    translation: "Saya cintakan awak",
+    transliteration: "",
+    script: "Lateinisches Alphabet (Rumi)",
+    scriptInfo: "Malaiisch nutzt heute das lateinische Alphabet (Rumi). Historisch wurde die arabische Schrift (Jawi) verwendet, die in Brunei und teilweise in Malaysia noch offiziell ist.",
+    countries: ["🇲🇾 Malaysia", "🇧🇳 Brunei", "🇸🇬 Singapur"],
+    flags: "🇲🇾🇧🇳🇸🇬",
+    info: "Malaiisch ist die Grundlage für Indonesisch und wird in verschiedenen Formen von über 290 Millionen Menschen in Südostasien verstanden. Es war jahrhundertelang die Handelssprache der Region.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+  },
+  "Malayalam": {
+    translation: "ഞാൻ നിന്നെ സ്നേഹിക്കുന്നു",
+    transliteration: "Ñān ninne snēhikkunnu",
+    script: "Malayalam-Schrift",
+    scriptInfo: "Die Malayalam-Schrift hat sehr runde, geschwungene Formen und gehört zu den komplexesten indischen Schriften. Sie hat 53 Grundzeichen und zahlreiche Ligaturen.",
+    countries: ["🇮🇳 Indien (Kerala)"],
+    flags: "🇮🇳",
+    info: "Malayalam wird von 38 Millionen Menschen in Kerala, Südindien, gesprochen. Kerala hat die höchste Alphabetisierungsrate Indiens (96%). Die Sprache ist bekannt für ihr besonderes Palindrom: 'Malayalam' selbst.",
+    alphabet: "അ ആ ഇ ഈ ഉ ഊ ഋ ഌ എ ഏ ഐ ഒ ഓ ഔ ക ഖ ഗ ഘ ങ ച ഛ ജ ഝ ഞ ട ഠ ഡ ഢ ണ ത ഥ ദ ധ ന പ ഫ ബ ഭ മ യ ര ല വ ശ ഷ സ ഹ"
+  },
+  "Maltesisch": {
+    translation: "Inħobbok",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Maltesisch nutzt das lateinische Alphabet mit Sonderzeichen: ċ, ġ, għ, ħ, ie, ż. Es ist die einzige semitische Sprache, die in lateinischer Schrift geschrieben wird.",
+    countries: ["🇲🇹 Malta"],
+    flags: "🇲🇹",
+    info: "Maltesisch ist die einzige semitische Amtssprache der EU. Es basiert auf dem Sizilianisch-Arabischen mit starkem italienischen und englischen Einfluss. Es hat nur ca. 520.000 Sprecher.",
+    alphabet: "A B Ċ C D E F Ġ G GH H Ħ I IE J K L M N O P Q R S T U V W X Y Z"
+  },
+  "Maori": {
+    translation: "Kei te aroha au i a koe",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Maori nutzt das lateinische Alphabet mit nur 15 Buchstaben: a, e, h, i, k, m, n, ng, o, p, r, t, u, w, wh. Makrons zeigen lange Vokale an (ā, ē, ī, ō, ū).",
+    countries: ["🇳🇿 Neuseeland"],
+    flags: "🇳🇿",
+    info: "Maori ist eine polynesische Sprache und offizielle Sprache Neuseelands. Nach einem dramatischen Rückgang wird sie seit den 1980ern durch Sprachnester (Kōhanga Reo) und Maori-TV aktiv revitalisiert.",
+    alphabet: "A E H I K M N O P R T U W"
+  },
+  "Mongolisch": {
+    translation: "Би чамд хайртай",
+    transliteration: "Bi chamd khairtai",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "In der Mongolei wird heute kyrillische Schrift mit 35 Buchstaben verwendet. Die traditionelle mongolische Schrift (von oben nach unten, links nach rechts) wird in der Inneren Mongolei (China) noch genutzt.",
+    countries: ["🇲🇳 Mongolei", "🇨🇳 China (Innere Mongolei)"],
+    flags: "🇲🇳🇨🇳",
+    info: "Mongolisch wird von ca. 5,7 Millionen Menschen gesprochen. Die traditionelle mongolische Schrift ist die einzige vertikale Schrift, die von links nach rechts läuft. Die Mongolei plant die Wiedereinführung der traditionellen Schrift.",
+    alphabet: "А Б В Г Д Е Ё Ж З И Й К Л М Н О Ө П Р С Т У Ү Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я"
+  },
+  "Nepalesisch": {
+    translation: "म तिमीलाई माया गर्छु",
+    transliteration: "Ma timīlāī māyā garchu",
+    script: "Devanagari-Schrift",
+    scriptInfo: "Nepalesisch nutzt die gleiche Devanagari-Schrift wie Hindi mit 47 Grundzeichen. Jeder Buchstabe hängt an der oberen Shirorekha-Linie.",
+    countries: ["🇳🇵 Nepal", "🇮🇳 Indien (Sikkim, Westbengalen)"],
+    flags: "🇳🇵🇮🇳",
+    info: "Nepalesisch (Nepali) wird von ca. 17 Millionen Muttersprachlern gesprochen. Es ist eng mit Hindi verwandt und die Amtssprache Nepals – des einzigen Landes mit einer nicht-rechteckigen Nationalflagge.",
+    alphabet: "अ आ इ ई उ ऊ ऋ ए ऐ ओ औ क ख ग घ ङ च छ ज झ ञ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह"
+  },
+  "Niederländisch": {
+    translation: "Ik hou van jou",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Niederländisch nutzt das lateinische Alphabet mit 26 Buchstaben. Typisch sind die Digraphen ij (manchmal als ein Buchstabe betrachtet), oe, eu, ui, ei.",
+    countries: ["🇳🇱 Niederlande", "🇧🇪 Belgien (Flandern)", "🇸🇷 Suriname", "🇨🇼 Curaçao", "🇦🇼 Aruba"],
+    flags: "🇳🇱🇧🇪🇸🇷🇨🇼🇦🇼",
+    info: "Niederländisch wird von ca. 25 Millionen Muttersprachlern gesprochen. Es steht zwischen Deutsch und Englisch und hat zahlreiche Diminutive (-je, -tje, -pje). Die niederländische Kolonialgeschichte hat Spuren in Sprachen wie Afrikaans und Indonesisch hinterlassen.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+  },
+  "Norwegisch": {
+    translation: "Jeg elsker deg",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Norwegisch nutzt das lateinische Alphabet mit den Zusatzbuchstaben æ, ø und å. Das Alphabet hat 29 Buchstaben.",
+    countries: ["🇳🇴 Norwegen"],
+    flags: "🇳🇴",
+    info: "Norwegisch hat zwei offizielle Schriftformen: Bokmål (beeinflusst vom Dänischen) und Nynorsk (basierend auf norwegischen Dialekten). Etwa 5 Millionen Menschen sprechen es. Norwegisch, Schwedisch und Dänisch sind weitgehend gegenseitig verständlich.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Æ Ø Å"
+  },
+  "Persisch (Farsi)": {
+    translation: "دوستت دارم",
+    transliteration: "Duset dāram",
+    script: "Persisch-arabisches Alphabet",
+    scriptInfo: "Persisch nutzt eine modifizierte arabische Schrift mit 32 Buchstaben (4 mehr als Arabisch: پ, چ, ژ, گ). Es wird von rechts nach links geschrieben.",
+    countries: ["🇮🇷 Iran", "🇦🇫 Afghanistan (Dari)", "🇹🇯 Tadschikistan (Tadschikisch)"],
+    flags: "🇮🇷🇦🇫🇹🇯",
+    info: "Persisch ist eine der ältesten noch gesprochenen Sprachen mit einer über 2.500-jährigen Geschichte. Die persische Poesie (Rumi, Hafis, Ferdowsi) gehört zur Weltliteratur. Es wird von ca. 110 Millionen Menschen gesprochen.",
+    alphabet: "ا ب پ ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن و ه ی"
+  },
+  "Polnisch": {
+    translation: "Kocham cię",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Polnisch nutzt das lateinische Alphabet mit 9 Sonderzeichen: ą, ć, ę, ł, ń, ó, ś, ź, ż. Die Buchstaben q, v, x kommen nur in Fremdwörtern vor. Polnisch hat 32 Buchstaben.",
+    countries: ["🇵🇱 Polen"],
+    flags: "🇵🇱",
+    info: "Polnisch wird von etwa 45 Millionen Menschen gesprochen. Es hat sieben Kasus, komplexe Konsonantencluster (wie in 'chrząszcz' = Käfer) und gehört zu den schwierigsten Sprachen für Deutschsprachige.",
+    alphabet: "A Ą B C Ć D E Ę F G H I J K L Ł M N Ń O Ó P Q R S Ś T U V W X Y Z Ź Ż"
+  },
+  "Portugiesisch": {
+    translation: "Eu te amo",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Portugiesisch nutzt das lateinische Alphabet mit 26 Buchstaben und Akzenten: á, â, ã, à, ç, é, ê, í, ó, ô, õ, ú. Die Tilde (~) über Vokalen zeigt Nasalierung an.",
+    countries: ["🇵🇹 Portugal", "🇧🇷 Brasilien", "🇦🇴 Angola", "🇲🇿 Mosambik", "🇨🇻 Kap Verde"],
+    flags: "🇵🇹🇧🇷🇦🇴🇲🇿🇨🇻",
+    info: "Portugiesisch wird von über 250 Millionen Muttersprachlern gesprochen und ist damit die sechstmeistgesprochene Sprache der Welt. Brasilianisches und europäisches Portugiesisch unterscheiden sich erheblich in Aussprache und teilweise Grammatik.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z À Á Â Ã Ç É Ê Ó Ô Õ Ü"
+  },
+  "Punjabi": {
+    translation: "ਮੈਂ ਤੈਨੂੰ ਪਿਆਰ ਕਰਦਾ/ਕਰਦੀ ਹਾਂ",
+    transliteration: "Maiṁ tainūṁ piār kardā/kardī hāṁ",
+    script: "Gurmukhi-Schrift",
+    scriptInfo: "Die Gurmukhi-Schrift wurde im 16. Jahrhundert von Guru Angad für das Punjabi entwickelt. Sie hat 35 Grundkonsonanten und 10 Vokalzeichen. In Pakistan wird Punjabi in der Shahmukhi-Schrift (arabisch basiert) geschrieben.",
+    countries: ["🇮🇳 Indien (Punjab)", "🇵🇰 Pakistan (Punjab)"],
+    flags: "🇮🇳🇵🇰",
+    info: "Punjabi wird von über 100 Millionen Muttersprachlern gesprochen und ist eine Tonsprache – ungewöhnlich für eine indoarische Sprache. Es ist die Sprache des Sikhismus und der Bhangra-Musik.",
+    alphabet: "ਅ ਆ ਇ ਈ ਉ ਊ ਏ ਐ ਓ ਔ ਕ ਖ ਗ ਘ ਙ ਚ ਛ ਜ ਝ ਞ ਟ ਠ ਡ ਢ ਣ ਤ ਥ ਦ ਧ ਨ ਪ ਫ ਬ ਭ ਮ ਯ ਰ ਲ ਵ ਸ ਹ"
+  },
+  "Rumänisch": {
+    translation: "Te iubesc",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Rumänisch nutzt das lateinische Alphabet mit 5 Sonderzeichen: ă, â, î, ș, ț. Es ist die einzige romanische Sprache in Osteuropa.",
+    countries: ["🇷🇴 Rumänien", "🇲🇩 Moldawien"],
+    flags: "🇷🇴🇲🇩",
+    info: "Rumänisch ist die östlichste romanische Sprache und bewahrt Elemente des Lateinischen, die andere romanische Sprachen verloren haben, wie das Kasussystem. Es wird von ca. 24 Millionen Menschen gesprochen.",
+    alphabet: "A Ă Â B C D E F G H I Î J K L M N O P Q R S Ş T Ţ U V W X Y Z"
+  },
+  "Russisch": {
+    translation: "Я тебя люблю",
+    transliteration: "Ya tebya lyublyu",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Das russische kyrillische Alphabet hat 33 Buchstaben, darunter das Weichheitszeichen (ь) und Härtezeichen (ъ). Es basiert auf der Arbeit der Mönche Kyrill und Method im 9. Jahrhundert.",
+    countries: ["🇷🇺 Russland", "🇧🇾 Belarus", "🇰🇿 Kasachstan", "🇰🇬 Kirgisistan"],
+    flags: "🇷🇺🇧🇾🇰🇿🇰🇬",
+    info: "Russisch wird von etwa 258 Millionen Menschen gesprochen und ist die meistgesprochene slawische Sprache. Die russische Literatur (Tolstoi, Dostojewski, Tschechow) gehört zum Kanon der Weltliteratur.",
+    alphabet: "А Б В Г Д Е Ё Ж З И Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я"
+  },
+  "Samoanisch": {
+    translation: "Ou te alofa ia te oe",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Samoanisch nutzt das lateinische Alphabet mit 14 Buchstaben plus den Glottalstop (ʻ). Langvokale werden mit Makrons markiert (ā, ē, ī, ō, ū).",
+    countries: ["🇼🇸 Samoa", "🇦🇸 Amerikanisch-Samoa"],
+    flags: "🇼🇸🇦🇸",
+    info: "Samoanisch ist eine polynesische Sprache mit ca. 510.000 Sprechern. Es hat ein einzigartiges Höflichkeitssystem mit einer formellen Sprachebene (Gagana fa'aaloalo) für Häuptlinge und offizielle Anlässe.",
+    alphabet: "A E F G H I J K L M N O P S T U V"
+  },
+  "Schwedisch": {
+    translation: "Jag älskar dig",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Schwedisch nutzt das lateinische Alphabet mit den Zusatzbuchstaben å, ä und ö. Das Alphabet hat 29 Buchstaben.",
+    countries: ["🇸🇪 Schweden", "🇫🇮 Finnland (als Minderheitssprache)"],
+    flags: "🇸🇪🇫🇮",
+    info: "Schwedisch wird von etwa 10 Millionen Menschen gesprochen. Es hat einen melodischen Tonakzent (Wortakzent), der Wörter gleicher Schreibweise unterscheidet. Schwedisch ist auch eine der Amtssprachen Finnlands.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Å Ä Ö"
+  },
+  "Serbisch": {
+    translation: "Волим те / Volim te",
+    transliteration: "Volim te",
+    script: "Kyrillisch und Lateinisch",
+    scriptInfo: "Serbisch ist die einzige europäische Sprache, die offiziell zwei Alphabete gleichberechtigt nutzt: Kyrillisch (30 Buchstaben) und Lateinisch (30 Buchstaben). Im Alltag wird zunehmend Lateinisch verwendet.",
+    countries: ["🇷🇸 Serbien"],
+    flags: "🇷🇸",
+    info: "Serbisch hat ca. 12 Millionen Sprecher. Die Digraphie (Nutzung zweier Schriften) ist einzigartig in Europa. Der Reformator Vuk Karadžić schuf im 19. Jahrhundert das Prinzip 'Schreib wie du sprichst'.",
+    alphabet: "А Б В Г Д Е Ё Ж З И Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я"
+  },
+  "Singhalesisch": {
+    translation: "මම ඔයාට ආදරෙයි",
+    transliteration: "Mama oyāṭa ādarei",
+    script: "Singhalesische Schrift",
+    scriptInfo: "Die singhalesische Schrift hat sehr runde, geschwungene Buchstaben und ist eine der ästhetischsten Schriften der Welt. Sie hat 60 Grundzeichen und stammt von der Brahmi-Schrift ab.",
+    countries: ["🇱🇰 Sri Lanka"],
+    flags: "🇱🇰",
+    info: "Singhalesisch wird von ca. 17 Millionen Menschen in Sri Lanka gesprochen. Die runden Buchstabenformen entstanden, weil man historisch auf Palmblätter schrieb – gerade Linien hätten die Blätter zerrissen.",
+    alphabet: "අ ආ ඇ ඈ ඉ ඊ උ ඌ ඍ ඎ ඏ ඐ එ ඒ ඓ ඔ ඕ ඖ ක ඛ ག ඝ ང ច ඡ ජ ඣ ඥ ට ඨ ඩ ඪ ණ ත ථ ද ධ න"
+  },
+  "Slowakisch": {
+    translation: "Ľúbim ťa",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Slowakisch nutzt das lateinische Alphabet mit zahlreichen Diakritika: á, ä, č, ď, é, í, ĺ, ľ, ň, ó, ô, ŕ, š, ť, ú, ý, ž. Es hat 46 Buchstaben – eines der längsten lateinbasierten Alphabete.",
+    countries: ["🇸🇰 Slowakei"],
+    flags: "🇸🇰",
+    info: "Slowakisch wird von ca. 5 Millionen Menschen gesprochen. Es ist mit Tschechisch gegenseitig verständlich und hat eine besonders melodische Aussprache. Slowakisch hat syllabische Konsonanten – r und l können als Silbenkerne dienen.",
+    alphabet: "A Á B C Č D Ď E É F G H Ch I Í J K L Ľ Ł M N Ň O Ó Ô P Q R Ŕ S Š T Ť U Ú V W X Y Ý Z Ž"
+  },
+  "Slowenisch": {
+    translation: "Ljubim te",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Slowenisch nutzt das lateinische Alphabet mit 25 Buchstaben plus č, š, ž. Die Buchstaben q, w, x, y fehlen.",
+    countries: ["🇸🇮 Slowenien"],
+    flags: "🇸🇮",
+    info: "Slowenisch ist einzigartig unter den slawischen Sprachen: Es hat als einzige den Dual (Zweizahl) neben Singular und Plural vollständig bewahrt. Etwa 2,5 Millionen Menschen sprechen es.",
+    alphabet: "A B C Č D E F G H I J K L M N O P Q R S Š T U V W X Y Z Ž"
+  },
+  "Spanisch": {
+    translation: "Te quiero / Te amo",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Spanisch nutzt das lateinische Alphabet mit 27 Buchstaben – das ñ ist ein eigenständiger Buchstabe. Akzente (á, é, í, ó, ú) zeigen die Betonung an, die Diärese (ü) kommt in güe/güi vor.",
+    countries: ["🇪🇸 Spanien", "🇲🇽 Mexiko", "🇨🇴 Kolumbien", "🇦🇷 Argentinien", "🇵🇪 Peru", "🇨🇱 Chile"],
+    flags: "🇪🇸🇲🇽🇨🇴🇦🇷🇵🇪🇨🇱",
+    info: "Spanisch ist mit ca. 500 Millionen Muttersprachlern die zweitmeistgesprochene Muttersprache der Welt (nach Chinesisch). Es ist Amtssprache in 20 Ländern und eine der sechs UN-Amtssprachen.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Á É Í Ó Ú Ü Ñ ¿ ¡"
+  },
+  "Suaheli": {
+    translation: "Nakupenda",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Suaheli nutzt heute das lateinische Alphabet mit 26 Buchstaben. Historisch wurde die arabische Schrift (Swahili Ajami) verwendet. Die Rechtschreibung ist sehr regelmäßig.",
+    countries: ["🇹🇿 Tansania", "🇰🇪 Kenia", "🇺🇬 Uganda", "🇨🇩 DR Kongo"],
+    flags: "🇹🇿🇰🇪🇺🇬🇨🇩",
+    info: "Suaheli ist die meistgesprochene afrikanische Sprache mit über 100 Millionen Sprechern (meist als Zweitsprache). Es ist eine Bantusprache mit starkem arabischen Einfluss und dient als Lingua franca in Ostafrika.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+  },
+  "Tamil": {
+    translation: "நான் உன்னை காதலிக்கிறேன்",
+    transliteration: "Nāṉ uṉṉai kādalikkiṟēṉ",
+    script: "Tamil-Schrift",
+    scriptInfo: "Die Tamil-Schrift hat 12 Vokale und 18 Konsonanten, die zu 216 Kombinationszeichen werden. Sie ist eine Abugida und eine der ältesten noch verwendeten Schriften der Welt.",
+    countries: ["🇮🇳 Indien (Tamil Nadu)", "🇱🇰 Sri Lanka", "🇸🇬 Singapur", "🇲🇾 Malaysia"],
+    flags: "🇮🇳🇱🇰🇸🇬🇲🇾",
+    info: "Tamil ist eine der ältesten lebenden Sprachen der Welt mit einer über 2.000 Jahre alten Literatur. Es wird von 75 Millionen Menschen gesprochen und ist eine der klassischen Sprachen Indiens.",
+    alphabet: "அ ஆ இ ஈ உ ஊ எ ஏ ஐ ஒ ஓ ஔ க ங ச ஞ ட ண த ந ப ம ய ர ல வ ழ ள ற ன"
+  },
+  "Telugu": {
+    translation: "నేను నిన్ను ప్రేమిస్తున్నాను",
+    transliteration: "Nēnu ninnu prēmistunnānu",
+    script: "Telugu-Schrift",
+    scriptInfo: "Die Telugu-Schrift hat runde, elegante Formen mit 60 Grundsymbolen. Sie wird manchmal als 'italienisch des Ostens' bezeichnet wegen ihrer vokalreichen, melodischen Qualität.",
+    countries: ["🇮🇳 Indien (Andhra Pradesh, Telangana)"],
+    flags: "🇮🇳",
+    info: "Telugu wird von etwa 82 Millionen Menschen gesprochen und ist die meistgesprochene dravidische Sprache. Tollywood (Telugu-Filmindustrie) ist nach Bollywood die größte Filmindustrie Indiens.",
+    alphabet: "అ ఆ ఇ ఈ ఉ ఊ ఋ ఌ ఎ ఏ ఐ ఒ ఓ ఔ క ఖ గ ఘ ఙ చ ఛ జ ఝ ఞ ట ఠ డ ఢ ణ త థ ద ధ న ప ఫ బ భ మ య ర ల వ శ ష స హ"
+  },
+  "Thailändisch": {
+    translation: "ฉันรักคุณ",
+    transliteration: "Chan rak khun",
+    script: "Thai-Schrift",
+    scriptInfo: "Die Thai-Schrift hat 44 Konsonanten, 15 Vokalzeichen und 4 Tonzeichen. Sie wird ohne Wortabstände geschrieben und stammt von der Khmer-Schrift ab. Sie wurde 1283 von König Ramkhamhaeng erschaffen.",
+    countries: ["🇹🇭 Thailand"],
+    flags: "🇹🇭",
+    info: "Thailändisch ist eine Tonsprache mit fünf Tönen, die die Bedeutung von Wörtern verändern. Es wird von etwa 60 Millionen Menschen gesprochen und hat ein komplexes Höflichkeitssystem mit verschiedenen Höflichkeitspartikeln.",
+    alphabet: "ก ข ค ค ต ถ ท ธ น บ ป พ ฟ ม ย ร ล ว ส ห ฬ อ ฮ"
+  },
+  "Tibetisch": {
+    translation: "ང་ཁྱོད་ལ་དགའ་པོ་ཡོད།",
+    transliteration: "Nga khyod la dga' po yod",
+    script: "Tibetische Schrift",
+    scriptInfo: "Die tibetische Schrift wurde im 7. Jahrhundert vom indischen Brahmi-Alphabet abgeleitet. Sie hat 30 Konsonanten und 4 Vokalzeichen. Die Schreibweise entspricht oft nicht mehr der modernen Aussprache.",
+    countries: ["🇨🇳 China (Tibet)", "🇮🇳 Indien (Dharamsala)", "🇳🇵 Nepal"],
+    flags: "🇨🇳🇮🇳🇳🇵",
+    info: "Tibetisch gehört zur sino-tibetischen Sprachfamilie und wird von ca. 6 Millionen Menschen gesprochen. Es ist die Liturgiesprache des tibetischen Buddhismus und hat eine reiche religiöse und philosophische Literatur.",
+    alphabet: "ཀ ཁ ག གྷ ང ཅ ཆ ཇ ཉ ཏ ཐ ད དྷ ན པ ཕ བ བྷ མ ཙ ཚ ཛ ཝ ཞ ཟ ཡ ར ལ ཤ ཥ ས ཧ ཨ"
+  },
+  "Tschechisch": {
+    translation: "Miluji tě",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Tschechisch nutzt das lateinische Alphabet mit Háčky (Häkchen): č, ď, ě, ň, ř, š, ť, ž und Čárky (Strichen): á, é, í, ó, ú, ý. Der Buchstabe ř ist weltweit einzigartig.",
+    countries: ["🇨🇿 Tschechien"],
+    flags: "🇨🇿",
+    info: "Tschechisch wird von ca. 10,7 Millionen Menschen gesprochen. Es besitzt den Laut ř, der in keiner anderen Sprache als Phonem existiert. Der berühmte Satz 'Strč prst skrz krk' (Steck den Finger durch den Hals) kommt ohne einen einzigen Vokal aus.",
+    alphabet: "A Á B C Č D Ď E É Ě F G H Ch I Í J K L M N Ň O Ó P Q R Ř S Š T Ť U Ú Ů V W X Y Ý Z Ž"
+  },
+  "Türkisch": {
+    translation: "Seni seviyorum",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Türkisch nutzt seit 1928 das lateinische Alphabet mit 29 Buchstaben, darunter ç, ğ, ı, İ, ö, ş, ü. Zuvor wurde die arabische Schrift verwendet. Die Umstellung erfolgte unter Atatürk.",
+    countries: ["🇹🇷 Türkei", "🇨🇾 Nordzypern"],
+    flags: "🇹🇷🇨🇾",
+    info: "Türkisch wird von ca. 80 Millionen Muttersprachlern gesprochen. Es ist eine agglutinierende Sprache – Wörter werden durch Anfügen von Suffixen gebildet. Ein einzelnes Wort kann einen ganzen Satz ausdrücken.",
+    alphabet: "A B C Ç D E F G Ğ H I İ J K L M N O Ö P Q R S Ş T U Ü V W X Y Z"
+  },
+  "Ukrainisch": {
+    translation: "Я тебе кохаю",
+    transliteration: "Ya tebe kokhayu",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Das ukrainische kyrillische Alphabet hat 33 Buchstaben, darunter die einzigartigen Buchstaben ґ, є, і, ї. Es unterscheidet sich deutlich vom russischen Kyrillisch.",
+    countries: ["🇺🇦 Ukraine"],
+    flags: "🇺🇦",
+    info: "Ukrainisch wird von ca. 40 Millionen Muttersprachlern gesprochen. Es gilt als eine der melodischsten slawischen Sprachen. Die ukrainische Literatur hat eine reiche Tradition, besonders durch den Nationaldichter Taras Schewtschenko.",
+    alphabet: "А Б В Г Ґ Д Е Є Ж З И І Ї Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ь Ю Я"
+  },
+  "Ungarisch": {
+    translation: "Szeretlek",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Ungarisch nutzt das lateinische Alphabet mit 44 Buchstaben, darunter: á, é, í, ó, ö, ő, ú, ü, ű und Digraphen wie cs, gy, ly, ny, sz, ty, zs, dzs.",
+    countries: ["🇭🇺 Ungarn"],
+    flags: "🇭🇺",
+    info: "Ungarisch ist eine finno-ugrische Sprache und mit keiner Nachbarsprache verwandt. 'Szeretlek' ist besonders: Es ist eine spezielle Verbform, die 'Ich-dich' gleichzeitig ausdrückt – eine Konjugationsform, die es nur im Ungarischen gibt.",
+    alphabet: "A Á B C D E É F G H I Í J K L M N O Ó Ö Ő P Q R S T U Ú Ü Ű V W X Y Z"
+  },
+  "Urdu": {
+    translation: "میں تم سے محبت کرتا/کرتی ہوں",
+    transliteration: "Main tumse mohabbat karta/karti hoon",
+    script: "Nastaliq (persisch-arabische Schrift)",
+    scriptInfo: "Urdu wird in der Nastaliq-Kalligraphie geschrieben, einer besonders ästhetischen Form der arabischen Schrift. Sie hat 38 Buchstaben und wird von rechts nach links geschrieben.",
+    countries: ["🇵🇰 Pakistan", "🇮🇳 Indien"],
+    flags: "🇵🇰🇮🇳",
+    info: "Urdu ist die Amtssprache Pakistans und wird von ca. 230 Millionen Menschen gesprochen (inkl. Zweitsprachler). Gesprochen ist es fast identisch mit Hindi, verwendet aber die arabische Schrift und mehr persisch-arabische Lehnwörter.",
+    alphabet: "ا آ ب پ ت ٹ ث ج چ ح خ د ڈ ذ ر ڑ ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن ں و ہ ء ی ے"
+  },
+  "Vietnamesisch": {
+    translation: "Anh yêu em / Em yêu anh",
+    transliteration: "",
+    script: "Lateinisches Alphabet (Quốc Ngữ)",
+    scriptInfo: "Vietnamesisch nutzt das lateinische Alphabet mit zahlreichen Diakritika für Töne und Vokalqualitäten: ă, â, đ, ê, ô, ơ, ư plus Tonzeichen (à, á, ả, ã, ạ). Es hat 29 Buchstaben.",
+    countries: ["🇻🇳 Vietnam"],
+    flags: "🇻🇳",
+    info: "Vietnamesisch ist eine Tonsprache mit sechs Tönen. Die lateinische Schrift (Quốc Ngữ) wurde im 17. Jahrhundert von portugiesischen Missionaren eingeführt und ersetzte die chinesischen Zeichen. Es hat ca. 85 Millionen Muttersprachler.",
+    alphabet: "A Ă Â B C D Đ E Ê G H I K L M N O Ô Ơ P Q R S T U Ư V X Y"
+  },
+  "Walisisch": {
+    translation: "Rwy'n dy garu di",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Walisisch nutzt das lateinische Alphabet mit 29 Buchstaben, darunter 8 Digraphen: ch, dd, ff, ng, ll, ph, rh, th. Die Buchstaben k, q, v, x, z fehlen.",
+    countries: ["🇬🇧 Wales (Großbritannien)"],
+    flags: "🏴󠁧󠁢󠁷󠁬󠁳󠁿",
+    info: "Walisisch ist die lebendigste keltische Sprache mit ca. 880.000 Sprechern. Es hat Konsonantenmutationen am Wortanfang und das berühmte Dorf Llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch – der längste Ortsname Europas.",
+    alphabet: "A B C Ch D Dd E F Ff G Ng H I J K L Ll M N O P Ph Q R Rh S T Th U W Y"
+  },
+  "Zulu": {
+    translation: "Ngiyakuthanda",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Zulu nutzt das lateinische Alphabet mit 26 Buchstaben. Besondere Digraphen und Trigraphen repräsentieren die Klicklaute: c (dentaler Klick), q (alveolärer Klick), x (lateraler Klick).",
+    countries: ["🇿🇦 Südafrika"],
+    flags: "🇿🇦",
+    info: "Zulu ist die meistgesprochene Sprache Südafrikas mit ca. 12 Millionen Muttersprachlern. Es gehört zu den Bantusprachen und ist berühmt für seine drei Klicklaute, die aus den Khoisan-Sprachen übernommen wurden.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+  }
+};
+
+// ===== STATE =====
+let entries = [];
+let pendingImage = null; // base64 data URL for the form
+
+// ===== INIT =====
+function init() {
+  // Load from localStorage
+  const saved = localStorage.getItem('iloveyou_entries');
+  if (saved) {
+    try { entries = JSON.parse(saved); } catch(e) { entries = []; }
+  }
+
+  // Set today's date
+  document.getElementById('inputDate').value = new Date().toISOString().split('T')[0];
+
+  // Populate language dropdown
+  const select = document.getElementById('inputLanguage');
+  const usedLanguages = new Set(entries.map(e => e.language));
+
+  Object.keys(LANGUAGES).sort().forEach(lang => {
+    const opt = document.createElement('option');
+    opt.value = lang;
+    opt.textContent = usedLanguages.has(lang) ? `${lang} ✓` : lang;
+    if (usedLanguages.has(lang)) opt.style.color = '#999';
+    select.appendChild(opt);
+  });
+
+  renderEntries();
+}
+
+function resizeImage(dataUrl, maxWidth, maxHeight) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      if (w > maxWidth || h > maxHeight) {
+        const ratio = Math.min(maxWidth / w, maxHeight / h);
+        w = Math.round(w * ratio);
+        h = Math.round(h * ratio);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', 0.8));
+    };
+    img.src = dataUrl;
+  });
+}
+
+function onImageSelected(event) {
+  event.stopPropagation();
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    pendingImage = await resizeImage(e.target.result, 800, 600);
+    const preview = document.getElementById('uploadPreview');
+    const placeholder = document.getElementById('uploadPlaceholder');
+    const removeBtn = document.getElementById('uploadRemove');
+    const area = document.getElementById('imageUploadArea');
+    preview.src = pendingImage;
+    preview.style.display = 'block';
+    placeholder.style.display = 'none';
+    removeBtn.style.display = 'flex';
+    area.classList.add('has-image');
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeFormImage(event) {
+  event.stopPropagation();
+  pendingImage = null;
+  document.getElementById('uploadPreview').style.display = 'none';
+  document.getElementById('uploadPlaceholder').style.display = 'block';
+  document.getElementById('uploadRemove').style.display = 'none';
+  document.getElementById('imageUploadArea').classList.remove('has-image');
+  document.getElementById('inputImage').value = '';
+}
+
+function resetFormImage() {
+  pendingImage = null;
+  const preview = document.getElementById('uploadPreview');
+  const placeholder = document.getElementById('uploadPlaceholder');
+  const removeBtn = document.getElementById('uploadRemove');
+  const area = document.getElementById('imageUploadArea');
+  if (preview) { preview.style.display = 'none'; preview.src = ''; }
+  if (placeholder) placeholder.style.display = 'block';
+  if (removeBtn) removeBtn.style.display = 'none';
+  if (area) area.classList.remove('has-image');
+  const input = document.getElementById('inputImage');
+  if (input) input.value = '';
+}
+
+function uploadCardImage(event, index) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const resized = await resizeImage(e.target.result, 800, 600);
+    entries[index].image = resized;
+    localStorage.setItem('iloveyou_entries', JSON.stringify(entries));
+    renderEntries();
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeCardImage(index) {
+  delete entries[index].image;
+  localStorage.setItem('iloveyou_entries', JSON.stringify(entries));
+  renderEntries();
+}
+
+let currentMode = 'db'; // 'db' or 'manual'
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('modeDb').classList.toggle('active', mode === 'db');
+  document.getElementById('modeManual').classList.toggle('active', mode === 'manual');
+  document.getElementById('dbLanguageGroup').style.display = mode === 'db' ? '' : 'none';
+  document.getElementById('manualLanguageGroup').style.display = mode === 'manual' ? '' : 'none';
+  document.getElementById('manualFields').classList.toggle('visible', mode === 'manual');
+  document.getElementById('previewBox').classList.remove('visible');
+}
+
+function toggleForm() {
+  editingIndex = null;
+  const form = document.getElementById('formCard');
+  form.classList.toggle('visible');
+  if (form.classList.contains('visible')) {
+    document.getElementById('inputDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('inputLanguage').value = '';
+    document.getElementById('previewBox').classList.remove('visible');
+    resetFormImage();
+    setMode('db');
+    // Clear manual fields
+    ['manualLanguage','manualTranslation','manualTranslit','manualScript','manualScriptInfo','manualCountries','manualInfo'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+  }
+}
+
+function onLanguageSelect() {
+  const lang = document.getElementById('inputLanguage').value;
+  const preview = document.getElementById('previewBox');
+  if (lang && LANGUAGES[lang]) {
+    const data = LANGUAGES[lang];
+    document.getElementById('previewText').textContent = data.translation;
+    document.getElementById('previewTranslit').textContent = data.transliteration ? `(${data.transliteration})` : '';
+    preview.classList.add('visible');
+  } else {
+    preview.classList.remove('visible');
+  }
+}
+
+function saveEntry() {
+  const date = document.getElementById('inputDate').value;
+  if (!date) {
+    alert('Bitte ein Datum eingeben.');
+    return;
+  }
+
+  let newEntry;
+
+  if (currentMode === 'db') {
+    // --- DATABASE MODE ---
+    const lang = document.getElementById('inputLanguage').value;
+    if (!lang) {
+      alert('Bitte eine Sprache auswählen.');
+      return;
+    }
+    if (!LANGUAGES[lang]) {
+      alert('Sprache nicht in der Datenbank gefunden.');
+      return;
+    }
+    if (entries.some(e => e.language === lang)) {
+      if (!confirm(`${lang} ist bereits eingetragen. Trotzdem hinzufügen?`)) return;
+    }
+    const data = LANGUAGES[lang];
+    newEntry = { date, language: lang, ...data };
+
+  } else {
+    // --- MANUAL MODE ---
+    const lang = document.getElementById('manualLanguage').value.trim();
+    const translation = document.getElementById('manualTranslation').value.trim();
+    if (!lang) {
+      alert('Bitte den Namen der Sprache eingeben.');
+      return;
+    }
+    if (!translation) {
+      alert('Bitte die Übersetzung von „Ich liebe dich" eingeben.');
+      return;
+    }
+    if (entries.some(e => e.language === lang)) {
+      if (!confirm(`${lang} ist bereits eingetragen. Trotzdem hinzufügen?`)) return;
+    }
+
+    const countriesRaw = document.getElementById('manualCountries').value.trim();
+    const countries = countriesRaw ? countriesRaw.split(',').map(c => c.trim()).filter(Boolean) : [];
+    // Extract flag emojis for the flags field
+    const flagRegex = /[\u{1F1E0}-\u{1F1FF}]{2}/gu;
+    const flagMatches = countriesRaw.match(flagRegex);
+    const flags = flagMatches ? flagMatches.join('') : '🌍';
+
+    newEntry = {
+      date,
+      language: lang,
+      translation,
+      transliteration: document.getElementById('manualTranslit').value.trim() || '',
+      script: document.getElementById('manualScript').value.trim() || 'Nicht angegeben',
+      scriptInfo: document.getElementById('manualScriptInfo').value.trim() || '',
+      countries,
+      flags,
+      info: document.getElementById('manualInfo').value.trim() || '',
+      manual: true
+    };
+  }
+
+  if (pendingImage) newEntry.image = pendingImage;
+  if (editingIndex !== null) {
+    entries[editingIndex] = newEntry;
+    editingIndex = null;
+  } else {
+    entries.push(newEntry);
+  }
+
+  localStorage.setItem('iloveyou_entries', JSON.stringify(entries));
+  toggleForm();
+  renderEntries();
+
+  // Refresh dropdown to mark used (for db entries)
+  if (currentMode === 'db') {
+    const select = document.getElementById('inputLanguage');
+    Array.from(select.options).forEach(opt => {
+      if (opt.value === newEntry.language) {
+        opt.textContent = `${newEntry.language} ✓`;
+        opt.style.color = '#999';
+      }
+    });
+  }
+}
+
+function deleteEntry(index) {
+  if (confirm('Eintrag wirklich löschen?')) {
+    entries.splice(index, 1);
+    localStorage.setItem('iloveyou_entries', JSON.stringify(entries));
+    renderEntries();
+  }
+}
+
+let editingIndex = null;
+
+function editEntry(index) {
+  const entry = entries[index];
+  if (!entry) return;
+  editingIndex = index;
+  
+  // Open form and set to manual mode
+  const form = document.getElementById('formCard');
+  if (!form.classList.contains('visible')) form.classList.add('visible');
+  setMode('manual');
+  
+  // Fill in all fields
+  document.getElementById('inputDate').value = entry.date || '';
+  document.getElementById('manualLanguage').value = entry.language || '';
+  document.getElementById('manualTranslation').value = entry.translation || '';
+  document.getElementById('manualTranslit').value = entry.transliteration || '';
+  document.getElementById('manualScript').value = entry.script || '';
+  document.getElementById('manualScriptInfo').value = entry.scriptInfo || '';
+  document.getElementById('manualAlphabet').value = entry.alphabet || '';
+  document.getElementById('manualCountries').value = (entry.countries || []).join(', ');
+  document.getElementById('manualInfo').value = entry.info || '';
+  
+  // Handle image
+  resetFormImage();
+  if (entry.image) {
+    pendingImage = entry.image;
+    const preview = document.getElementById('uploadPreview');
+    const placeholder = document.getElementById('uploadPlaceholder');
+    const removeBtn = document.getElementById('uploadRemove');
+    const area = document.getElementById('imageUploadArea');
+    preview.src = pendingImage;
+    preview.style.display = 'block';
+    placeholder.style.display = 'none';
+    removeBtn.style.display = 'flex';
+    area.classList.add('has-image');
+  }
+  
+  // Scroll to form
+  document.querySelector('.add-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+function speakTranslation(text, language, btnId) {
+  const synth = window.speechSynthesis;
+
+  // Stop if already speaking
+  if (synth.speaking) {
+    synth.cancel();
+    document.querySelectorAll('.speak-btn.speaking').forEach(b => b.classList.remove('speaking'));
+    return;
+  }
+
+  const langCode = SPEECH_CODES[language] || 'en';
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = langCode;
+  utterance.rate = 0.85;
+  utterance.pitch = 1;
+
+  // Try to find a matching voice
+  const voices = synth.getVoices();
+  const match = voices.find(v => v.lang.startsWith(langCode)) ||
+                voices.find(v => v.lang.split('-')[0] === langCode.split('-')[0]);
+  if (match) utterance.voice = match;
+
+  const btn = document.getElementById(btnId);
+  if (btn) btn.classList.add('speaking');
+
+  utterance.onend = () => { if (btn) btn.classList.remove('speaking'); };
+  utterance.onerror = () => { if (btn) btn.classList.remove('speaking'); };
+
+  synth.speak(utterance);
+}
+
+function speakEntry(index) {
+  const entry = entries[index];
+  if (!entry) return;
+  speakTranslation(entry.translation, entry.language, 'speak-' + index);
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function renderEntries() {
+  const grid = document.getElementById('entriesGrid');
+  const empty = document.getElementById('emptyState');
+  const filterBar = document.getElementById('filterBar');
+  const search = document.getElementById('searchInput')?.value?.toLowerCase() || '';
+
+  document.getElementById('entryCount').textContent = entries.length;
+
+  if (entries.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    filterBar.style.display = 'none';
+    return;
+  }
+
+  empty.style.display = 'none';
+  filterBar.style.display = entries.length > 3 ? 'flex' : 'none';
+
+  // Sort by date descending
+  const sorted = entries
+    .map((e, i) => ({...e, originalIndex: i}))
+    .filter(e => !search || e.language.toLowerCase().includes(search))
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  // Day numbers based on date order ascending
+  const byDateAsc = [...entries].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const dayMap = {};
+  byDateAsc.forEach((e, i) => { dayMap[e.language + e.date] = i + 1; });
+
+  grid.innerHTML = sorted.map(entry => {
+    const dayNum = dayMap[entry.language + entry.date] || '?';
+    const countriesHtml = entry.countries?.length > 0
+      ? entry.countries.join(', ')
+      : 'Weltweit';
+
+    return `
+      <div class="entry-card">
+        <div class="card-header">
+          <span class="card-day-number">Tag ${dayNum}</span>
+          <span class="card-date">${formatDate(entry.date)}</span>
+          <div class="card-translation">${entry.translation}</div>
+          ${entry.transliteration ? `<div class="card-translit">${entry.transliteration}</div>` : ''}
+          <div class="card-language">${entry.language}</div>
+          <button class="speak-btn" id="speak-${entry.originalIndex}" onclick="speakEntry(${entry.originalIndex})" title="Anhören">
+            <span class="speak-icon">🔊</span>
+            <span>Anhören</span>
+          </button>
+        </div>
+        ${entry.image ? `
+        <div class="card-image-container">
+          <img class="card-image" src="${entry.image}" alt="${entry.language}">
+          <div class="card-image-overlay">
+            <button class="card-img-remove" onclick="removeCardImage(${entry.originalIndex})">✕ Bild entfernen</button>
+          </div>
+        </div>` : `
+        <div class="card-image-upload">
+          <input type="file" accept="image/*" onchange="uploadCardImage(event, ${entry.originalIndex})">
+          📷 Bild hinzufügen
+        </div>`}
+        <div class="card-body">
+          <div class="card-info-row">
+            <div class="info-icon">🌍</div>
+            <div class="info-content">
+              <div class="info-label">Länder</div>
+              <div class="info-value">${countriesHtml}</div>
+            </div>
+          </div>
+          <div class="card-info-row">
+            <div class="info-icon">✏️</div>
+            <div class="info-content">
+              <div class="info-label">Schriftsystem</div>
+              <div class="info-value"><strong>${entry.script}</strong><br>${entry.scriptInfo}</div>
+            </div>
+          </div>
+          ${entry.alphabet ? `
+<div class="card-info-row">
+  <div class="info-icon">🔡</div>
+  <div class="info-content">
+    <div class="info-label">Alphabet</div>
+    <div class="info-value alphabet-display">${entry.alphabet}</div>
+  </div>
+</div>` : ''}
+${entry.transliteration ? `
+          <div class="card-info-row">
+            <div class="info-icon">🔤</div>
+            <div class="info-content">
+              <div class="info-label">Lateinische Umschrift</div>
+              <div class="info-value">${entry.transliteration}</div>
+            </div>
+          </div>` : ''}
+          <div class="card-info-row">
+            <div class="info-icon">💬</div>
+            <div class="info-content">
+              <div class="info-label">Über die Sprache</div>
+              <div class="info-value">${entry.info}</div>
+            </div>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="edit-btn" onclick="editEntry(${entry.originalIndex})" title="Bearbeiten">✎ Bearbeiten</button>
+          <button class="delete-btn" onclick="deleteEntry(${entry.originalIndex})" title="Löschen">✕ Entfernen</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Preload voices (some browsers load async)
+if (window.speechSynthesis) {
+  speechSynthesis.getVoices();
+  speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+}
+
+// Init on load
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
