@@ -308,12 +308,15 @@
   }
 
   .delete-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 12px;
     background: none;
     border: none;
     color: #ccc;
     cursor: pointer;
     font-size: 0.8em;
-    padding: 4px 10px;
+    padding: 4px 8px;
     border-radius: 6px;
     transition: all 0.2s;
   }
@@ -588,47 +591,6 @@
     font-size: 0.85em;
     color: var(--mid);
   }
-
-  .alphabet-display {
-    font-size: 1.05em;
-    letter-spacing: 2px;
-    line-height: 1.8;
-    word-break: break-all;
-    font-family: 'Playfair Display', serif;
-    color: var(--rose-dark);
-    background: var(--rose-light);
-    padding: 8px 12px;
-    border-radius: 8px;
-    margin-top: 4px;
-  }
-
-  .sync-status {
-    margin-top: 8px;
-    font-size: 0.8em;
-    color: #4caf50;
-    font-weight: 500;
-  }
-  .sync-status.offline {
-    color: var(--rose);
-  }
-
-  .card-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    padding: 0 16px 12px;
-  }
-  .edit-btn {
-    background: none;
-    border: none;
-    color: #bbb;
-    cursor: pointer;
-    font-size: 0.8em;
-    padding: 4px 10px;
-    border-radius: 6px;
-    transition: all 0.2s;
-  }
-  .edit-btn:hover { color: var(--gold); background: #fef7f0; }
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
@@ -641,7 +603,6 @@
   <div class="counter">
     <strong id="entryCount">0</strong> Sprachen gesammelt
   </div>
-  <div class="sync-status" id="syncStatus">☁️ Synchronisiert</div>
 </header>
 
 <div class="add-section">
@@ -703,11 +664,6 @@
         <textarea id="manualScriptInfo" placeholder="z.B. Anzahl Buchstaben, Besonderheiten, Schreibrichtung..."></textarea>
       </div>
       <div class="form-group">
-        <label>Alphabet / Zeichensatz</label>
-        <textarea id="manualAlphabet" placeholder="Buchstaben durch Leerzeichen getrennt, z.B. A B C D E F ..."></textarea>
-        <div class="manual-hint">Alle Buchstaben des Alphabets, durch Leerzeichen getrennt</div>
-      </div>
-      <div class="form-group">
         <label>Länder (mit Flaggen-Emoji)</label>
         <input type="text" id="manualCountries" placeholder="z.B. 🇹🇿 Tansania, 🇰🇪 Kenia">
         <div class="manual-hint">Kommagetrennt. Tipp: Flaggen-Emojis aus dem Emoji-Menü kopieren</div>
@@ -739,7 +695,7 @@
 
 <div class="filter-bar" id="filterBar" style="display:none;">
   <input type="text" id="searchInput" placeholder="Suche nach Sprache..." oninput="renderEntries()">
-  <span class="sort-label">Sortiert nach Datum (älteste zuerst)</span>
+  <span class="sort-label">Sortiert nach Datum (neueste zuerst)</span>
 </div>
 
 <div class="entries-section">
@@ -788,7 +744,84 @@ const SPEECH_CODES = {
   "Suaheli": "sw", "Tamil": "ta", "Telugu": "te", "Thailändisch": "th",
   "Tibetisch": "bo", "Tschechisch": "cs", "Türkisch": "tr",
   "Ukrainisch": "uk", "Ungarisch": "hu", "Urdu": "ur",
-  "Vietnamesisch": "vi", "Walisisch": "cy", "Zulu": "zu"
+  "Vietnamesisch": "vi", "Walisisch": "cy", "Zulu": "zu",
+  "Birmanisch": "my", "Kasachisch": "kk", "Usbekisch": "uz", "Kirgisisch": "ky",
+  "Laotisch": "lo", "Igbo": "ig", "Yoruba": "yo", "Hausa": "ha",
+  "Somali": "so", "Xhosa": "xh", "Shona": "sn", "Tigrinya": "ti",
+  "Oromo": "om", "Pashto": "ps", "Marathi": "mr", "Odia": "or",
+  "Assamesisch": "as", "Haitianisches Kreol": "ht", "Quechua": "qu",
+  "Guaraní": "gn", "Aymara": "ay", "Malagasy": "mg", "Javanisch": "jv",
+  "Schottisch-Gälisch": "gd", "Bretonisch": "br", "Galicisch": "gl",
+  "Sindhi": "sd", "Sesotho": "st", "Kinyarwanda": "rw", "Tok Pisin": "tpi",
+  "Wolof": "wo", "Lingala": "ln", "Luganda": "lg", "Bambara": "bm", "Twi (Akan)": "ak",
+  "Ewe": "ee", "Fon": "fon", "Chichewa (Nyanja)": "ny", "Kirundi": "rn", "Tswana (Setswana)": "tn",
+  "Swati (Siswati)": "ss", "Tsonga (Xitsonga)": "ts", "Venda (Tshivenda)": "ve", "Ndebele (Süd)": "nr",
+  "Fulfulde (Fula)": "ff", "Mandinka": "mnk", "Kikongo": "kg", "Bemba": "bem", "Luo (Dholuo)": "luo",
+  "Kanuri": "kr", "Mossi (Mooré)": "mos", "Dagbani": "dag", "Serer": "srr", "Tiv": "tiv",
+  "Edo (Bini)": "bin", "Ibibio": "ibb", "Nuer": "nus", "Dinka": "din", "Maasai": "mas",
+  "Luba-Katanga": "lu", "Umbundu": "umb", "Kimbundu": "kmb", "Sotho (Nord/Sepedi)": "nso",
+  "Makonde": "kde", "Sukuma": "suk", "Nyamwezi": "nym", "Tumbuka": "tum", "Wolaitta": "wal",
+  "Sidama": "sid", "Berberisch (Tamazight)": "ber", "Kabylisch": "kab", "Tuareg (Tamashek)": "tmh",
+  "Zarma": "dje", "Soninke": "snk", "Mende": "men", "Temne": "tem", "Krio": "kri",
+  "Afar": "aa", "Tigre": "tig", "Beja": "bej",
+  "Kantonesisch": "yue", "Tadschikisch": "tg", "Turkmenisch": "tk", "Tatarisch": "tt",
+  "Hmong": "hmn", "Dzongkha": "dz", "Konkani": "kok", "Maithili": "mai", "Dogri": "doi",
+  "Kashmiri": "ks", "Sanskrit": "sa", "Meitei (Manipuri)": "mni", "Balinesisch": "ban",
+  "Sundanesisch": "su", "Cebuano": "ceb", "Ilokano": "ilo", "Hiligaynon": "hil",
+  "Waray": "war", "Bikol": "bik", "Kapampangan": "pam", "Pangasinan": "pag",
+  "Chuukesisch": "chk", "Palauisch": "pau", "Karen (S'gaw)": "ksw", "Shan": "shn",
+  "Mon": "mnw", "Minangkabau": "min", "Bugis": "bug", "Acehnese": "ace", "Tulu": "tcy",
+  "Santhali": "sat", "Bodo": "brx", "Mizo": "lus", "Khasi": "kha", "Garo": "grt",
+  "Kokborok": "trp", "Nagamesisch": "nag", "Tatar (Krim)": "crh", "Baschkirisch": "ba",
+  "Tschuwaschisch": "cv", "Karakalpakisch": "kaa", "Gagausisch": "gag",
+  "Jakutisch (Sacha)": "sah", "Tuwinisch": "tyv", "Burjatisch": "bua",
+  "Kalmückisch": "xal", "Evenki": "evn", "Adygeisch": "ady", "Abchasisch": "ab",
+  "Ossetisch": "os", "Tschetschenisch": "ce", "Awarisch": "av", "Lezgisch": "lez",
+  "Tabassaranisch": "tab", "Darginisch": "dar",
+  "Tonganisch": "to", "Fidschianisch": "fj", "Tahitianisch": "ty", "Chamorro": "ch",
+  "Marshallese": "mh", "Rapanui (Osterinsel)": "rap", "Niueanisch": "niu",
+  "Gilbertesisch (Kiribati)": "gil", "Tuvaluisch": "tvl", "Bislama": "bi",
+  "Hiri Motu": "ho", "Tetum": "tet", "Nauruanisch": "na", "Palauanisch": "pau",
+  "Yapesisch": "yap", "Kosraeanisch": "kos", "Ponapeanisch (Pohnpeianisch)": "pon",
+  "Rarotonga": "rar", "Wallisianisch": "wls", "Futunisch": "fud", "Tokelauisch": "tkl",
+  "Rotuma": "rtm", "Drehu": "dhv", "Nengone": "nen", "Paicî": "pri",
+  "Okzitanisch": "oc", "Sardisch": "sc", "Rätoromanisch": "rm", "Friesisch (West)": "fy",
+  "Friesisch (Nord)": "frr", "Sorbisch (Ober)": "hsb", "Sorbisch (Nieder)": "dsb",
+  "Jiddisch": "yi", "Kornisch": "kw", "Manx": "gv", "Nordsamisch": "se",
+  "Lulesamisch": "smj", "Inarisamisch": "smn", "Ladino (Judenspanisch)": "lad",
+  "Romani": "rom", "Aromunisch (Mazedorumänisch)": "rup", "Mirandés": "mwl",
+  "Asturisch": "ast", "Aragonesisch": "an", "Piemontesisch": "pms",
+  "Lombardisch": "lmo", "Venezianisch": "vec", "Neapolitanisch": "nap",
+  "Sizilianisch": "scn", "Korsisch": "co", "Lothringisch (Platt)": "pfl",
+  "Limburgisch": "li", "Niedersächsisch": "nds", "Scots": "sco", "Karelisch": "krl",
+  "Navajo": "nv", "Cherokee": "chr", "Nahuatl": "nah", "Maya (Yucatec)": "yua",
+  "Mapudungun (Mapuche)": "arn", "Inuktitut": "iu", "Grönländisch (Kalaallisut)": "kl",
+  "Cree": "cr", "Ojibwe": "oj", "Lakota (Sioux)": "lkt", "Apache": "apw",
+  "Hopi": "hop", "Zapotekisch": "zap", "Mixtekisch": "mix", "K'iche' (Maya)": "quc",
+  "Kaqchikel (Maya)": "cak", "Wayuu": "guc", "Wayampi": "oym", "Nheengatu": "yrl",
+  "Bribri": "bzd", "Kuna (Guna)": "cuk", "Garifuna": "cab", "Miskito": "miq",
+  "Arawak": "arw", "Sranan Tongo": "srn",
+  "Papiamento": "pap", "Kapverdisches Kreol": "kea", "Seychellen-Kreol": "crs",
+  "Mauritius-Kreol": "mfe", "Réunion-Kreol": "rcf", "Guadeloupe-Kreol": "gcf",
+  "Martinique-Kreol": "gcf-mq", "Chavacano": "cbk", "Sango": "sg", "Kituba": "mkw",
+  "Fanagalo": "fng", "Kriol (Australisch)": "rop", "Hawai'i-Kreol": "hwc",
+  "Toki Pona": "tok", "Interlingua": "ia", "Volapük": "vo", "Ido": "io",
+  "Lojban": "jbo", "Altgriechisch": "grc", "Altnordisch": "non",
+  "Altägyptisch (hieroglyphisch)": "egy", "Sumerisch": "sux", "Akkadisch": "akk",
+  "Gotisch": "got", "Altirisch": "sga", "Mittelhochdeutsch": "gmh",
+  "Altenglisch": "ang", "Gebärdensprache (International Sign)": "ils",
+  "Zazaisch": "zza", "Luri": "lrc", "Belutschi": "bal", "Gilaki": "glk",
+  "Mazandarani": "mzn", "Talysch": "tly", "Tat": "ttt", "Mingrelisch": "xmf",
+  "Swanisch": "sva", "Lasisch": "lzz", "Tscham": "cja", "Jarai": "jra",
+  "Rade": "rad", "Koho": "kpm", "Mnong": "mng", "Bahnar": "bdq", "Sedang": "sed",
+  "Pacoh": "pac", "Bru": "bru", "Khmu": "kjg", "Lahu": "lhu", "Akha": "ahk",
+  "Lisu": "lis", "Naxi": "nxq", "Bai": "bca", "Yi (Nuosu)": "ii", "Zhuang": "za",
+  "Dong": "doc", "Miao": "hmn-cn", "Yao": "ium", "Li": "lic", "Va": "wbm",
+  "Jingpo": "kac", "Rawang": "raw", "Dulong": "duu", "Qiang": "qxs", "Pumi": "pmi",
+  "Derung": "duu-d", "Tajik (Afghan Dari variety)": "prs", "Hazaragi": "haz",
+  "Aimaq": "aiq", "Pashai": "psi", "Nuristani (Kati)": "bsh", "Burushaski": "bsk",
+  "Brahui": "brh", "Wakhi": "wbl",
+  "Saterfriesisch": "stq", "Livisch": "liv"
 };
 
 // ===== LANGUAGE DATABASE =====
@@ -1532,8 +1565,2919 @@ const LANGUAGES = {
     countries: ["🇿🇦 Südafrika"],
     flags: "🇿🇦",
     info: "Zulu ist die meistgesprochene Sprache Südafrikas mit ca. 12 Millionen Muttersprachlern. Es gehört zu den Bantusprachen und ist berühmt für seine drei Klicklaute, die aus den Khoisan-Sprachen übernommen wurden."
+  },
+  "Birmanisch": {
+    translation: "ချစ်တယ်",
+    transliteration: "Chit tal",
+    script: "Birmanische Schrift",
+    scriptInfo: "Die birmanische Schrift besteht aus runden Buchstaben, die von der Mon-Schrift abstammen. Sie hat 33 Konsonanten und 12 Vokale. Die runden Formen entstanden, weil auf Palmblätter geschrieben wurde.",
+    alphabet: "က ခ ဂ ဃ င စ ဆ ဇ ဈ ဉ ည ဋ ဌ ဍ ဎ ဏ တ ထ ဒ ဓ န ပ ဖ ဗ ဘ မ ယ ရ လ ဝ သ ဟ ဠ အ",
+    countries: ["🇲🇲 Myanmar"],
+    flags: "🇲🇲",
+    info: "Birmanisch wird von etwa 33 Millionen Muttersprachlern gesprochen und ist die Amtssprache Myanmars. Es ist eine Tonsprache mit drei Tönen und gehört zur sino-tibetischen Sprachfamilie."
+  },
+  "Kasachisch": {
+    translation: "Мен сені сүйемін",
+    transliteration: "Men seni süyemin",
+    script: "Kyrillisches Alphabet (Umstellung auf Lateinisch geplant)",
+    scriptInfo: "Kasachisch nutzt aktuell ein erweitertes kyrillisches Alphabet mit 42 Buchstaben. Kasachstan plant die vollständige Umstellung auf das lateinische Alphabet bis 2031.",
+    alphabet: "А Ә Б В Г Ғ Д Е Ё Ж З И Й К Қ Л М Н Ң О Ө П Р С Т У Ұ Ү Ф Х Һ Ц Ч Ш Щ Ъ Ы І Ь Э Ю Я",
+    countries: ["🇰🇿 Kasachstan", "🇨🇳 China (Xinjiang)"],
+    flags: "🇰🇿🇨🇳",
+    info: "Kasachisch ist eine Turksprache mit ca. 13 Millionen Muttersprachlern. Es hat die Vokalharmonie – Vokale in einem Wort müssen zueinander passen. In China wird Kasachisch in arabischer Schrift geschrieben."
+  },
+  "Usbekisch": {
+    translation: "Men seni sevaman",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Usbekisch verwendet seit 1992 offiziell das lateinische Alphabet mit Sonderzeichen wie Oʻ, Gʻ und Digraphen Sh, Ch. Im Alltag wird teilweise noch Kyrillisch verwendet.",
+    alphabet: "A B D E F G Gʻ H I J K L M N O Oʻ P Q R S T U V X Y Z Sh Ch Ng",
+    countries: ["🇺🇿 Usbekistan", "🇦🇫 Afghanistan"],
+    flags: "🇺🇿🇦🇫",
+    info: "Usbekisch wird von ca. 35 Millionen Menschen gesprochen und ist die meistgesprochene Turksprache in Zentralasien. Anders als andere Turksprachen hat Usbekisch die Vokalharmonie weitgehend verloren."
+  },
+  "Kirgisisch": {
+    translation: "Мен сени сүйөм",
+    transliteration: "Men seni süyöm",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Kirgisisch nutzt ein erweitertes kyrillisches Alphabet mit 36 Buchstaben, darunter die Sonderzeichen Ң, Ө, Ү.",
+    alphabet: "А Б В Г Д Е Ё Ж З И Й К Л М Н Ң О Ө П Р С Т У Ү Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я",
+    countries: ["🇰🇬 Kirgisistan"],
+    flags: "🇰🇬",
+    info: "Kirgisisch wird von ca. 4,5 Millionen Menschen gesprochen. Die kirgisische Kultur ist stark von der Nomadentradition geprägt. Das Nationalepos Manas ist mit 500.000 Versen eines der längsten der Welt."
+  },
+  "Laotisch": {
+    translation: "ຂ້ອຍຮັກເຈົ້າ",
+    transliteration: "Khoi hak chao",
+    script: "Laotische Schrift",
+    scriptInfo: "Die laotische Schrift hat 27 Konsonanten und 28 Vokalzeichen. Sie stammt von der Khmer-Schrift ab und wird von links nach rechts geschrieben, ohne Wortabstände.",
+    alphabet: "ກ ຂ ຄ ງ ຈ ສ ຊ ຍ ດ ຕ ຖ ທ ນ ບ ປ ຜ ຝ ພ ຟ ມ ຢ ຣ ລ ວ ຫ ອ ຮ",
+    countries: ["🇱🇦 Laos"],
+    flags: "🇱🇦",
+    info: "Laotisch wird von ca. 7 Millionen Menschen gesprochen. Es ist eine Tonsprache mit sechs Tönen und ist eng mit Thailändisch verwandt – Sprecher beider Sprachen können sich teilweise verstehen."
+  },
+  "Igbo": {
+    translation: "A hụrụ m gị n'anya",
+    transliteration: "",
+    script: "Lateinisches Alphabet (Önwu-Alphabet)",
+    scriptInfo: "Igbo verwendet das lateinische Alphabet mit 36 Buchstaben, darunter Digraphen wie ch, gb, gh, gw, kp, kw, nw, ny, sh und Sonderzeichen wie ị, ọ, ụ, ñ.",
+    alphabet: "A B Ch D E F G Gb Gh Gw H I Ị J K Kp Kw L M N Ñ Nw Ny O Ọ P R S Sh T U Ụ V W Y Z",
+    countries: ["🇳🇬 Nigeria"],
+    flags: "🇳🇬",
+    info: "Igbo wird von ca. 45 Millionen Menschen in Südost-Nigeria gesprochen. Es ist eine Tonsprache mit zwei Grundtönen. Die Igbo-Kultur ist bekannt für ihr demokratisches Gesellschaftssystem ohne zentralisierte Könige."
+  },
+  "Yoruba": {
+    translation: "Mo nífẹ̀ẹ́ rẹ",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Yoruba nutzt das lateinische Alphabet mit 25 Buchstaben plus Unterstriche und Akzente für Töne: á (hoher Ton), à (tiefer Ton), ohne Akzent (mittlerer Ton). Die Buchstaben ẹ, ọ, ṣ sind spezifisch für Yoruba.",
+    alphabet: "A B D E Ẹ F G Gb H I J K L M N O Ọ P R S Ṣ T U W Y",
+    countries: ["🇳🇬 Nigeria", "🇧🇯 Benin", "🇹🇬 Togo"],
+    flags: "🇳🇬🇧🇯🇹🇬",
+    info: "Yoruba wird von ca. 47 Millionen Menschen gesprochen. Es ist eine Tonsprache mit drei Tönen, die die Bedeutung komplett verändern. Die Yoruba-Kultur hat über die Sklaverei die Religionen Candomblé und Santería in Brasilien und der Karibik geprägt."
+  },
+  "Hausa": {
+    translation: "Ina sonki / Ina sonka",
+    transliteration: "",
+    script: "Lateinisches Alphabet (Boko)",
+    scriptInfo: "Hausa verwendet heute hauptsächlich das lateinische Boko-Alphabet mit Sonderzeichen wie ɓ, ɗ, ƙ und Digraphen sh, ts. Historisch und religiös wird auch die arabische Ajami-Schrift verwendet.",
+    alphabet: "A B Ɓ C D Ɗ E F G H I J K Ƙ L M N O R S Sh T Ts U W Y Z ʼ",
+    countries: ["🇳🇬 Nigeria", "🇳🇪 Niger", "🇬🇭 Ghana"],
+    flags: "🇳🇬🇳🇪🇬🇭",
+    info: "Hausa ist mit über 80 Millionen Sprechern (inkl. Zweitsprachler) die meistgesprochene Sprache Westafrikas und die größte tschadische Sprache. Es dient als Lingua franca in weiten Teilen Westafrikas."
+  },
+  "Somali": {
+    translation: "Waan ku jeclahay",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Somali verwendet seit 1972 offiziell das lateinische Alphabet. Zuvor gab es keine standardisierte Schrift. Das Alphabet hat 26 Buchstaben, wobei Kombinationen wie dh, kh, sh spezielle Laute darstellen.",
+    alphabet: "A B C D Dh E F G H I J K Kh L M N O P Q R S Sh T U V W X Y Z",
+    countries: ["🇸🇴 Somalia", "🇩🇯 Dschibuti", "🇪🇹 Äthiopien (Ogaden)", "🇰🇪 Kenia"],
+    flags: "🇸🇴🇩🇯🇪🇹🇰🇪",
+    info: "Somali wird von ca. 22 Millionen Menschen gesprochen. Es gehört zur kuschitischen Sprachfamilie und hat eine reiche mündliche Dichtungstradition. Somali war bis 1972 eine reine Mündlichkeitssprache."
+  },
+  "Xhosa": {
+    translation: "Ndiyakuthanda",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Xhosa nutzt das lateinische Alphabet mit 26 Buchstaben. Besondere Digraphen und Trigraphen repräsentieren die 18 Klicklaute: c (dentaler Klick), q (postalveolärer Klick), x (lateraler Klick).",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇿🇦 Südafrika"],
+    flags: "🇿🇦",
+    info: "Xhosa wird von ca. 8 Millionen Muttersprachlern in Südafrika gesprochen. Es hat 18 Klicklaute – mehr als fast jede andere Bantusprache. Nelson Mandela und Desmond Tutu waren Muttersprachler des Xhosa."
+  },
+  "Shona": {
+    translation: "Ndinokuda",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Shona nutzt das lateinische Alphabet mit speziellen Kombinationen wie bh, ch, dh, dy, mb, mh, ny, sv, zv für Laute, die im Deutschen nicht existieren.",
+    alphabet: "A B Bh C Ch D Dh Dy E F G H I J K L M Mb Mh N Ny O P R S Sv T U V W Y Z Zv",
+    countries: ["🇿🇼 Simbabwe", "🇲🇿 Mosambik"],
+    flags: "🇿🇼🇲🇿",
+    info: "Shona wird von ca. 12 Millionen Menschen gesprochen und ist die meistgesprochene Sprache Simbabwes. Es ist eine Tonsprache mit zwei Tönen und hat eine reiche Tradition von Sprichwörtern und mündlicher Literatur."
+  },
+  "Tigrinya": {
+    translation: "እፈትወካ / እፈትወኪ",
+    transliteration: "Ifetiweka / Ifetiweki",
+    script: "Ge'ez-Schrift (Äthiopisches Alphabet)",
+    scriptInfo: "Tigrinya nutzt die gleiche Ge'ez-Schrift wie Amharisch – eine Abugida mit über 200 Zeichen. Jedes Zeichen repräsentiert eine Konsonant-Vokal-Kombination.",
+    alphabet: "ሀ ለ ሐ መ ሠ ረ ሰ ሸ ቀ ቐ በ ቨ ተ ቸ ኀ ነ ኘ አ ከ ኸ ወ ዐ ዘ ዠ የ ደ ጀ ገ ጠ ጨ ጰ ፈ ፐ",
+    countries: ["🇪🇷 Eritrea", "🇪🇹 Äthiopien (Tigray)"],
+    flags: "🇪🇷🇪🇹",
+    info: "Tigrinya wird von ca. 9 Millionen Menschen gesprochen. Es ist die Amtssprache Eritreas und gehört wie Amharisch zu den semitischen Sprachen. Tigrinya hat ein komplexes Verbsystem mit über 10 verschiedenen Konjugationsmustern."
+  },
+  "Oromo": {
+    translation: "Sin jaaladha",
+    transliteration: "",
+    script: "Lateinisches Alphabet (Qubee)",
+    scriptInfo: "Oromo nutzt seit 1991 das lateinische Alphabet Qubee mit Digraphen wie ch, dh, ny, ph, sh. Zuvor wurde es in Ge'ez-Schrift oder gar nicht geschrieben.",
+    alphabet: "A B C Ch D Dh E F G H I J K L M N Ny O P Ph Q R S Sh T U V W X Y Z",
+    countries: ["🇪🇹 Äthiopien", "🇰🇪 Kenia"],
+    flags: "🇪🇹🇰🇪",
+    info: "Oromo wird von ca. 37 Millionen Menschen gesprochen und ist die meistgesprochene kuschitische Sprache. Die Oromo sind die größte ethnische Gruppe Äthiopiens. Die Sprache hat ein demokratisches Rechtssystem namens Gadaa."
+  },
+  "Pashto": {
+    translation: "زه تا سره مینه لرم",
+    transliteration: "Za ta sara mina larum",
+    script: "Persisch-arabisches Alphabet (erweitert)",
+    scriptInfo: "Pashto nutzt eine erweiterte Version der arabischen Schrift mit 44 Buchstaben – 12 mehr als Arabisch. Spezielle Buchstaben wie ټ, ډ, ړ, ږ, ښ existieren nur im Pashto.",
+    alphabet: "ا ب پ ت ټ ث ج چ ح خ څ ځ د ډ ذ ر ړ ز ژ ږ س ش ښ ص ض ط ظ ع غ ف ق ک ګ ل م ن ڼ و ه ي ې ۍ ئ",
+    countries: ["🇦🇫 Afghanistan", "🇵🇰 Pakistan"],
+    flags: "🇦🇫🇵🇰",
+    info: "Pashto wird von ca. 50 Millionen Menschen gesprochen und ist neben Dari eine der beiden Amtssprachen Afghanistans. Es gehört zu den iranischen Sprachen und hat eine über 1.000 Jahre alte literarische Tradition."
+  },
+  "Marathi": {
+    translation: "मी तुझ्यावर प्रेम करतो / करते",
+    transliteration: "Mī tujhyāvar prem kartō / karte",
+    script: "Devanagari-Schrift",
+    scriptInfo: "Marathi nutzt die gleiche Devanagari-Schrift wie Hindi mit 47 Grundzeichen. Es verwendet zusätzlich den Buchstaben ळ (retroflexes l), der im Hindi nicht vorkommt.",
+    alphabet: "अ आ इ ई उ ऊ ए ऐ ओ औ अं अः क ख ग घ ङ च छ ज झ ञ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह ळ",
+    countries: ["🇮🇳 Indien (Maharashtra)"],
+    flags: "🇮🇳",
+    info: "Marathi wird von ca. 83 Millionen Muttersprachlern gesprochen und ist damit die drittmeistgesprochene Sprache Indiens. Mumbai ist die Hauptstadt des Marathi-sprachigen Bundesstaates Maharashtra."
+  },
+  "Odia": {
+    translation: "ମୁଁ ତୁମକୁ ଭଲ ପାଏ",
+    transliteration: "Mun tumaku bhala pae",
+    script: "Odia-Schrift",
+    scriptInfo: "Die Odia-Schrift hat sehr runde Formen und gehört zu den ästhetischsten indischen Schriften. Sie hat 47 Grundzeichen und stammt von der Brahmi-Schrift ab. Die runden Formen entstanden durch das Schreiben auf Palmblättern.",
+    alphabet: "ଅ ଆ ଇ ଈ ଉ ଊ ଏ ଐ ଓ ଔ କ ଖ ଗ ଘ ଙ ଚ ଛ ଜ ଝ ଞ ଟ ଠ ଡ ଢ ଣ ତ ଥ ଦ ଧ ନ ପ ଫ ବ ଭ ମ ଯ ର ଲ ଵ ଶ ଷ ସ ହ",
+    countries: ["🇮🇳 Indien (Odisha)"],
+    flags: "🇮🇳",
+    info: "Odia wird von ca. 35 Millionen Menschen gesprochen und ist eine der ältesten klassischen Sprachen Indiens. Die Odia-Literatur hat eine über 1.000 Jahre alte Tradition. Der Jagannath-Tempel in Puri ist das kulturelle Zentrum."
+  },
+  "Assamesisch": {
+    translation: "মই তোমাক ভাল পাওঁ",
+    transliteration: "Moi tumak bhal paon",
+    script: "Assamesische Schrift",
+    scriptInfo: "Die assamesische Schrift ist sehr ähnlich zur bengalischen Schrift, hat aber eigene Buchstabenformen wie ৰ (ra) und ৱ (wa). Sie hat 41 Konsonanten und 11 Vokale.",
+    alphabet: "অ আ ই ঈ উ ঊ এ ঐ ও ঔ ক খ গ ঘ ঙ চ ছ জ ঝ ঞ ট ঠ ড ঢ ণ ত থ দ ধ ন প ফ ব ভ ম য ৰ ল ৱ শ ষ স হ",
+    countries: ["🇮🇳 Indien (Assam)"],
+    flags: "🇮🇳",
+    info: "Assamesisch wird von ca. 15 Millionen Menschen in Nordost-Indien gesprochen. Es ist die östlichste indoarische Sprache. Die Region Assam ist berühmt für ihren Tee, und die Sprache hat viele Lehnwörter aus tibeto-birmanischen Sprachen."
+  },
+  "Haitianisches Kreol": {
+    translation: "Mwen renmen ou",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Haitianisches Kreol nutzt das lateinische Alphabet mit phonetischer Schreibweise. Besondere Zeichen sind è, ò und die Nasalvokale an, en, on. Die Rechtschreibung wurde 1979 offiziell standardisiert.",
+    alphabet: "A B Ch D E È F G H I J K L M N O Ò P R S T Ou V W Y Z",
+    countries: ["🇭🇹 Haiti"],
+    flags: "🇭🇹",
+    info: "Haitianisches Kreol wird von ca. 12 Millionen Menschen gesprochen. Es basiert auf dem Französischen des 17./18. Jahrhunderts mit Einflüssen westafrikanischer Sprachen. Es ist seit 1987 neben Französisch offizielle Amtssprache Haitis."
+  },
+  "Quechua": {
+    translation: "Munakuyki",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Quechua nutzt das lateinische Alphabet mit Sonderzeichen und Apostrophen für ejektive Laute (p', t', k', ch', q'). Es hat nur drei Vokale: a, i, u.",
+    alphabet: "A Ch Chh Ch' H I K Kh K' L Ll M N Ñ P Ph P' Q Qh Q' R S T Th T' U W Y",
+    countries: ["🇵🇪 Peru", "🇧🇴 Bolivien", "🇪🇨 Ecuador"],
+    flags: "🇵🇪🇧🇴🇪🇨",
+    info: "Quechua war die Sprache des Inka-Reichs und wird heute von ca. 8 Millionen Menschen in den Anden gesprochen. Es ist eine agglutinierende Sprache – lange Suffixketten drücken komplexe Bedeutungen aus."
+  },
+  "Guaraní": {
+    translation: "Rohayhu",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Guaraní nutzt das lateinische Alphabet mit nasalen Vokalen (ã, ẽ, ĩ, õ, ũ, ỹ), dem Glottalstop (ʼ) und dem Tilde-g (g̃). Es hat 33 Buchstaben.",
+    alphabet: "A Ã B Ch D E Ẽ G G̃ H I Ĩ J K L M Mb N Nd Ng Nt Ñ O Õ P R Rr S T U Ũ V Y Ỹ ʼ",
+    countries: ["🇵🇾 Paraguay", "🇧🇴 Bolivien", "🇦🇷 Argentinien", "🇧🇷 Brasilien"],
+    flags: "🇵🇾🇧🇴🇦🇷🇧🇷",
+    info: "Guaraní ist neben Spanisch Amtssprache Paraguays – das einzige Land Lateinamerikas, in dem eine indigene Sprache von der Mehrheit der Bevölkerung gesprochen wird (ca. 90%). Es hat ca. 6 Millionen Sprecher."
+  },
+  "Aymara": {
+    translation: "Nayax jumataw munapsmawa",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Aymara nutzt das lateinische Alphabet mit Sonderzeichen für ejektive Laute (p', t', k', ch', q') und aspirierte Laute (ph, th, kh, chh, qh). Es hat nur drei Vokale: a, i, u.",
+    alphabet: "A Ch Chh Ch' H I J K Kh K' L Ll M N Ñ P Ph P' Q Qh Q' R S T Th T' U W X Y",
+    countries: ["🇧🇴 Bolivien", "🇵🇪 Peru", "🇨🇱 Chile"],
+    flags: "🇧🇴🇵🇪🇨🇱",
+    info: "Aymara wird von ca. 2 Millionen Menschen in den Hochanden gesprochen. Es hat ein einzigartiges Zeitkonzept: Die Zukunft liegt hinter dem Sprecher (unsichtbar), die Vergangenheit vor ihm (sichtbar)."
+  },
+  "Malagasy": {
+    translation: "Tiako ianao",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Malagasy nutzt das lateinische Alphabet mit 21 Buchstaben (c, q, u, w, x fehlen). Die Schreibweise wurde im 19. Jahrhundert von britischen Missionaren standardisiert.",
+    alphabet: "A B D E F G H I J K L M N O P R S T V Y Z",
+    countries: ["🇲🇬 Madagaskar"],
+    flags: "🇲🇬",
+    info: "Malagasy gehört überraschenderweise zur austronesischen Sprachfamilie – es ist näher mit Indonesisch und Malaiisch verwandt als mit afrikanischen Sprachen. Seefahrer aus Borneo besiedelten Madagaskar vor ca. 1.500 Jahren."
+  },
+  "Javanisch": {
+    translation: "Aku tresna kowe",
+    transliteration: "",
+    script: "Lateinisches Alphabet (und Javanische Schrift)",
+    scriptInfo: "Javanisch wird heute meist in lateinischer Schrift geschrieben. Die historische javanische Schrift (Aksara Jawa) hat 20 Grundkonsonanten und stammt von der Brahmi-Schrift ab.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇮🇩 Indonesien (Java)"],
+    flags: "🇮🇩",
+    info: "Javanisch ist mit ca. 82 Millionen Sprechern die meistgesprochene austronesische Sprache. Es hat ein komplexes Höflichkeitssystem mit drei Sprachebenen: Ngoko (informell), Madya (neutral) und Krama (höflich)."
+  },
+  "Schottisch-Gälisch": {
+    translation: "Tha gaol agam ort",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Schottisch-Gälisch nutzt nur 18 Buchstaben des lateinischen Alphabets (j, k, q, v, w, x, y, z fehlen). Es verwendet Lenition durch ein nachgestelltes h (bh, ch, dh, fh, gh, mh, ph, sh, th).",
+    alphabet: "A B C D E F G H I L M N O P R S T U",
+    countries: ["🇬🇧 Schottland (Großbritannien)"],
+    flags: "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+    info: "Schottisch-Gälisch wird von nur noch ca. 57.000 Menschen gesprochen, hauptsächlich auf den Äußeren Hebriden. Es ist eine keltische Sprache und eng mit dem Irischen verwandt. Die BBC betreibt einen eigenen gälischen TV-Sender (BBC Alba)."
+  },
+  "Bretonisch": {
+    translation: "Da garout a ran",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Bretonisch nutzt das lateinische Alphabet mit Sonderzeichen wie ñ, ù, ê, â, î, ô, û und dem Trigraph c'h für den ich-Laut.",
+    alphabet: "A B C C'h D E F G H I J K L M N Ñ O P R S T U V W Y Z",
+    countries: ["🇫🇷 Frankreich (Bretagne)"],
+    flags: "🇫🇷",
+    info: "Bretonisch ist die einzige keltische Sprache auf dem europäischen Festland und wird von ca. 200.000 Menschen in der Bretagne gesprochen. Es ist stark bedroht – die meisten Sprecher sind über 60."
+  },
+  "Galicisch": {
+    translation: "Quérote",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Galicisch nutzt das lateinische Alphabet ähnlich wie Portugiesisch mit Akzenten (á, é, í, ó, ú) und dem ñ. Es hat 23 Grundbuchstaben.",
+    alphabet: "A B C D E F G H I L M N Ñ O P Q R S T U V X Z",
+    countries: ["🇪🇸 Spanien (Galicien)"],
+    flags: "🇪🇸",
+    info: "Galicisch wird von ca. 2,4 Millionen Menschen in Galicien (Nordwest-Spanien) gesprochen. Es ist eng mit Portugiesisch verwandt – beide Sprachen waren bis zum 14. Jahrhundert eins (Galicisch-Portugiesisch)."
+  },
+  "Sindhi": {
+    translation: "مان توکي پيار ڪريان ٿو",
+    transliteration: "Maan tokhe pyar karyan tho",
+    script: "Arabische Schrift (in Pakistan) / Devanagari (in Indien)",
+    scriptInfo: "Sindhi in Pakistan nutzt eine erweiterte arabische Schrift mit 52 Buchstaben – eines der größten arabisch-basierten Alphabete. Einzigartige Buchstaben wie ڪ, ڳ, ڱ existieren nur im Sindhi.",
+    alphabet: "ا ب ٻ پ ت ٿ ٽ ث ج جھ ڄ چ ڇ ح خ د ڏ ڊ ذ ر ڙ ز س ش ص ض ط ظ ع غ ف ق ڪ ک گ ڳ ڱ ل م ن ڻ و ه ء ي ے",
+    countries: ["🇵🇰 Pakistan (Sindh)", "🇮🇳 Indien (Gujarat, Rajasthan)"],
+    flags: "🇵🇰🇮🇳",
+    info: "Sindhi wird von ca. 30 Millionen Menschen gesprochen. Die Indus-Tal-Zivilisation lag im heutigen Sindh. Sindhi hat eine reiche sufistische Dichtungstradition, besonders durch den Dichter Shah Abdul Latif Bhittai."
+  },
+  "Sesotho": {
+    translation: "Ke a go rata",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Sesotho nutzt das lateinische Alphabet mit 26 Buchstaben und Digraphen wie ph, th, tlh, kg, ng, sh, ts, tsh für spezifische Laute.",
+    alphabet: "A B D E F G H I J K L M N O P Q R S T U V W Y Z",
+    countries: ["🇱🇸 Lesotho", "🇿🇦 Südafrika"],
+    flags: "🇱🇸🇿🇦",
+    info: "Sesotho wird von ca. 5,6 Millionen Muttersprachlern gesprochen. Es ist die Amtssprache Lesothos und eine der elf Amtssprachen Südafrikas. Lesotho ist vollständig von Südafrika umschlossen."
+  },
+  "Kinyarwanda": {
+    translation: "Ndagukunda",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Kinyarwanda nutzt das lateinische Alphabet mit 25 Buchstaben (x fehlt). Die Rechtschreibung ist sehr phonetisch und regelmäßig. Lange Vokale werden durch Verdopplung dargestellt (aa, ee, ii, oo, uu).",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W Y Z",
+    countries: ["🇷🇼 Ruanda"],
+    flags: "🇷🇼",
+    info: "Kinyarwanda ist einzigartig in Afrika: Es wird von praktisch der gesamten Bevölkerung Ruandas als Muttersprache gesprochen (ca. 12 Millionen). Es ist fast identisch mit Kirundi (Burundi). Kinyarwanda hat 15 Nominalklassen."
+  },
+  "Tok Pisin": {
+    translation: "Mi lavim yu",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Tok Pisin nutzt das lateinische Alphabet mit 22 Buchstaben (c, q, x, z fehlen). Die Rechtschreibung ist phonetisch und wurde 1956 standardisiert.",
+    alphabet: "A B D E F G H I J K L M N O P R S T U V W Y",
+    countries: ["🇵🇬 Papua-Neuguinea"],
+    flags: "🇵🇬",
+    info: "Tok Pisin ist eine englisch-basierte Kreolsprache und die meistgesprochene Sprache Papua-Neuguineas (ca. 4 Millionen Sprecher). In einem Land mit über 800 Sprachen dient es als unverzichtbare Lingua franca."
+  },
+  "Wolof": {
+    translation: "Dama la noob",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Wolof verwendet das lateinische Alphabet mit einigen Sonderzeichen wie ñ, ë und Digraphen.",
+    alphabet: "A B C D E Ë F G H I J K L M N Ñ Ŋ O P Q R S T U W X Y",
+    countries: ["🇸🇳 Senegal", "🇬🇲 Gambia", "🇲🇷 Mauretanien"],
+    flags: "🇸🇳🇬🇲🇲🇷",
+    info: "Wolof ist die meistgesprochene Sprache Senegals mit über 5 Millionen Muttersprachlern und 10 Millionen Zweitsprechern. Sie dient als Lingua franca in der Region."
+  },
+  "Lingala": {
+    translation: "Nalingi yo",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Lingala nutzt das lateinische Alphabet mit Sonderzeichen wie ɛ, ɔ und Tonzeichen.",
+    alphabet: "A B C D E Ɛ F G H I K L M N O Ɔ P R S T U V W Y Z",
+    countries: ["🇨🇩 DR Kongo", "🇨🇬 Republik Kongo"],
+    flags: "🇨🇩🇨🇬",
+    info: "Lingala ist eine Bantusprache und Lingua franca in beiden Kongos. Sie verbreitete sich durch Handel und Musik – Lingala ist die Sprache der berühmten kongolesischen Rumba."
+  },
+  "Luganda": {
+    translation: "Nkwagala",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Luganda nutzt das lateinische Alphabet mit speziellen Digraphen und Tonzeichen.",
+    alphabet: "A B C D E F G H I J K L M N Ŋ O P R S T U V W Y Z",
+    countries: ["🇺🇬 Uganda"],
+    flags: "🇺🇬",
+    info: "Luganda ist die meistgesprochene Sprache Ugandas mit über 8 Millionen Muttersprachlern. Es ist die Sprache des Königreichs Buganda und hat ein komplexes Nominalklassensystem."
+  },
+  "Bambara": {
+    translation: "N b'i fɛ",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Bambara nutzt das lateinische Alphabet mit Sonderzeichen wie ɛ, ɔ, ɲ, ŋ.",
+    alphabet: "A B C D E Ɛ F G H I J K L M N Ɲ Ŋ O Ɔ P R S T U W Y Z",
+    countries: ["🇲🇱 Mali"],
+    flags: "🇲🇱",
+    info: "Bambara ist die meistgesprochene Sprache Malis und dient als Lingua franca für über 15 Millionen Menschen. Sie gehört zur Mande-Sprachfamilie."
+  },
+  "Twi (Akan)": {
+    translation: "Me dɔ wo",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Twi nutzt das lateinische Alphabet mit Sonderzeichen wie ɛ, ɔ und Tonzeichen.",
+    alphabet: "A B D E Ɛ F G H I K L M N O Ɔ P R S T U W Y",
+    countries: ["🇬🇭 Ghana"],
+    flags: "🇬🇭",
+    info: "Twi ist ein Dialekt der Akan-Sprache und wird von über 9 Millionen Menschen in Ghana gesprochen. Es ist eine tonale Sprache mit zwei Haupttönen."
+  },
+  "Ewe": {
+    translation: "Me lɔ̃ wo",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Ewe nutzt das lateinische Alphabet mit Sonderzeichen wie ɖ, ɛ, ƒ, ɣ, ŋ, ɔ, ʋ und Tonzeichen.",
+    alphabet: "A B D Ɖ E Ɛ F Ƒ G Ɣ H I K L M N Ŋ O Ɔ P R S T U V Ʋ W X Y Z",
+    countries: ["🇬🇭 Ghana", "🇹🇬 Togo"],
+    flags: "🇬🇭🇹🇬",
+    info: "Ewe ist eine Gbe-Sprache mit über 7 Millionen Sprechern in Ghana und Togo. Es ist eine tonale Sprache mit drei Grundtöne und hat eine reiche mündliche Literaturtradition."
+  },
+  "Fon": {
+    translation: "Un yí wǎn nú we",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Fon nutzt das lateinische Alphabet mit Sonderzeichen wie ɛ, ɔ, ɖ und Tonzeichen.",
+    alphabet: "A B C D Ɖ E Ɛ F G H I J K L M N Ŋ O Ɔ P R S T U V W X Y Z",
+    countries: ["🇧🇯 Benin"],
+    flags: "🇧🇯",
+    info: "Fon ist die meistgesprochene Sprache Benins mit über 2 Millionen Muttersprachlern. Es ist eng mit Ewe verwandt und die Sprache des historischen Königreichs Dahomey."
+  },
+  "Chichewa (Nyanja)": {
+    translation: "Ndimakukonda",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Chichewa nutzt das lateinische Alphabet mit 23 Buchstaben und verschiedenen Digraphen.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U W Y Z",
+    countries: ["🇲🇼 Malawi", "🇿🇲 Sambia", "🇲🇿 Mosambik"],
+    flags: "🇲🇼🇿🇲🇲🇿",
+    info: "Chichewa ist die Nationalsprache Malawis und wird von über 15 Millionen Menschen gesprochen. David Livingstone war einer der ersten Europäer, die diese Sprache dokumentierten."
+  },
+  "Kirundi": {
+    translation: "Ndagukunda",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Kirundi nutzt das lateinische Alphabet und ist fast identisch mit Kinyarwanda in der Schrift.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W Y Z",
+    countries: ["🇧🇮 Burundi"],
+    flags: "🇧🇮",
+    info: "Kirundi ist die Nationalsprache Burundis und nahezu identisch mit Kinyarwanda. Es wird von über 9 Millionen Menschen gesprochen und hat ein komplexes Tonsystem."
+  },
+  "Tswana (Setswana)": {
+    translation: "Ke a go rata",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Tswana nutzt das lateinische Alphabet mit 26 Buchstaben und speziellen Digraphen wie tl, kg, ng.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇧🇼 Botswana", "🇿🇦 Südafrika"],
+    flags: "🇧🇼🇿🇦",
+    info: "Tswana ist die Nationalsprache Botswanas und eine der 11 offiziellen Sprachen Südafrikas. Etwa 8 Millionen Menschen sprechen Tswana als Muttersprache."
+  },
+  "Swati (Siswati)": {
+    translation: "Ngiyakutsandza",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Siswati nutzt das lateinische Alphabet mit Klicklaut-Zeichen und Digraphen.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇸🇿 Eswatini", "🇿🇦 Südafrika"],
+    flags: "🇸🇿🇿🇦",
+    info: "Siswati ist die Nationalsprache von Eswatini (ehemals Swasiland) und wird von etwa 2,5 Millionen Menschen gesprochen. Es gehört zur Nguni-Gruppe der Bantusprachen."
+  },
+  "Tsonga (Xitsonga)": {
+    translation: "Ndi ku rhandza",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Xitsonga nutzt das lateinische Alphabet mit Digraphen wie bv, dz, ng, ny, pf, sv, ts.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W X Y Z",
+    countries: ["🇿🇦 Südafrika", "🇲🇿 Mosambik"],
+    flags: "🇿🇦🇲🇿",
+    info: "Xitsonga wird von etwa 12 Millionen Menschen in Südafrika und Mosambik gesprochen. Die Sprache wurde im 19. Jahrhundert von Schweizer Missionaren erstmals verschriftlicht."
+  },
+  "Venda (Tshivenda)": {
+    translation: "Ndi a ni funa",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Tshivenda nutzt das lateinische Alphabet mit speziellen Digraphen wie ḓ, ḽ, ṋ, ṱ, ṅ.",
+    alphabet: "A B D Ḓ E F G H I K L Ḽ M N Ṅ Ṋ O P R S T Ṱ U V W Y Z",
+    countries: ["🇿🇦 Südafrika"],
+    flags: "🇿🇦",
+    info: "Tshivenda wird von etwa 1,3 Millionen Menschen in Südafrika gesprochen. Die Venda-Kultur ist bekannt für den Domba-Tanz und den heiligen See Fundudzi."
+  },
+  "Ndebele (Süd)": {
+    translation: "Ngiyakuthanda",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Südndebele nutzt das lateinische Alphabet mit Klicklaut-Digraphen.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇿🇦 Südafrika"],
+    flags: "🇿🇦",
+    info: "Südndebele ist eine der 11 offiziellen Sprachen Südafrikas mit etwa 1,1 Millionen Sprechern. Die Ndebele sind berühmt für ihre farbenprächtigen geometrischen Wandmalereien."
+  },
+  "Fulfulde (Fula)": {
+    translation: "Miɗo yiɗi ma",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Fulfulde nutzt das lateinische Alphabet mit Sonderzeichen wie ɓ, ɗ, ŋ, ɲ, ƴ.",
+    alphabet: "A B Ɓ C D Ɗ E F G H I J K L M N Ŋ Ɲ O P R S T U W Y Ƴ Z",
+    countries: ["🇳🇬 Nigeria", "🇬🇳 Guinea", "🇸🇳 Senegal", "🇲🇱 Mali"],
+    flags: "🇳🇬🇬🇳🇸🇳🇲🇱",
+    info: "Fulfulde wird von über 40 Millionen Menschen in ganz Westafrika gesprochen und ist eine der am weitesten verbreiteten Sprachen Afrikas. Die Fulbe sind traditionell nomadische Viehzüchter."
+  },
+  "Mandinka": {
+    translation: "N b'i fɛ",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Mandinka nutzt das lateinische Alphabet mit einigen Sonderzeichen wie ŋ, ɲ.",
+    alphabet: "A B C D E F G H I J K L M N Ŋ Ɲ O P R S T U W Y Z",
+    countries: ["🇬🇲 Gambia", "🇸🇳 Senegal", "🇬🇳 Guinea-Bissau"],
+    flags: "🇬🇲🇸🇳",
+    info: "Mandinka ist eine Mande-Sprache mit über 1,3 Millionen Sprechern. Die Mandinka sind bekannt durch Alex Haleys Roman 'Roots' und ihre Griot-Tradition der mündlichen Geschichtsüberlieferung."
+  },
+  "Kikongo": {
+    translation: "Mono ke zola nge",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Kikongo nutzt das lateinische Alphabet mit einigen Sonderzeichen.",
+    alphabet: "A B D E F G I K L M N O P S T U V W Y Z",
+    countries: ["🇨🇩 DR Kongo", "🇨🇬 Republik Kongo", "🇦🇴 Angola"],
+    flags: "🇨🇩🇨🇬🇦🇴",
+    info: "Kikongo wird von über 6 Millionen Menschen gesprochen. Es war die Sprache des historischen Königreichs Kongo und hat das Kituba-Pidgin beeinflusst."
+  },
+  "Bemba": {
+    translation: "Nalikutemwa",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Bemba nutzt das lateinische Alphabet mit Digraphen und speziellen Zeichen.",
+    alphabet: "A B C D E F G H I J K L M N O P S T U W Y",
+    countries: ["🇿🇲 Sambia", "🇨🇩 DR Kongo"],
+    flags: "🇿🇲🇨🇩",
+    info: "Bemba ist die meistgesprochene Bantusprache Sambias mit über 4 Millionen Sprechern. Sie hat ein reiches System von Höflichkeitsformen und Nominalklassen."
+  },
+  "Luo (Dholuo)": {
+    translation: "Aheri",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Dholuo nutzt das lateinische Alphabet mit einigen Sonderzeichen.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W Y",
+    countries: ["🇰🇪 Kenia", "🇹🇿 Tansania"],
+    flags: "🇰🇪🇹🇿",
+    info: "Dholuo wird von über 4 Millionen Menschen in Kenia und Tansania gesprochen. Barack Obamas Vater war ein Luo, wodurch die Sprache internationale Bekanntheit erlangte."
+  },
+  "Kanuri": {
+    translation: "Nəwu ndə kərgəna",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Kanuri nutzt das lateinische Alphabet mit speziellen Zeichen wie ə und Digraphen.",
+    alphabet: "A B C D E Ə F G H I J K L M N O P R S T U W Y Z",
+    countries: ["🇳🇬 Nigeria", "🇳🇪 Niger", "🇹🇩 Tschad"],
+    flags: "🇳🇬🇳🇪🇹🇩",
+    info: "Kanuri wird von über 4 Millionen Menschen in der Tschadsee-Region gesprochen. Es war die Sprache des mächtigen Kanem-Bornu-Reiches, das über 1000 Jahre existierte."
+  },
+  "Mossi (Mooré)": {
+    translation: "Mam nong fo",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Mooré nutzt das lateinische Alphabet mit Sonderzeichen wie ɛ, ɩ, ʋ, ũ.",
+    alphabet: "A B D E Ɛ F G H I Ɩ K L M N Ŋ O P R S T U Ʋ W Y Z",
+    countries: ["🇧🇫 Burkina Faso"],
+    flags: "🇧🇫",
+    info: "Mooré ist die meistgesprochene Sprache Burkina Fasos mit über 8 Millionen Sprechern. Es ist die Sprache des Mossi-Volkes und ihres historischen Königreichs."
+  },
+  "Dagbani": {
+    translation: "N bɔri a",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Dagbani nutzt das lateinische Alphabet mit Sonderzeichen wie ɛ, ɔ, ɣ, ŋ, ʒ.",
+    alphabet: "A B D E Ɛ F G Ɣ H I K L M N Ŋ O Ɔ P R S T U W Y Z Ʒ",
+    countries: ["🇬🇭 Ghana"],
+    flags: "🇬🇭",
+    info: "Dagbani wird von über 1 Million Menschen in Nordghana gesprochen. Es ist die Sprache des Dagbon-Königreichs, eines der ältesten und größten traditionellen Staaten Ghanas."
+  },
+  "Serer": {
+    translation: "Da la bëgg",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Serer nutzt das lateinische Alphabet mit Sonderzeichen.",
+    alphabet: "A B C D E F G H I J K L M N Ŋ O P Q R S T U W X Y",
+    countries: ["🇸🇳 Senegal", "🇬🇲 Gambia"],
+    flags: "🇸🇳🇬🇲",
+    info: "Serer wird von über 1,7 Millionen Menschen gesprochen. Die Serer haben eine reiche kosmologische Tradition und sind eines der ältesten Völker Westafrikas."
+  },
+  "Tiv": {
+    translation: "M hegen u",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Tiv nutzt das lateinische Alphabet mit Sonderzeichen.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W Y Z",
+    countries: ["🇳🇬 Nigeria"],
+    flags: "🇳🇬",
+    info: "Tiv wird von über 5 Millionen Menschen in Zentralnigeria gesprochen. Die Tiv-Gesellschaft ist egalitär und hat keine traditionellen Häuptlingstümer."
+  },
+  "Edo (Bini)": {
+    translation: "I hó u we",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Edo nutzt das lateinische Alphabet mit Tonzeichen und Sonderzeichen wie ẹ, ọ.",
+    alphabet: "A B D E Ẹ F G H I K L M N O Ọ P R S T U V W Y Z",
+    countries: ["🇳🇬 Nigeria"],
+    flags: "🇳🇬",
+    info: "Edo ist die Sprache des historischen Königreichs Benin (nicht zu verwechseln mit der Republik Benin). Die berühmten Benin-Bronzen stammen aus dieser Kultur. Über 5 Millionen Sprecher."
+  },
+  "Ibibio": {
+    translation: "Mme mme owo fo",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Ibibio nutzt das lateinische Alphabet mit Sonderzeichen und Tonzeichen.",
+    alphabet: "A B D E F G H I K M N Ŋ O P R S T U W Y",
+    countries: ["🇳🇬 Nigeria"],
+    flags: "🇳🇬",
+    info: "Ibibio wird von über 4 Millionen Menschen in Südostnigeria gesprochen. Die Ibibio sind bekannt für ihre Ekpo-Maskeraden und komplexen Gesellschaftsstrukturen."
+  },
+  "Nuer": {
+    translation: "Ŋa̱ jiëën yi",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Nuer nutzt das lateinische Alphabet mit Sonderzeichen und Diakritika für Töne und Vokallängen.",
+    alphabet: "A B C D E Ɛ F G H I J K L M N Ŋ O Ɔ P R T U W Y",
+    countries: ["🇸🇸 Südsudan", "🇪🇹 Äthiopien"],
+    flags: "🇸🇸🇪🇹",
+    info: "Nuer wird von über 2 Millionen Menschen im Südsudan und Äthiopien gesprochen. E.E. Evans-Pritchards ethnographische Studie der Nuer gilt als Klassiker der Sozialanthropologie."
+  },
+  "Dinka": {
+    translation: "Nhiaar yïn",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Dinka nutzt das lateinische Alphabet mit Sonderzeichen wie ä, ë, ɛ, ɣ, ŋ, ɔ und Tonzeichen.",
+    alphabet: "A Ä B C D E Ë Ɛ G Ɣ H I J K L M N Ŋ O Ɔ P R T U W Y",
+    countries: ["🇸🇸 Südsudan"],
+    flags: "🇸🇸",
+    info: "Dinka ist die meistgesprochene Sprache im Südsudan mit über 4 Millionen Sprechern. Die Dinka sind eines der größten Völker Afrikas und bekannt für ihre Viehzuchtkultur."
+  },
+  "Maasai": {
+    translation: "Akíyíéú",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Maasai nutzt das lateinische Alphabet mit Tonzeichen und speziellen Zeichen.",
+    alphabet: "A B C D E G H I J K L M N Ŋ O P R S T U W Y",
+    countries: ["🇰🇪 Kenia", "🇹🇿 Tansania"],
+    flags: "🇰🇪🇹🇿",
+    info: "Maasai wird von über 1,5 Millionen Menschen in Kenia und Tansania gesprochen. Die Maasai sind weltweit bekannt für ihre Kriegerkultur und halbnomadische Lebensweise."
+  },
+  "Luba-Katanga": {
+    translation: "Ndi mukutemwa",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Luba-Katanga nutzt das lateinische Alphabet mit Sonderzeichen.",
+    alphabet: "A B C D E F G H I J K L M N O P S T U V W Y Z",
+    countries: ["🇨🇩 DR Kongo"],
+    flags: "🇨🇩",
+    info: "Luba-Katanga wird von über 2 Millionen Menschen in der DR Kongo gesprochen. Die Luba schufen eines der bedeutendsten Königreiche Zentralafrikas mit einer ausgefeilten Gedächtniskultur (Lukasa-Bretter)."
+  },
+  "Umbundu": {
+    translation: "Ondi ku sakula",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Umbundu nutzt das lateinische Alphabet mit einigen speziellen Zeichen.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W Y",
+    countries: ["🇦🇴 Angola"],
+    flags: "🇦🇴",
+    info: "Umbundu ist die meistgesprochene Bantusprache Angolas mit über 6 Millionen Sprechern. Es ist die Sprache der Ovimbundu, der größten ethnischen Gruppe Angolas."
+  },
+  "Kimbundu": {
+    translation: "Ngi ku zola",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Kimbundu nutzt das lateinische Alphabet mit einigen Sonderzeichen.",
+    alphabet: "A B D E F G H I J K L M N O P R S T U V W X Y Z",
+    countries: ["🇦🇴 Angola"],
+    flags: "🇦🇴",
+    info: "Kimbundu wird von über 3 Millionen Menschen in Angola gesprochen. Viele portugiesische Lehnwörter wie 'Samba', 'Banjo' und 'Zombie' stammen aus dem Kimbundu."
+  },
+  "Sotho (Nord/Sepedi)": {
+    translation: "Ke a go rata",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Sepedi nutzt das lateinische Alphabet mit speziellen Digraphen wie šh, tšh.",
+    alphabet: "A B D E F G H I J K L M N O P R S Š T U W Y",
+    countries: ["🇿🇦 Südafrika"],
+    flags: "🇿🇦",
+    info: "Sepedi ist eine der 11 offiziellen Sprachen Südafrikas mit über 4,7 Millionen Muttersprachlern. Es ist eng mit Sesotho und Setswana verwandt."
+  },
+  "Makonde": {
+    translation: "Nanukupinga",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Makonde nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W Y Z",
+    countries: ["🇹🇿 Tansania", "🇲🇿 Mosambik"],
+    flags: "🇹🇿🇲🇿",
+    info: "Makonde wird von über 2 Millionen Menschen gesprochen. Die Makonde sind weltberühmt für ihre Holzschnitzkunst, besonders die komplexen Shetani-Skulpturen."
+  },
+  "Sukuma": {
+    translation: "Nakogwenda",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Sukuma nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W Y Z",
+    countries: ["🇹🇿 Tansania"],
+    flags: "🇹🇿",
+    info: "Sukuma ist die meistgesprochene Bantusprache Tansanias mit über 8 Millionen Sprechern. Die Sukuma sind die größte ethnische Gruppe Tansanias."
+  },
+  "Nyamwezi": {
+    translation: "Nakugwira",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Nyamwezi nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W Y Z",
+    countries: ["🇹🇿 Tansania"],
+    flags: "🇹🇿",
+    info: "Nyamwezi wird von über 1,5 Millionen Menschen in Tansania gesprochen. Die Nyamwezi waren historisch bedeutende Fernhändler in Ostafrika."
+  },
+  "Tumbuka": {
+    translation: "Nkhukutemwa",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Tumbuka nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W Y Z",
+    countries: ["🇲🇼 Malawi", "🇿🇲 Sambia"],
+    flags: "🇲🇼🇿🇲",
+    info: "Tumbuka wird von über 3 Millionen Menschen in Malawi und Sambia gesprochen. Es ist eine der größten Sprachen Malawis nach Chichewa."
+  },
+  "Wolaitta": {
+    translation: "Taani siiqays",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Wolaitta nutzt das lateinische Alphabet mit speziellen Zeichen.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇪🇹 Äthiopien"],
+    flags: "🇪🇹",
+    info: "Wolaitta wird von über 2,4 Millionen Menschen in Südäthiopien gesprochen. Es gehört zur omotischen Sprachfamilie, die nur in Äthiopien vorkommt."
+  },
+  "Sidama": {
+    translation: "Ani di hexxo",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Sidama nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇪🇹 Äthiopien"],
+    flags: "🇪🇹",
+    info: "Sidama wird von über 4 Millionen Menschen in Südäthiopien gesprochen. Im Jahr 2020 wurde die Sidama-Region durch ein Referendum als eigenständige Region Äthiopiens gegründet."
+  },
+  "Berberisch (Tamazight)": {
+    translation: "ⵅ ⴽⵎⵉⵖ / Hmlegh-kem",
+    transliteration: "Hmlegh-kem",
+    script: "Tifinagh / Lateinisches Alphabet",
+    scriptInfo: "Tamazight kann in Tifinagh-Schrift, lateinischem oder arabischem Alphabet geschrieben werden. Tifinagh ist eine der ältesten Schriften Afrikas.",
+    alphabet: "ⴰ ⴱ ⴳ ⴷ ⴹ ⴻ ⴼ ⴽ ⵀ ⵃ ⵄ ⵅ ⵇ ⵉ ⵊ ⵍ ⵎ ⵏ ⵓ ⵔ ⵕ ⵖ ⵙ ⵚ ⵛ ⵜ ⵟ ⵡ ⵢ ⵣ ⵥ",
+    countries: ["🇲🇦 Marokko", "🇩🇿 Algerien", "🇹🇳 Tunesien", "🇱🇾 Libyen"],
+    flags: "🇲🇦🇩🇿🇹🇳🇱🇾",
+    info: "Tamazight ist die Sprache der Berber/Amazigh und wird von über 30 Millionen Menschen in Nordafrika gesprochen. Die Tifinagh-Schrift wurde 2003 in Marokko offiziell anerkannt."
+  },
+  "Kabylisch": {
+    translation: "Hemleɣ-kem",
+    transliteration: "",
+    script: "Lateinisches Alphabet / Tifinagh",
+    scriptInfo: "Kabylisch wird hauptsächlich in lateinischer Schrift geschrieben, zunehmend auch in Tifinagh.",
+    alphabet: "A B C Č D Ḍ E Ɛ F G Ǧ Ɣ H Ḥ I J K L M N P Q R Ṛ S Ṣ T Ṭ U V W X Y Z Ẓ",
+    countries: ["🇩🇿 Algerien"],
+    flags: "🇩🇿",
+    info: "Kabylisch wird von über 6 Millionen Menschen in der Kabylei-Region Algeriens gesprochen. Es hat die stärkste literarische Tradition unter den Berbersprachen."
+  },
+  "Tuareg (Tamashek)": {
+    translation: "Akh righ-em",
+    transliteration: "",
+    script: "Tifinagh / Lateinisches Alphabet",
+    scriptInfo: "Tamashek nutzt traditionell die Tifinagh-Schrift, die von den Tuareg seit über 2000 Jahren verwendet wird.",
+    alphabet: "ⴰ ⴱ ⴳ ⴷ ⴹ ⴻ ⴼ ⴽ ⵀ ⵃ ⵄ ⵅ ⵇ ⵉ ⵊ ⵍ ⵎ ⵏ ⵓ ⵔ ⵕ ⵖ ⵙ ⵚ ⵛ ⵜ ⵟ ⵡ ⵢ ⵣ",
+    countries: ["🇲🇱 Mali", "🇳🇪 Niger", "🇩🇿 Algerien", "🇧🇫 Burkina Faso"],
+    flags: "🇲🇱🇳🇪🇩🇿🇧🇫",
+    info: "Tamashek wird von über 1 Million Tuareg-Nomaden in der Sahara gesprochen. Die Tuareg sind eines der wenigen Völker, bei denen traditionell die Männer verschleiert sind."
+  },
+  "Zarma": {
+    translation: "Ay ga ni baa",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Zarma nutzt das lateinische Alphabet mit Sonderzeichen wie ɲ, ŋ, š, ž.",
+    alphabet: "A B C D E F G H I J K L M N Ɲ Ŋ O P R S Š T U W Y Z Ž",
+    countries: ["🇳🇪 Niger"],
+    flags: "🇳🇪",
+    info: "Zarma ist die meistgesprochene Sprache Nigers und wird von über 5 Millionen Menschen gesprochen. Sie gehört zur Songhai-Sprachfamilie."
+  },
+  "Soninke": {
+    translation: "N da i xanu",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Soninke nutzt das lateinische Alphabet mit Sonderzeichen.",
+    alphabet: "A B C D E F G H I J K L M N Ŋ O P Q R S T U W X Y Z",
+    countries: ["🇲🇱 Mali", "🇸🇳 Senegal", "🇲🇷 Mauretanien"],
+    flags: "🇲🇱🇸🇳🇲🇷",
+    info: "Soninke wird von über 2 Millionen Menschen gesprochen. Die Soninke gründeten das Ghana-Reich, eines der ältesten und mächtigsten Reiche Westafrikas."
+  },
+  "Mende": {
+    translation: "Ngá lóní",
+    transliteration: "",
+    script: "Lateinisches Alphabet / Mende-Kikakui",
+    scriptInfo: "Mende hat eine eigene Silbenschrift namens Kikakui, die 1921 erfunden wurde. Heute wird meist lateinische Schrift verwendet.",
+    alphabet: "A B D E Ɛ F G H I J K L M N Ŋ O Ɔ P S T U V W Y",
+    countries: ["🇸🇱 Sierra Leone"],
+    flags: "🇸🇱",
+    info: "Mende wird von über 2 Millionen Menschen in Sierra Leone gesprochen. Die Mende-Kikakui-Silbenschrift ist eine der wenigen in Afrika erfundenen Schriften."
+  },
+  "Temne": {
+    translation: "A lɔm ɔ",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Temne nutzt das lateinische Alphabet mit Sonderzeichen.",
+    alphabet: "A B D E Ɛ F G H I K L M N Ŋ O Ɔ P R S T U V W Y",
+    countries: ["🇸🇱 Sierra Leone"],
+    flags: "🇸🇱",
+    info: "Temne wird von über 2 Millionen Menschen in Sierra Leone gesprochen und ist neben Mende die wichtigste einheimische Sprache des Landes."
+  },
+  "Krio": {
+    translation: "A lɛk yu",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Krio nutzt das lateinische Alphabet mit einigen phonetischen Zeichen.",
+    alphabet: "A B C D E Ɛ F G H I J K L M N O Ɔ P R S T U V W Y",
+    countries: ["🇸🇱 Sierra Leone"],
+    flags: "🇸🇱",
+    info: "Krio ist eine englisch-basierte Kreolsprache und Lingua franca Sierra Leones mit über 4 Millionen Sprechern. Es entstand durch befreite Sklaven aus Nordamerika und Großbritannien."
+  },
+  "Afar": {
+    translation: "Ko kicino",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Afar nutzt das lateinische Alphabet seit 1972.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇩🇯 Dschibuti", "🇪🇹 Äthiopien", "🇪🇷 Eritrea"],
+    flags: "🇩🇯🇪🇹🇪🇷",
+    info: "Afar wird von über 2 Millionen Menschen am Horn von Afrika gesprochen. Die Afar leben in einer der heißesten und unwirtlichsten Gegenden der Erde, der Danakil-Wüste."
+  },
+  "Tigre": {
+    translation: "ኣፍቂረክ / Afqirek",
+    transliteration: "Afqirek",
+    script: "Ge'ez-Schrift",
+    scriptInfo: "Tigre nutzt die äthiopische Ge'ez-Schrift, eine Abugida mit Konsonant-Vokal-Kombinationen.",
+    alphabet: "ሀ ለ ሐ መ ረ ሰ ሸ ቀ በ ተ ኀ ነ አ ከ ወ ዐ ዘ የ ደ ገ ጠ ጨ ፈ ፐ",
+    countries: ["🇪🇷 Eritrea"],
+    flags: "🇪🇷",
+    info: "Tigre wird von über 1 Million Menschen in Eritrea gesprochen. Trotz des ähnlichen Namens ist es eine andere Sprache als Tigrinya und stärker mit Ge'ez verwandt."
+  },
+  "Beja": {
+    translation: "Anāk tū-tāmīna",
+    transliteration: "",
+    script: "Lateinisches Alphabet / Arabisches Alphabet",
+    scriptInfo: "Beja wird in lateinischer oder arabischer Schrift geschrieben.",
+    alphabet: "A B D E F G H I K L M N O R S T U W Y",
+    countries: ["🇸🇩 Sudan", "🇪🇷 Eritrea", "🇪🇬 Ägypten"],
+    flags: "🇸🇩🇪🇷🇪🇬",
+    info: "Beja wird von über 2 Millionen Menschen an der Küste des Roten Meeres gesprochen. Die Beja sind eines der ältesten Völker Nordostafrikas, bereits von den alten Ägyptern erwähnt."
+  },
+  "Kantonesisch": {
+    translation: "我愛你",
+    transliteration: "Ngo oi nei",
+    script: "Chinesische Schriftzeichen",
+    scriptInfo: "Kantonesisch verwendet traditionelle chinesische Schriftzeichen und hat ein eigenes Romanisierungssystem (Jyutping).",
+    alphabet: "我 愛 你 係 唔 有 人 大 好 地 中 國 上 下 天 日 月 水 火 山",
+    countries: ["🇭🇰 Hongkong", "🇲🇴 Macau", "🇨🇳 China (Guangdong)"],
+    flags: "🇭🇰🇲🇴🇨🇳",
+    info: "Kantonesisch wird von über 85 Millionen Menschen gesprochen und ist die Sprache Hongkongs und Macaus. Es hat 6-9 Töne (gegenüber 4 bei Mandarin) und bewahrt viele Merkmale des Altchinesischen."
+  },
+  "Tadschikisch": {
+    translation: "Ман туро дӯст медорам",
+    transliteration: "Man turo dust medoram",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Tadschikisch nutzt das kyrillische Alphabet mit zusätzlichen Zeichen wie ғ, ӣ, қ, ӯ, ҳ, ҷ.",
+    alphabet: "А Б В Г Ғ Д Е Ё Ж З И Ӣ Й К Қ Л М Н О П Р С Т У Ӯ Ф Х Ҳ Ч Ҷ Ш Ъ Э Ю Я",
+    countries: ["🇹🇯 Tadschikistan"],
+    flags: "🇹🇯",
+    info: "Tadschikisch ist eine persische Sprache und wird von über 8 Millionen Menschen gesprochen. Es ist im Grunde Farsi in kyrillischer Schrift und gehört zur iranischen Sprachfamilie."
+  },
+  "Turkmenisch": {
+    translation: "Men seni söýýärin",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Turkmenisch wurde 1993 auf das lateinische Alphabet umgestellt, zuvor wurde kyrillisch verwendet.",
+    alphabet: "A B Ç D E Ä F G H I J K L M N Ň O Ö P R S Ş T U Ü W Y Ý Z Ž",
+    countries: ["🇹🇲 Turkmenistan"],
+    flags: "🇹🇲",
+    info: "Turkmenisch wird von über 7 Millionen Menschen gesprochen. Turkmenistan besitzt die viertgrößten Erdgasreserven der Welt und die Sprache ist eng mit Türkisch verwandt."
+  },
+  "Tatarisch": {
+    translation: "Мин сине яратам",
+    transliteration: "Min sine yaratam",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Tatarisch nutzt das kyrillische Alphabet mit zusätzlichen Zeichen wie ә, ө, ү, җ, ң, ҳ.",
+    alphabet: "А Ә Б В Г Д Е Ё Ж Җ З И Й К Л М Н Ң О Ө П Р С Т У Ү Ф Х Һ Ц Ч Ш Щ Ъ Ы Ь Э Ю Я",
+    countries: ["🇷🇺 Russland (Tatarstan)"],
+    flags: "🇷🇺",
+    info: "Tatarisch wird von über 5 Millionen Menschen gesprochen, hauptsächlich in Tatarstan, Russland. Kasan, die Hauptstadt Tatarstans, war das Zentrum des historischen Kasaner Khanats."
+  },
+  "Hmong": {
+    translation: "Kuv hlub koj",
+    transliteration: "",
+    script: "Lateinisches Alphabet (RPA)",
+    scriptInfo: "Hmong nutzt das Romanized Popular Alphabet (RPA), das 1953 entwickelt wurde. Tonzeichen werden durch Endbuchstaben dargestellt.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇱🇦 Laos", "🇻🇳 Vietnam", "🇨🇳 China", "🇺🇸 USA"],
+    flags: "🇱🇦🇻🇳🇨🇳🇺🇸",
+    info: "Hmong wird von über 4 Millionen Menschen in Südostasien und der Diaspora gesprochen. Durch den Vietnamkrieg wanderten viele Hmong in die USA aus, wo heute über 300.000 leben."
+  },
+  "Dzongkha": {
+    translation: "ང་གིས་ཁྱོད་ལ་དགའ",
+    transliteration: "Nga gi chö la ga",
+    script: "Tibetische Schrift",
+    scriptInfo: "Dzongkha nutzt die tibetische Schrift (Ucen), eine Abugida die im 7. Jahrhundert entwickelt wurde.",
+    alphabet: "ཀ ཁ ག ང ཅ ཆ ཇ ཉ ཏ ཐ ད ན པ ཕ བ མ ཙ ཚ ཛ ཝ ཞ ཟ འ ཡ ར ལ ཤ ས ཧ ཨ",
+    countries: ["🇧🇹 Bhutan"],
+    flags: "🇧🇹",
+    info: "Dzongkha ist die Nationalsprache Bhutans mit über 170.000 Muttersprachlern. Bhutan ist das einzige Land, das Bruttonationalglück als Entwicklungsmaß verwendet."
+  },
+  "Konkani": {
+    translation: "हांव तुका मोगतां",
+    transliteration: "Hanv tuka mogtam",
+    script: "Devanagari-Schrift",
+    scriptInfo: "Konkani nutzt hauptsächlich die Devanagari-Schrift, kann aber auch in Kannada-, Lateinischer oder Arabischer Schrift geschrieben werden.",
+    alphabet: "अ आ इ ई उ ऊ ए ऐ ओ औ क ख ग घ च छ ज झ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह",
+    countries: ["🇮🇳 Indien (Goa)"],
+    flags: "🇮🇳",
+    info: "Konkani wird von über 2,5 Millionen Menschen gesprochen, hauptsächlich in Goa, Indien. Es ist eine der 22 offiziell anerkannten Sprachen Indiens."
+  },
+  "Maithili": {
+    translation: "हम अहाँ सँ प्रेम करैत छी",
+    transliteration: "Ham ahaan san prem karait chhi",
+    script: "Devanagari-Schrift",
+    scriptInfo: "Maithili nutzt die Devanagari-Schrift, hatte aber historisch eine eigene Schrift namens Mithilakshar/Tirhuta.",
+    alphabet: "अ आ इ ई उ ऊ ए ऐ ओ औ क ख ग घ च छ ज झ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह",
+    countries: ["🇮🇳 Indien (Bihar)", "🇳🇵 Nepal"],
+    flags: "🇮🇳🇳🇵",
+    info: "Maithili wird von über 34 Millionen Menschen gesprochen und ist die zweitmeistgesprochene Sprache Nepals. Vidyapati, der berühmte mittelalterliche Dichter, schrieb auf Maithili."
+  },
+  "Dogri": {
+    translation: "मैं तुसा नै प्यार करना",
+    transliteration: "Main tusa nai pyar karna",
+    script: "Devanagari-Schrift",
+    scriptInfo: "Dogri nutzt die Devanagari-Schrift, hatte historisch die Dogra-Schrift (Takri).",
+    alphabet: "अ आ इ ई उ ऊ ए ऐ ओ औ क ख ग घ च छ ज झ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह",
+    countries: ["🇮🇳 Indien (Jammu)"],
+    flags: "🇮🇳",
+    info: "Dogri wird von über 3 Millionen Menschen in Jammu, Indien gesprochen. Es wurde 2003 als 22. offizielle Sprache Indiens in die Verfassung aufgenommen."
+  },
+  "Kashmiri": {
+    translation: "مٖے چھُس تسٖے گَژھان / मॆ छुस त्सॆ गॅझान",
+    transliteration: "Me chus tse gazhaan",
+    script: "Perso-Arabisch / Devanagari",
+    scriptInfo: "Kashmiri kann in arabischer oder Devanagari-Schrift geschrieben werden, wobei die persisch-arabische Variante häufiger ist.",
+    alphabet: "ا ب پ ت ٹ ث ج چ ح خ د ڈ ذ ر ڑ ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن و ہ ی",
+    countries: ["🇮🇳 Indien (Kashmir)"],
+    flags: "🇮🇳",
+    info: "Kashmiri wird von über 7 Millionen Menschen gesprochen. Es ist eine der wenigen südasiatischen Sprachen mit V2-Wortstellung (Verb an zweiter Stelle) wie im Deutschen."
+  },
+  "Sanskrit": {
+    translation: "अहं त्वां प्रणयामि",
+    transliteration: "Aham tvam pranayami",
+    script: "Devanagari-Schrift",
+    scriptInfo: "Sanskrit nutzt die Devanagari-Schrift. Als liturgische Sprache wird es auch in anderen indischen Schriften geschrieben.",
+    alphabet: "अ आ इ ई उ ऊ ऋ ॠ ए ऐ ओ औ क ख ग घ ङ च छ ज झ ञ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह",
+    countries: ["🇮🇳 Indien"],
+    flags: "🇮🇳",
+    info: "Sanskrit ist eine der ältesten Sprachen der Welt und die heilige Sprache des Hinduismus. Paninis Grammatik (ca. 400 v. Chr.) gilt als erstes formales System der Sprachwissenschaft."
+  },
+  "Meitei (Manipuri)": {
+    translation: "ꯑꯩ ꯅꯪꯕꯨ ꯅꯨꯡꯁꯤ",
+    transliteration: "Ei nangbu nungshi",
+    script: "Meitei-Schrift (Meitei Mayek)",
+    scriptInfo: "Meitei hat eine eigene Schrift namens Meitei Mayek, die seit 2005 wieder offiziell verwendet wird.",
+    alphabet: "ꯀ ꯈ ꯒ ꯘ ꯉ ꯆ ꯖ ꯓ ꯇ ꯊ ꯗ ꯙ ꯅ ꯄ ꯐ ꯕ ꯚ ꯃ ꯌ ꯔ ꯂ ꯋ ꯁ ꯍ ꯏ",
+    countries: ["🇮🇳 Indien (Manipur)"],
+    flags: "🇮🇳",
+    info: "Meitei wird von über 1,8 Millionen Menschen in Manipur, Indien gesprochen. Es ist die einzige tibeto-birmanische Sprache unter den 22 offiziellen Sprachen Indiens."
+  },
+  "Balinesisch": {
+    translation: "Tiang tresna ring ragane",
+    transliteration: "",
+    script: "Lateinisches Alphabet / Balinesische Schrift",
+    scriptInfo: "Balinesisch hat eine eigene Schrift (Aksara Bali), wird aber meist in lateinischer Schrift geschrieben.",
+    alphabet: "A B C D E G H I J K L M N O P R S T U W Y",
+    countries: ["🇮🇩 Indonesien (Bali)"],
+    flags: "🇮🇩",
+    info: "Balinesisch wird von über 3,3 Millionen Menschen auf Bali gesprochen. Es hat ein komplexes Sprachregister-System mit verschiedenen Höflichkeitsstufen."
+  },
+  "Sundanesisch": {
+    translation: "Abdi bogoh ka anjeun",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Sundanesisch wird heute in lateinischer Schrift geschrieben, hat aber eine historische eigene Schrift (Aksara Sunda).",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇮🇩 Indonesien (West-Java)"],
+    flags: "🇮🇩",
+    info: "Sundanesisch wird von über 42 Millionen Menschen gesprochen und ist die zweitgrößte Regionalsprache Indonesiens. Die Sundanesen sind bekannt für ihre Angklung-Bambusmusik."
+  },
+  "Cebuano": {
+    translation: "Gihigugma ko ikaw",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Cebuano nutzt das lateinische Alphabet. Historisch wurde die Baybayin-Schrift verwendet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇵🇭 Philippinen (Visayas)"],
+    flags: "🇵🇭",
+    info: "Cebuano wird von über 27 Millionen Menschen gesprochen und ist die zweitmeistgesprochene Sprache der Philippinen. Es dominiert in den Visayas und auf Mindanao."
+  },
+  "Ilokano": {
+    translation: "Ay-ayaten ka",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Ilokano nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇵🇭 Philippinen (Luzon)"],
+    flags: "🇵🇭",
+    info: "Ilokano wird von über 10 Millionen Menschen auf den Philippinen gesprochen und ist die drittgrößte Sprache des Landes. Viele Ilokanische Auswanderer leben auf Hawaii."
+  },
+  "Hiligaynon": {
+    translation: "Palangga ko ikaw",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Hiligaynon nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇵🇭 Philippinen (Western Visayas)"],
+    flags: "🇵🇭",
+    info: "Hiligaynon wird von über 9 Millionen Menschen auf den Philippinen gesprochen. Es ist bekannt als eine der melodischsten philippinischen Sprachen."
+  },
+  "Waray": {
+    translation: "Hinihigugma ko ikaw",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Waray nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇵🇭 Philippinen (Eastern Visayas)"],
+    flags: "🇵🇭",
+    info: "Waray wird von über 3,6 Millionen Menschen auf den Philippinen gesprochen. Die Waray-Region wurde 2013 durch den Super-Taifun Haiyan (Yolanda) schwer getroffen."
+  },
+  "Bikol": {
+    translation: "Namumutan taka",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Bikol nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇵🇭 Philippinen (Bicol)"],
+    flags: "🇵🇭",
+    info: "Bikol wird von über 3,5 Millionen Menschen in der Bicol-Region der Philippinen gesprochen. Die Region ist bekannt für den aktiven Vulkan Mayon."
+  },
+  "Kapampangan": {
+    translation: "Kaluguran daka",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Kapampangan nutzt das lateinische Alphabet. Historisch wurde die Kulitan-Schrift verwendet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇵🇭 Philippinen (Pampanga)"],
+    flags: "🇵🇭",
+    info: "Kapampangan wird von über 2,9 Millionen Menschen gesprochen. Pampanga ist als die kulinarische Hauptstadt der Philippinen bekannt."
+  },
+  "Pangasinan": {
+    translation: "Inaro taka",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Pangasinan nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇵🇭 Philippinen (Pangasinan)"],
+    flags: "🇵🇭",
+    info: "Pangasinan wird von über 1,5 Millionen Menschen in der Provinz Pangasinan gesprochen. Der Name bedeutet 'Land des Salzes' und bezieht sich auf die traditionelle Salzgewinnung."
+  },
+  "Chuukesisch": {
+    translation: "Ai tungor ngonuk",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Chuukesisch nutzt das lateinische Alphabet mit speziellen Zeichen.",
+    alphabet: "A C E F H I K M N O P R S T U W Y",
+    countries: ["🇫🇲 Föderierte Staaten von Mikronesien"],
+    flags: "🇫🇲",
+    info: "Chuukesisch wird von etwa 50.000 Menschen in Chuuk, Mikronesien gesprochen. Die Chuuk-Lagune beherbergt eines der größten Unterwasser-Schiffswracks der Welt aus dem Zweiten Weltkrieg."
+  },
+  "Palauisch": {
+    translation: "Ak kaiuererir er kau",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Palauisch nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E I K L M N O R S T U",
+    countries: ["🇵🇼 Palau"],
+    flags: "🇵🇼",
+    info: "Palauisch wird von etwa 17.000 Menschen gesprochen. Palau war das erste Land, das sein gesamtes Meeresgebiet zum Meeresschutzgebiet erklärte."
+  },
+  "Karen (S'gaw)": {
+    translation: "ယၟ ဘၪ နၟ",
+    transliteration: "Ya bah nah",
+    script: "Birmanische Schrift",
+    scriptInfo: "S'gaw Karen nutzt eine Variante der birmanischen Schrift mit zusätzlichen Zeichen.",
+    alphabet: "က ခ ဂ ဃ င စ ဆ ဇ ဈ ည ဏ တ ထ ဒ ဓ န ပ ဖ ဗ ဘ မ ယ ရ လ ဝ ဟ",
+    countries: ["🇲🇲 Myanmar", "🇹🇭 Thailand"],
+    flags: "🇲🇲🇹🇭",
+    info: "S'gaw Karen wird von über 3 Millionen Menschen gesprochen. Die Karen sind eine der größten ethnischen Minderheiten Myanmars mit einer langen Geschichte des Kampfes um Autonomie."
+  },
+  "Shan": {
+    translation: "ၶႃႈႁၵ်ႉၸဝ်ႈ",
+    transliteration: "Kha hak chao",
+    script: "Shan-Schrift",
+    scriptInfo: "Die Shan-Schrift ist eine Variante der birmanischen Schrift mit runden Buchstabenformen.",
+    alphabet: "ၵ ၶ င ၸ သ ၺ တ ထ ၻ ၼ ပ ၾ ၽ မ ယ ရ လ ဝ ႁ ဢ",
+    countries: ["🇲🇲 Myanmar"],
+    flags: "🇲🇲",
+    info: "Shan wird von über 6 Millionen Menschen in Myanmar gesprochen. Der Shan-Staat ist der größte Teilstaat Myanmars und kulturell eng mit Thailand verwandt."
+  },
+  "Mon": {
+    translation: "အဲ ဂွ မွဲ ညး",
+    transliteration: "Ah ku mua nyah",
+    script: "Mon-Schrift",
+    scriptInfo: "Die Mon-Schrift ist eine der ältesten Schriften Südostasiens und beeinflusste die birmanische und thailändische Schrift.",
+    alphabet: "က ခ ဂ ဃ င စ ဆ ဇ ည ဏ တ ထ ဒ ဓ န ပ ဖ ဗ ဘ မ ယ ရ လ ဝ ၐ ၑ ဟ",
+    countries: ["🇲🇲 Myanmar", "🇹🇭 Thailand"],
+    flags: "🇲🇲🇹🇭",
+    info: "Mon wird von über 1 Million Menschen gesprochen. Die Mon gründeten eines der ältesten Königreiche Südostasiens und brachten den Theravada-Buddhismus in die Region."
+  },
+  "Minangkabau": {
+    translation: "Ambo cinto ka waang",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Minangkabau nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U W Y",
+    countries: ["🇮🇩 Indonesien (West-Sumatra)"],
+    flags: "🇮🇩",
+    info: "Minangkabau wird von über 7 Millionen Menschen gesprochen. Die Minangkabau sind die weltweit größte matrilineare Gesellschaft – Besitz und Name werden über die weibliche Linie vererbt."
+  },
+  "Bugis": {
+    translation: "Upakaboro'ko",
+    transliteration: "",
+    script: "Lateinisches Alphabet / Lontara-Schrift",
+    scriptInfo: "Bugis hat eine eigene Schrift namens Lontara, wird aber heute meist in lateinischer Schrift geschrieben.",
+    alphabet: "A B C D E G H I J K L M N O P R S T U W Y",
+    countries: ["🇮🇩 Indonesien (Sulawesi)"],
+    flags: "🇮🇩",
+    info: "Bugis wird von über 5 Millionen Menschen auf Sulawesi gesprochen. Die Bugis waren legendäre Seefahrer – das Wort 'Boogeyman' soll von ihnen abstammen."
+  },
+  "Acehnese": {
+    translation: "Lon galak droeneuh",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Acehnese nutzt das lateinische Alphabet, historisch auch die arabisch-basierte Jawi-Schrift.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U W Y",
+    countries: ["🇮🇩 Indonesien (Aceh)"],
+    flags: "🇮🇩",
+    info: "Acehnese wird von über 3,5 Millionen Menschen in Aceh, Sumatra gesprochen. Aceh war das erste Gebiet in Südostasien, das den Islam annahm."
+  },
+  "Tulu": {
+    translation: "ಯಾನ್ ನಿನನ್ ಪ್ರೀತಿ ಮಲ್ಪುವೆ",
+    transliteration: "Yaan ninan priti malpuve",
+    script: "Kannada-Schrift",
+    scriptInfo: "Tulu wird heute in Kannada-Schrift geschrieben, hat aber eine eigene historische Schrift (Tulu-Tigalari).",
+    alphabet: "ಅ ಆ ಇ ಈ ಉ ಊ ಎ ಏ ಐ ಒ ಓ ಔ ಕ ಖ ಗ ಘ ಙ ಚ ಛ ಜ ಝ ಞ ಟ ಠ ಡ ಢ ಣ ತ ಥ ದ ಧ ನ ಪ ಫ ಬ ಭ ಮ ಯ ರ ಲ ವ ಶ ಷ ಸ ಹ",
+    countries: ["🇮🇳 Indien (Karnataka, Kerala)"],
+    flags: "🇮🇳",
+    info: "Tulu wird von über 2 Millionen Menschen in Südindien gesprochen. Trotz der großen Sprecherzahl hat Tulu keinen offiziellen Status und ist bekannt als die 'reichste Sprache ohne Staat'."
+  },
+  "Santhali": {
+    translation: "ᱤᱧ ᱟᱢ ᱫᱩᱞᱟᱹᱲ ᱢᱮᱱᱟ",
+    transliteration: "Ing am dular mena",
+    script: "Ol Chiki-Schrift",
+    scriptInfo: "Santhali nutzt die Ol Chiki-Schrift, die 1925 von Raghunath Murmu speziell für diese Sprache erfunden wurde.",
+    alphabet: "ᱚ ᱛ ᱜ ᱝ ᱞ ᱟ ᱠ ᱡ ᱢ ᱣ ᱤ ᱥ ᱦ ᱧ ᱨ ᱩ ᱪ ᱫ ᱬ ᱭ ᱮ ᱯ ᱰ ᱱ ᱲ ᱳ ᱴ ᱵ ᱶ ᱷ",
+    countries: ["🇮🇳 Indien", "🇧🇩 Bangladesch", "🇳🇵 Nepal"],
+    flags: "🇮🇳🇧🇩🇳🇵",
+    info: "Santhali wird von über 7 Millionen Menschen gesprochen. Die Ol Chiki-Schrift ist eine der wenigen modernen Schrifterfindungen, die in Unicode aufgenommen wurden."
+  },
+  "Bodo": {
+    translation: "आं नोंथांखौ मोजां मोनो",
+    transliteration: "Ang nongthangkhou mojang mono",
+    script: "Devanagari-Schrift",
+    scriptInfo: "Bodo nutzt die Devanagari-Schrift seit 1963.",
+    alphabet: "अ आ इ ई उ ऊ ए ऐ ओ औ क ख ग घ च छ ज झ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह",
+    countries: ["🇮🇳 Indien (Assam)"],
+    flags: "🇮🇳",
+    info: "Bodo wird von über 1,5 Millionen Menschen in Assam, Indien gesprochen. Es ist eine tibeto-birmanische Sprache und eine der 22 offiziellen Sprachen Indiens."
+  },
+  "Mizo": {
+    translation: "Ka hmangaih che",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Mizo nutzt das lateinische Alphabet, eingeführt von walisischen Missionaren im 19. Jahrhundert.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V Z",
+    countries: ["🇮🇳 Indien (Mizoram)"],
+    flags: "🇮🇳",
+    info: "Mizo wird von über 800.000 Menschen in Mizoram gesprochen. Mizoram hat eine der höchsten Alphabetisierungsraten Indiens (über 91%)."
+  },
+  "Khasi": {
+    translation: "Nga ieid ia phi",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Khasi nutzt das lateinische Alphabet, eingeführt von Missionaren.",
+    alphabet: "A B D E G H I J K L M N O P R S T U W Y",
+    countries: ["🇮🇳 Indien (Meghalaya)"],
+    flags: "🇮🇳",
+    info: "Khasi wird von über 1 Million Menschen in Meghalaya gesprochen. Die Khasi haben eine matrilineare Gesellschaft – Kinder erben den Familiennamen der Mutter."
+  },
+  "Garo": {
+    translation: "Anga nikna dong'a",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Garo nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E G H I J K L M N O P R S T U W",
+    countries: ["🇮🇳 Indien (Meghalaya)"],
+    flags: "🇮🇳",
+    info: "Garo wird von über 1 Million Menschen gesprochen. Wie die Khasi haben auch die Garo eine matrilineare Gesellschaftsstruktur."
+  },
+  "Kokborok": {
+    translation: "Ang nwng nw khulungwi",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Kokborok nutzt das lateinische Alphabet, manchmal auch Bengali-Schrift.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U W Y",
+    countries: ["🇮🇳 Indien (Tripura)"],
+    flags: "🇮🇳",
+    info: "Kokborok wird von über 900.000 Menschen in Tripura, Indien gesprochen. Es ist eine tibeto-birmanische Sprache und die offizielle Sprache Tripuras."
+  },
+  "Nagamesisch": {
+    translation: "Moi tumi ke bhal pao",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Nagamesisch nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W Y Z",
+    countries: ["🇮🇳 Indien (Nagaland)"],
+    flags: "🇮🇳",
+    info: "Nagamesisch ist ein assamesisch-basiertes Kreol und Lingua franca Nagalands mit über 30.000 Muttersprachlern. In Nagaland werden über 60 verschiedene Sprachen gesprochen."
+  },
+  "Tatar (Krim)": {
+    translation: "Men seni sevem",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Krimtatarisch nutzt das lateinische Alphabet seit 1992, zuvor kyrillisch.",
+    alphabet: "A B C Ç D E F G Ğ H I İ J K L M N Ñ O Ö P Q R S Ş T U Ü V Y Z",
+    countries: ["🇺🇦 Ukraine (Krim)"],
+    flags: "🇺🇦",
+    info: "Krimtatarisch wird von etwa 500.000 Menschen gesprochen. Die Krimtataren wurden 1944 von Stalin massendeportiert und kehrten erst ab 1989 auf die Krim zurück."
+  },
+  "Baschkirisch": {
+    translation: "Мин һине яратам",
+    transliteration: "Min hine yaratam",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Baschkirisch nutzt das kyrillische Alphabet mit zusätzlichen Zeichen wie ә, ө, ү, ғ, ҡ, ң, ҫ, һ.",
+    alphabet: "А Б В Г Ғ Д Ҙ Е Ё Ж З И Й К Ҡ Л М Н Ң О Ө П Р С Ҫ Т У Ү Ф Х Һ Ц Ч Ш Щ Ъ Ы Ь Э Ә Ю Я",
+    countries: ["🇷🇺 Russland (Baschkortostan)"],
+    flags: "🇷🇺",
+    info: "Baschkirisch wird von über 1,4 Millionen Menschen gesprochen. Baschkortostan ist bekannt für seinen Honig und die Bashkir Curly-Pferderasse."
+  },
+  "Tschuwaschisch": {
+    translation: "Эпĕ сана юрататăп",
+    transliteration: "Epe sana yuratatp",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Tschuwaschisch nutzt das kyrillische Alphabet mit den Sonderzeichen ă, ĕ, ç, ÿ.",
+    alphabet: "А Ă Б В Г Д Е Ĕ Ё Ж З И Й К Л М Н О П Р С Ç Т У Ÿ Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я",
+    countries: ["🇷🇺 Russland (Tschuwaschien)"],
+    flags: "🇷🇺",
+    info: "Tschuwaschisch wird von über 1 Million Menschen gesprochen. Es ist die einzige überlebende Sprache des bulgarischen Zweigs der Turksprachen."
+  },
+  "Karakalpakisch": {
+    translation: "Men seni suyemin",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Karakalpakisch wurde 1994 auf das lateinische Alphabet umgestellt.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇺🇿 Usbekistan (Karakalpakstan)"],
+    flags: "🇺🇿",
+    info: "Karakalpakisch wird von über 700.000 Menschen gesprochen. Karakalpakstan liegt am Aralsee, dessen Austrocknung eine der größten Umweltkatastrophen des 20. Jahrhunderts ist."
+  },
+  "Gagausisch": {
+    translation: "Ben seni seveerim",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Gagausisch nutzt das lateinische Alphabet mit Sonderzeichen wie ä, ö, ü, ç, ş, ţ.",
+    alphabet: "A Ä B C Ç D E F G H I İ J K L M N O Ö P R S Ş T Ţ U Ü V Y Z",
+    countries: ["🇲🇩 Moldau (Gagausien)"],
+    flags: "🇲🇩",
+    info: "Gagausisch wird von etwa 150.000 Menschen gesprochen. Die Gagausen sind ein turksprachiges, christlich-orthodoxes Volk – eine seltene Kombination."
+  },
+  "Jakutisch (Sacha)": {
+    translation: "Мин эйиигин таптыыбын",
+    transliteration: "Min eyiigin taptyybin",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Jakutisch nutzt das kyrillische Alphabet mit den Sonderzeichen ҕ, ҥ, ө, һ, ү.",
+    alphabet: "А Б В Г Ҕ Д Дь Е Ё Ж З И Й К Л М Н Ҥ Нь О Ө П Р С Т У Ү Ф Х Һ Ц Ч Ш Щ Ъ Ы Ь Э Ю Я",
+    countries: ["🇷🇺 Russland (Sacha/Jakutien)"],
+    flags: "🇷🇺",
+    info: "Jakutisch wird von über 450.000 Menschen in der größten Teilrepublik Russlands gesprochen. Jakutien erlebt Temperaturen von -60°C und ist einer der kältesten bewohnten Orte der Erde."
+  },
+  "Tuwinisch": {
+    translation: "Мен сени ынак мен",
+    transliteration: "Men seni ynak men",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Tuwinisch nutzt das kyrillische Alphabet mit Sonderzeichen.",
+    alphabet: "А Б В Г Д Е Ё Ж З И Й К Л М Н Ң О Ө П Р С Т У Ү Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я",
+    countries: ["🇷🇺 Russland (Tuwa)"],
+    flags: "🇷🇺",
+    info: "Tuwinisch wird von etwa 280.000 Menschen gesprochen. Tuwa ist weltbekannt für seinen Kehlkopfgesang (Khöömei), bei dem ein Sänger gleichzeitig mehrere Töne erzeugt."
+  },
+  "Burjatisch": {
+    translation: "Би шамдаа дуратайб",
+    transliteration: "Bi shamdaa durataib",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Burjatisch nutzt das kyrillische Alphabet mit den Sonderzeichen ө, ү, һ.",
+    alphabet: "А Б В Г Д Е Ё Ж З И Й К Л М Н О Ө П Р С Т У Ү Ф Х Һ Ц Ч Ш Щ Ъ Ы Ь Э Ю Я",
+    countries: ["🇷🇺 Russland (Burjatien)"],
+    flags: "🇷🇺",
+    info: "Burjatisch wird von über 300.000 Menschen am Baikalsee gesprochen. Die Burjaten sind das größte indigene Volk Sibiriens und praktizieren Buddhismus und Schamanismus."
+  },
+  "Kalmückisch": {
+    translation: "Би чамаг хәәрлнәв",
+    transliteration: "Bi chamag khaarlnav",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Kalmückisch nutzt das kyrillische Alphabet. Historisch wurde die vertikale Oirat-Klare-Schrift verwendet.",
+    alphabet: "А Ә Б В Г Һ Д Е Ж З И Й К Л М Н Ң О Ө П Р С Т У Ү Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я",
+    countries: ["🇷🇺 Russland (Kalmückien)"],
+    flags: "🇷🇺",
+    info: "Kalmückisch wird von etwa 80.000 Menschen gesprochen. Die Kalmücken sind das einzige buddhistische Volk Europas und sprechen eine mongolische Sprache."
+  },
+  "Evenki": {
+    translation: "Би синэвэ аявдяри",
+    transliteration: "Bi sineve ayavdyari",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Evenki nutzt das kyrillische Alphabet mit Sonderzeichen.",
+    alphabet: "А Б В Г Д Е Ё Ж З И Й К Л М Н Ӈ О П Р С Т У Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я",
+    countries: ["🇷🇺 Russland", "🇨🇳 China"],
+    flags: "🇷🇺🇨🇳",
+    info: "Evenki wird von etwa 20.000 Menschen in Sibirien und Nordchina gesprochen. Die Evenken sind Rentierzüchter und besiedeln das größte Gebiet aller indigenen Völker Sibiriens."
+  },
+  "Adygeisch": {
+    translation: "Сыпфэшъуагъо",
+    transliteration: "Sipfeshuago",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Adygeisch nutzt das kyrillische Alphabet mit vielen Sonderzeichen für die komplexen Konsonanten.",
+    alphabet: "А Б В Г Гу Гъ Гъу Д Дж Дз Дзу Е Ё Ж Жъ Жь З И Й К Ку Къ Къу Кl Кlу Л Лъ Лl М Н О П Пl Пlу Р С Т Тл Тlу У Ф Х Хъ Хъу Хь Ц Цу Ч Чъ Ш Шъ Шlу Щ Ъ Ы Ь Э Ю Я Ll I",
+    countries: ["🇷🇺 Russland (Adygeja)"],
+    flags: "🇷🇺",
+    info: "Adygeisch wird von etwa 130.000 Menschen gesprochen. Es gehört zu den nordwestkaukasischen Sprachen und hat eines der größten Konsonantensysteme der Welt."
+  },
+  "Abchasisch": {
+    translation: "Бара бзиа бсоит",
+    transliteration: "Bara bzia bsoit",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Abchasisch nutzt das kyrillische Alphabet mit zahlreichen Sonderzeichen für sein extrem großes Konsonantensystem.",
+    alphabet: "А Б В Г Гь Гә Ҕ Ҕь Ҕә Д Дә Е Ж Жь Жә З Ӡ Ӡә И К Кь Кә Қ Қь Қә Ҟ Ҟь Ҟә Л М Н О П Ҧ Р С Т Тә Ҭ Ҭә У Ф Х Хь Хә Ҳ Ҳә Ц Цә Ҵ Ҵә Ч Ҷ Ш Шь Шә Щ Ы",
+    countries: ["🇬🇪 Abchasien"],
+    flags: "🇬🇪",
+    info: "Abchasisch wird von etwa 120.000 Menschen gesprochen. Es hat nur 2-3 Vokale, aber über 60 Konsonanten – eines der extremsten Lautsysteme der Welt."
+  },
+  "Ossetisch": {
+    translation: "Æз дæ уарзын",
+    transliteration: "Az da warzin",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Ossetisch nutzt das kyrillische Alphabet mit dem Sonderzeichen æ.",
+    alphabet: "А Æ Б В Г Гъ Д Дж Дз Е Ё Ж З И Й К Къ Л М Н О П Пъ Р С Т Тъ У Ф Х Хъ Ц Цъ Ч Чъ Ш Щ Ъ Ы Ь Э Ю Я",
+    countries: ["🇷🇺 Russland (Nordossetien)", "🇬🇪 Südossetien"],
+    flags: "🇷🇺🇬🇪",
+    info: "Ossetisch wird von über 500.000 Menschen gesprochen. Es ist die einzige überlebende nordostirianische Sprache und ein direkter Nachkomme der Sprache der Skythen und Alanen."
+  },
+  "Tschetschenisch": {
+    translation: "Суна хьо еза",
+    transliteration: "Suna ho yeza",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Tschetschenisch nutzt das kyrillische Alphabet mit Sonderzeichen.",
+    alphabet: "А Аь Б В Г Гl Д Е Ё Ж З И Й К Кх Къ Кl Л М Н О Оь П Пl Р С Т Тl У Уь Ф Х Хь Хl Ц Цl Ч Чl Ш Щ Ъ Ы Ь Э Ю Юь Я Яь",
+    countries: ["🇷🇺 Russland (Tschetschenien)"],
+    flags: "🇷🇺",
+    info: "Tschetschenisch wird von über 1,7 Millionen Menschen gesprochen. Es gehört zu den nachisch-dagestanischen Sprachen und hat ein komplexes System von Nominalklassen."
+  },
+  "Awarisch": {
+    translation: "Дун мун бокьула",
+    transliteration: "Dun mun bokula",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Awarisch nutzt das kyrillische Alphabet mit zusätzlichen Digraphen.",
+    alphabet: "А Б В Г Гъ Гь Гl Д Е Ё Ж З И Й К Къ Кь Кl Л Лъ Лl М Н О П Р С Т Тl У Ф Х Хъ Хь Хl Ц Цl Ч Чl Ш Щ Ъ Ы Ь Э Ю Я",
+    countries: ["🇷🇺 Russland (Dagestan)"],
+    flags: "🇷🇺",
+    info: "Awarisch wird von über 1 Million Menschen in Dagestan gesprochen. Der berühmte Imam Schamil, der im 19. Jahrhundert gegen die russische Expansion kämpfte, war Aware."
+  },
+  "Lezgisch": {
+    translation: "Зун вун кlанзава",
+    transliteration: "Zun vun klanzawa",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Lezgisch nutzt das kyrillische Alphabet mit Digraphen und Sonderzeichen.",
+    alphabet: "А Б В Г Гъ Гь Д Е Ё Ж З И Й К Къ Кь Кl Л М Н О П Пl Р С Т Тl У Уь Ф Х Хъ Хь Ц Цl Ч Чl Ш Щ Ъ Ы Ь Э Ю Я",
+    countries: ["🇷🇺 Russland (Dagestan)", "🇦🇿 Aserbaidschan"],
+    flags: "🇷🇺🇦🇿",
+    info: "Lezgisch wird von über 800.000 Menschen gesprochen. Die Lezgier sind bekannt für ihren energetischen Volkstanz Lezginka, der in der gesamten Kaukasusregion populär ist."
+  },
+  "Tabassaranisch": {
+    translation: "Узу вуву ккундуза",
+    transliteration: "Uzu vuvu kkunduza",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Tabassaranisch nutzt das kyrillische Alphabet und hielt lange den Guinness-Weltrekord für die meisten grammatischen Fälle.",
+    alphabet: "А Б В Г Гг Гъ Гь Д Е Ё Ж Жв З И Й К Кк Къ Кь Кl Л М Н О П Пп Р С Сс Т Тт У Уь Ф Х Хъ Хь Ц Цц Ч Чч Ш Шш Щ Ъ Ы Ь Э Ю Я",
+    countries: ["🇷🇺 Russland (Dagestan)"],
+    flags: "🇷🇺",
+    info: "Tabassaranisch wird von etwa 150.000 Menschen gesprochen. Es hat 46-54 grammatische Fälle und hielt damit lange den Guinness-Weltrekord für die sprachliche Komplexität."
+  },
+  "Darginisch": {
+    translation: "Ду хIу дигулра",
+    transliteration: "Du hu digulra",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Darginisch nutzt das kyrillische Alphabet mit Sonderzeichen.",
+    alphabet: "А Б В Г Гъ Гь Гl Д Е Ё Ж З И Й К Къ Кь Кl Л М Н О П Пl Р С Т Тl У Ф Х Хъ Хь Хl Ц Цl Ч Чl Ш Щ Ъ Ы Ь Э Ю Я",
+    countries: ["🇷🇺 Russland (Dagestan)"],
+    flags: "🇷🇺",
+    info: "Darginisch wird von über 500.000 Menschen in Dagestan gesprochen. Dagestan ist der sprachlich vielfältigste Ort Europas mit über 30 eigenständigen Sprachen."
+  },
+  "Tonganisch": {
+    translation: "Oku ou ofa atu kiate koe",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Tonganisch nutzt das lateinische Alphabet mit dem Sonderzeichen ʻ (Glottalstopp).",
+    alphabet: "A E F H I K L M N O P S T U V ʻ",
+    countries: ["🇹🇴 Tonga"],
+    flags: "🇹🇴",
+    info: "Tonganisch wird von über 100.000 Menschen gesprochen. Tonga ist die einzige Monarchie im Pazifik, die nie kolonisiert wurde."
+  },
+  "Fidschianisch": {
+    translation: "Au domoni iko",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Fidschianisch nutzt das lateinische Alphabet. Besonderheit: b wird mb ausgesprochen, d wird nd, g wird ng.",
+    alphabet: "A B C D E F G I K L M N O P Q R S T U V W Y",
+    countries: ["🇫🇯 Fidschi"],
+    flags: "🇫🇯",
+    info: "Fidschianisch wird von über 350.000 Menschen gesprochen. Die fidschianische Aussprache weicht stark von der Schreibung ab: 'Beqa' wird 'Mbengga' ausgesprochen."
+  },
+  "Tahitianisch": {
+    translation: "Ua here au ia oe",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Tahitianisch nutzt das lateinische Alphabet mit nur 13 Buchstaben und dem Glottalstopp ʻ.",
+    alphabet: "A E F H I M N O P R T U V ʻ",
+    countries: ["🇵🇫 Französisch-Polynesien"],
+    flags: "🇵🇫",
+    info: "Tahitianisch wird von über 68.000 Menschen gesprochen. Es ist eng mit Hawaiianisch und Maori verwandt und war die Sprache, die Captain Cook als erste polynesische Sprache dokumentierte."
+  },
+  "Chamorro": {
+    translation: "Hu guaiya hao",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Chamorro nutzt das lateinische Alphabet mit dem Sonderzeichen ñ.",
+    alphabet: "A B C D E F G H I J K L M N Ñ O P R S T U V W Y",
+    countries: ["🇬🇺 Guam", "🇲🇵 Nördliche Marianen"],
+    flags: "🇬🇺🇲🇵",
+    info: "Chamorro wird von über 60.000 Menschen auf Guam und den Nördlichen Marianen gesprochen. Es ist eine austronesische Sprache mit starkem spanischem Einfluss."
+  },
+  "Marshallese": {
+    translation: "Ij yakwe eok",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Marshallese nutzt das lateinische Alphabet mit Sonderzeichen und Makronen.",
+    alphabet: "A Ā B D E I J K L Ļ M M̧ N N̄ Ñ O Ō P R T U Ū W",
+    countries: ["🇲🇭 Marshallinseln"],
+    flags: "🇲🇭",
+    info: "Marshallese wird von über 44.000 Menschen gesprochen. Die Marshallese navigierten über den offenen Ozean mit 'Stabkarten', einem einzigartigen Navigationssystem aus Palmrippen."
+  },
+  "Rapanui (Osterinsel)": {
+    translation: "Haka here kia koe",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Rapanui nutzt das lateinische Alphabet mit nur 10 Konsonanten und 5 Vokalen.",
+    alphabet: "A E G H I K M N O P R T U V",
+    countries: ["🇨🇱 Chile (Osterinsel)"],
+    flags: "🇨🇱",
+    info: "Rapanui wird von weniger als 4.000 Menschen auf der Osterinsel gesprochen. Die berühmten Moai-Statuen und die unentschlüsselte Rongorongo-Schrift gehören zu dieser Kultur."
+  },
+  "Niueanisch": {
+    translation: "Ofa atu kia koe",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Niueanisch nutzt das lateinische Alphabet mit wenigen Buchstaben.",
+    alphabet: "A E F G H I K L M N O P T U V",
+    countries: ["🇳🇺 Niue"],
+    flags: "🇳🇺",
+    info: "Niueanisch wird von etwa 2.000 Menschen auf Niue gesprochen. Niue ist die kleinste selbstregierte Nation der Welt und war 2003 der erste Staat mit kostenlosem landesweitem WLAN."
+  },
+  "Gilbertesisch (Kiribati)": {
+    translation: "I tangiriko",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Gilbertesisch nutzt das lateinische Alphabet mit nur 13 Buchstaben.",
+    alphabet: "A B E I K M N O R T U W",
+    countries: ["🇰🇮 Kiribati"],
+    flags: "🇰🇮",
+    info: "Gilbertesisch wird von über 100.000 Menschen gesprochen. Kiribati erstreckt sich über alle vier Hemisphären und ist durch den steigenden Meeresspiegel existenziell bedroht."
+  },
+  "Tuvaluisch": {
+    translation: "Ko ofa ki a koe",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Tuvaluisch nutzt das lateinische Alphabet mit wenigen Buchstaben.",
+    alphabet: "A E F G H I K L M N O P S T U V",
+    countries: ["🇹🇻 Tuvalu"],
+    flags: "🇹🇻",
+    info: "Tuvaluisch wird von etwa 11.000 Menschen gesprochen. Tuvalu ist mit nur 26 km² eines der kleinsten Länder der Welt und vom Klimawandel stark bedroht."
+  },
+  "Bislama": {
+    translation: "Mi lavem yu",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Bislama nutzt das lateinische Alphabet mit phonetischer Schreibung.",
+    alphabet: "A B D E F G H I J K L M N O P R S T U V W Y",
+    countries: ["🇻🇺 Vanuatu"],
+    flags: "🇻🇺",
+    info: "Bislama ist eine englisch-basierte Kreolsprache und die nationale Lingua franca Vanuatus. In einem Land mit über 100 Sprachen ermöglicht Bislama die Kommunikation zwischen allen Gruppen."
+  },
+  "Hiri Motu": {
+    translation: "Lau oi emu henao",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Hiri Motu nutzt das lateinische Alphabet.",
+    alphabet: "A B D E F G H I K L M N O P R S T U V",
+    countries: ["🇵🇬 Papua-Neuguinea"],
+    flags: "🇵🇬",
+    info: "Hiri Motu ist neben Tok Pisin und Englisch eine der drei offiziellen Sprachen Papua-Neuguineas. Es entstand als vereinfachte Handelssprache der Motu-Leute."
+  },
+  "Tetum": {
+    translation: "Hau hadomi o",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Tetum nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W X Y Z",
+    countries: ["🇹🇱 Osttimor"],
+    flags: "🇹🇱",
+    info: "Tetum ist neben Portugiesisch die offizielle Sprache Osttimors mit über 800.000 Sprechern. Osttimor wurde 2002 als einer der jüngsten Staaten der Welt unabhängig."
+  },
+  "Nauruanisch": {
+    translation: "Ña kamwara omo",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Nauruanisch nutzt das lateinische Alphabet mit Sonderzeichen.",
+    alphabet: "A B C D E G I J K M N O P Q R T U W Y",
+    countries: ["🇳🇷 Nauru"],
+    flags: "🇳🇷",
+    info: "Nauruanisch wird von etwa 7.000 Menschen gesprochen. Nauru ist der drittkleinste Staat der Welt und war einst durch Phosphatabbau eines der reichsten Länder pro Kopf."
+  },
+  "Palauanisch": {
+    translation: "Ak melakel er kau",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Palauanisch nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E I K L M N O R S T U",
+    countries: ["🇵🇼 Palau"],
+    flags: "🇵🇼",
+    info: "Palauanisch hat ein seltenes Labiovelar-System und wird von etwa 17.000 Menschen gesprochen. Die Felseninseln Palaus gehören zum UNESCO-Welterbe."
+  },
+  "Yapesisch": {
+    translation: "Gu runguy niim",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Yapesisch nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I K L M N O P R S T U W Y",
+    countries: ["🇫🇲 Föderierte Staaten von Mikronesien"],
+    flags: "🇫🇲",
+    info: "Yapesisch wird von etwa 7.000 Menschen gesprochen. Yap ist berühmt für seine Rai-Steine – riesige Steingeldstücke von bis zu 4 Metern Durchmesser."
+  },
+  "Kosraeanisch": {
+    translation: "Nga lungse kom",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Kosraeanisch nutzt das lateinische Alphabet.",
+    alphabet: "A C E F G H I K L M N O P R S T U W Y",
+    countries: ["🇫🇲 Föderierte Staaten von Mikronesien"],
+    flags: "🇫🇲",
+    info: "Kosraeanisch wird von etwa 8.000 Menschen auf der Insel Kosrae gesprochen. Kosrae wird wegen seiner Schönheit oft 'Insel der schlafenden Dame' genannt."
+  },
+  "Ponapeanisch (Pohnpeianisch)": {
+    translation: "I poakohng uhk",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Ponapeanisch nutzt das lateinische Alphabet.",
+    alphabet: "A D E H I J K L M N O P R S T U W",
+    countries: ["🇫🇲 Föderierte Staaten von Mikronesien"],
+    flags: "🇫🇲",
+    info: "Ponapeanisch wird von über 30.000 Menschen gesprochen. Auf Pohnpei befinden sich die geheimnisvollen Ruinen von Nan Madol, oft als 'Venedig des Pazifiks' bezeichnet."
+  },
+  "Rarotonga": {
+    translation: "Ka inangaro au ia koe",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Rarotonga nutzt das lateinische Alphabet mit dem Glottalstopp ʻ.",
+    alphabet: "A E G I K M N O P R T U V ʻ",
+    countries: ["🇨🇰 Cookinseln"],
+    flags: "🇨🇰",
+    info: "Rarotonga ist die Sprache der Cookinseln mit etwa 43.000 Sprechern weltweit. Die Cookinseln sind ein selbstverwaltetes Territorium in freier Assoziierung mit Neuseeland."
+  },
+  "Wallisianisch": {
+    translation: "Oku ou ofa atu kiate koe",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Wallisianisch nutzt das lateinische Alphabet.",
+    alphabet: "A E F G H I K L M N O P S T U V ʻ",
+    countries: ["🇼🇫 Wallis und Futuna"],
+    flags: "🇼🇫",
+    info: "Wallisianisch wird von etwa 10.000 Menschen auf Wallis gesprochen. Es ist eng mit Tonganisch verwandt, da Wallis historisch dem tongaischen Einflussbereich angehörte."
+  },
+  "Futunisch": {
+    translation: "Ku ofa atu au kia te koe",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Futunisch nutzt das lateinische Alphabet.",
+    alphabet: "A E F G I K L M N O P S T U V",
+    countries: ["🇼🇫 Wallis und Futuna"],
+    flags: "🇼🇫",
+    info: "Futunisch wird von etwa 5.000 Menschen auf Futuna gesprochen. Es ist eng mit Samoanisch verwandt und unterscheidet sich deutlich vom benachbarten Wallisianisch."
+  },
+  "Tokelauisch": {
+    translation: "Ko ofa aku kia te koe",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Tokelauisch nutzt das lateinische Alphabet.",
+    alphabet: "A E F G H I K L M N O P S T U V",
+    countries: ["🇹🇰 Tokelau"],
+    flags: "🇹🇰",
+    info: "Tokelauisch wird von etwa 4.000 Menschen gesprochen. Tokelau besteht aus nur drei Atollen und ist eines der kleinsten Territorien der Welt."
+  },
+  "Rotuma": {
+    translation: "Ou ʻofa ke",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Rotuma nutzt das lateinische Alphabet mit Sonderzeichen.",
+    alphabet: "A E F G H I J K L M N O P R S T U V ʻ",
+    countries: ["🇫🇯 Fidschi (Rotuma-Insel)"],
+    flags: "🇫🇯",
+    info: "Rotuma wird von etwa 2.000 Menschen auf der Rotuma-Insel gesprochen. Die Sprache ist ein linguistisches Rätsel, da sie sich stark von allen Nachbarsprachen unterscheidet."
+  },
+  "Drehu": {
+    translation: "Ini hnimi eö",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Drehu nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W X Y Z",
+    countries: ["🇳🇨 Neukaledonien"],
+    flags: "🇳🇨",
+    info: "Drehu wird von etwa 15.000 Menschen auf der Loyalty-Insel Lifou in Neukaledonien gesprochen. Es ist eine der größten einheimischen Sprachen Neukaledoniens."
+  },
+  "Nengone": {
+    translation: "Ini hmi eö",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Nengone nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E G H I J K L M N O P R S T U V W X Y Z",
+    countries: ["🇳🇨 Neukaledonien"],
+    flags: "🇳🇨",
+    info: "Nengone wird von etwa 9.000 Menschen auf der Insel Maré in Neukaledonien gesprochen. Die Sprache hat ein ungewöhnliches Nasalkonsonantensystem."
+  },
+  "Paicî": {
+    translation: "Go pwicîri-â",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Paicî nutzt das lateinische Alphabet mit Sonderzeichen und Zirkumflex.",
+    alphabet: "A B C D E G I J K L M N O P R T U V W",
+    countries: ["🇳🇨 Neukaledonien"],
+    flags: "🇳🇨",
+    info: "Paicî wird von etwa 6.000 Menschen in der nördlichen Provinz Neukaledoniens gesprochen. Es gehört zur ozeanischen Sprachfamilie."
+  },
+  "Okzitanisch": {
+    translation: "T'aimi",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Okzitanisch nutzt das lateinische Alphabet mit Sonderzeichen wie ç, ò, ó, ü.",
+    alphabet: "A B C Ç D E F G H I J K L M N O P Q R S T U Ü V W X Y Z",
+    countries: ["🇫🇷 Frankreich", "🇪🇸 Spanien (Aran-Tal)", "🇮🇹 Italien"],
+    flags: "🇫🇷🇪🇸🇮🇹",
+    info: "Okzitanisch wird von über 1 Million Menschen in Südfrankreich gesprochen. Die Trobadors des Mittelalters dichteten auf Okzitanisch und begründeten die europäische Liebeslyrik."
+  },
+  "Sardisch": {
+    translation: "T'amo",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Sardisch nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V X Z",
+    countries: ["🇮🇹 Italien (Sardinien)"],
+    flags: "🇮🇹",
+    info: "Sardisch wird von über 1 Million Menschen gesprochen und gilt als die konservativste romanische Sprache – am nächsten am Vulgärlatein."
+  },
+  "Rätoromanisch": {
+    translation: "Jau hai tai gust",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Rätoromanisch nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇨🇭 Schweiz (Graubünden)"],
+    flags: "🇨🇭",
+    info: "Rätoromanisch ist eine der vier Landessprachen der Schweiz mit nur etwa 60.000 Sprechern. Es hat fünf regionale Schriftsprachen und seit 1982 eine einheitliche Schriftsprache (Rumantsch Grischun)."
+  },
+  "Friesisch (West)": {
+    translation: "Ik hâld fan dy",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Westfriesisch nutzt das lateinische Alphabet mit Sonderzeichen wie â, ê, ô, û, ú, ü.",
+    alphabet: "A Â B C D E Ê F G H I J K L M N O Ô P R S T U Û Ú Ü V W Y Z",
+    countries: ["🇳🇱 Niederlande (Friesland)"],
+    flags: "🇳🇱",
+    info: "Westfriesisch wird von über 450.000 Menschen in der niederländischen Provinz Friesland gesprochen. Es ist die dem Englischen am nächsten verwandte lebende Sprache auf dem Kontinent."
+  },
+  "Friesisch (Nord)": {
+    translation: "Ik haa di liif",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Nordfriesisch nutzt das lateinische Alphabet mit Sonderzeichen.",
+    alphabet: "A Ä B C D E F G H I J K L M N O Ö P R S T U Ü V W Y Z",
+    countries: ["🇩🇪 Deutschland (Schleswig-Holstein)"],
+    flags: "🇩🇪",
+    info: "Nordfriesisch wird von etwa 8.000 Menschen an der Nordseeküste Schleswig-Holsteins gesprochen. Es hat mehrere stark voneinander abweichende Dialekte auf den Inseln und dem Festland."
+  },
+  "Sorbisch (Ober)": {
+    translation: "Lubuju tebje",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Obersorbisch nutzt das lateinische Alphabet mit Sonderzeichen wie č, ě, ř, š, ž, ó, ć, ń.",
+    alphabet: "A B C Č Ć D Dź E Ě F G H Ch I J K Ł L M N Ń O Ó P R Ř S Š T U W Y Z Ž",
+    countries: ["🇩🇪 Deutschland (Sachsen)"],
+    flags: "🇩🇪",
+    info: "Obersorbisch wird von etwa 20.000 Menschen in der Oberlausitz gesprochen. Die Sorben sind das kleinste slawische Volk und haben ihre Kultur trotz Jahrhunderte der Germanisierung bewahrt."
+  },
+  "Sorbisch (Nieder)": {
+    translation: "Lubujom tebje",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Niedersorbisch nutzt das lateinische Alphabet mit Sonderzeichen wie č, ě, š, ž, ś, ź, ń.",
+    alphabet: "A B C Č Ć D E Ě F G H Ch I J K Ł L M N Ń O P R Ŕ S Š Ś T U W Y Z Ž Ź",
+    countries: ["🇩🇪 Deutschland (Brandenburg)"],
+    flags: "🇩🇪",
+    info: "Niedersorbisch wird von nur noch etwa 7.000 Menschen in der Niederlausitz gesprochen und ist stark vom Aussterben bedroht. Intensive Revitalisierungsbemühungen sind im Gange."
+  },
+  "Jiddisch": {
+    translation: "איך ליב דיך",
+    transliteration: "Ikh lib dikh",
+    script: "Hebräisches Alphabet",
+    scriptInfo: "Jiddisch nutzt das hebräische Alphabet mit eigener Orthographie. Es wird von rechts nach links geschrieben.",
+    alphabet: "א אַ אָ ב בֿ ג ד ה ו וּ וֹ ז ח ט י ײ ײַ כ כּ ל מ נ ס ע פ פּ פֿ צ ק ר ש שׂ ת תּ",
+    countries: ["🇮🇱 Israel", "🇺🇸 USA"],
+    flags: "🇮🇱🇺🇸",
+    info: "Jiddisch wird noch von über 1,5 Millionen Menschen gesprochen, hauptsächlich ultraorthodoxe Juden. Es basiert auf Mittelhochdeutsch mit hebräischen und slawischen Einflüssen."
+  },
+  "Kornisch": {
+    translation: "My a'th kar",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Kornisch nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇬🇧 Vereinigtes Königreich (Cornwall)"],
+    flags: "🇬🇧",
+    info: "Kornisch starb im 18. Jahrhundert als Muttersprache aus, wird aber seit Anfang des 20. Jahrhunderts erfolgreich wiederbelebt. Heute gibt es wieder einige hundert Sprecher."
+  },
+  "Manx": {
+    translation: "Ta graih aym ort",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Manx nutzt das lateinische Alphabet mit einer englisch-basierten Orthographie.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇮🇲 Isle of Man"],
+    flags: "🇮🇲",
+    info: "Manx starb 1974 mit Ned Maddrell als letztem Muttersprachler aus. Dank intensiver Wiederbelebung gibt es heute wieder über 1.800 Sprecher und eine Manx-Sprachschule."
+  },
+  "Nordsamisch": {
+    translation: "Mun ráhkistan du",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Nordsamisch nutzt das lateinische Alphabet mit Sonderzeichen wie á, č, đ, ŋ, š, ŧ, ž.",
+    alphabet: "A Á B C Č D Đ E F G H I J K L M N Ŋ O P R S Š T Ŧ U V Z Ž",
+    countries: ["🇳🇴 Norwegen", "🇸🇪 Schweden", "🇫🇮 Finnland"],
+    flags: "🇳🇴🇸🇪🇫🇮",
+    info: "Nordsamisch wird von über 20.000 Menschen gesprochen und ist die größte samische Sprache. Die Samen sind das einzige offiziell anerkannte indigene Volk Europas."
+  },
+  "Lulesamisch": {
+    translation: "Mån ráhkkiv duv",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Lulesamisch nutzt das lateinische Alphabet mit Sonderzeichen wie á, ŋ, å.",
+    alphabet: "A Á B C D E F G H I J K L M N Ŋ O P R S T U V Å",
+    countries: ["🇳🇴 Norwegen", "🇸🇪 Schweden"],
+    flags: "🇳🇴🇸🇪",
+    info: "Lulesamisch wird von etwa 2.000 Menschen in Schweden und Norwegen gesprochen. Es ist eine bedrohte Sprache mit intensiven Revitalisierungsbemühungen."
+  },
+  "Inarisamisch": {
+    translation: "Mun räähkástám tuv",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Inarisamisch nutzt das lateinische Alphabet mit zahlreichen Sonderzeichen.",
+    alphabet: "A Â B C Č D Đ E F G H I J K L M N Ŋ O P R S Š T U V Y Z Ž Ä",
+    countries: ["🇫🇮 Finnland"],
+    flags: "🇫🇮",
+    info: "Inarisamisch wird von nur etwa 400 Menschen in der Gemeinde Inari in Finnland gesprochen. Es ist die einzige samische Sprache, die vollständig innerhalb eines Landes gesprochen wird."
+  },
+  "Ladino (Judenspanisch)": {
+    translation: "Te kero",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Ladino wurde historisch in hebräischer Schrift (Rashi) geschrieben, heute wird meist das lateinische Alphabet verwendet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇮🇱 Israel", "🇹🇷 Türkei"],
+    flags: "🇮🇱🇹🇷",
+    info: "Ladino ist das Spanisch der sephardischen Juden, die 1492 aus Spanien vertrieben wurden. Es bewahrt mittelalterliches Spanisch und hat hebräische und türkische Einflüsse. Heute vom Aussterben bedroht."
+  },
+  "Romani": {
+    translation: "Kamav tut",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Romani nutzt verschiedene Alphabete je nach Land. Das lateinische Alphabet ist am verbreitetsten.",
+    alphabet: "A B C Č D E F G H I J K Kh L M N O P Ph R S Š T Th U V X Z Ž",
+    countries: ["🇷🇴 Rumänien", "🇧🇬 Bulgarien", "🇪🇸 Spanien"],
+    flags: "🇷🇴🇧🇬🇪🇸",
+    info: "Romani wird von über 3 Millionen Roma in ganz Europa gesprochen. Es ist eine indoarische Sprache, die mit Hindi und Punjabi verwandt ist – Beweis der indischen Herkunft der Roma."
+  },
+  "Aromunisch (Mazedorumänisch)": {
+    translation: "Ti voi njic",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Aromunisch nutzt das lateinische Alphabet mit rumänischen Sonderzeichen.",
+    alphabet: "A Ã B C D Dz E F G H I Î J K L Lj M N Nj O P Q R S Sh T Ts U V X Y Z",
+    countries: ["🇬🇷 Griechenland", "🇦🇱 Albanien", "🇲🇰 Nordmazedonien"],
+    flags: "🇬🇷🇦🇱🇲🇰",
+    info: "Aromunisch wird von etwa 250.000 Menschen auf dem Balkan gesprochen. Die Aromunen sind Nachfahren der romanisierten Bevölkerung des Balkans und waren historisch bedeutende Händler."
+  },
+  "Mirandés": {
+    translation: "Quiero-te",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Mirandés nutzt das lateinische Alphabet mit Sonderzeichen wie ç, ã, õ, ũ.",
+    alphabet: "A Ã B C Ç D E F G H I J K L M N O Õ P Q R S T U Ũ V W X Y Z",
+    countries: ["🇵🇹 Portugal (Miranda do Douro)"],
+    flags: "🇵🇹",
+    info: "Mirandés wird von etwa 10.000 Menschen im Nordosten Portugals gesprochen. Es ist seit 1999 als zweite offizielle Sprache in der Region Miranda do Douro anerkannt."
+  },
+  "Asturisch": {
+    translation: "Quiérote",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Asturisch nutzt das lateinische Alphabet mit Sonderzeichen wie ñ, ü und dem Digraphen ll.",
+    alphabet: "A B C D E F G H I J K L Ll M N Ñ O P Q R S T U Ü V W X Y Z",
+    countries: ["🇪🇸 Spanien (Asturien)"],
+    flags: "🇪🇸",
+    info: "Asturisch wird von über 100.000 Menschen in Asturien gesprochen. Es kämpft um offizielle Anerkennung als co-offizielle Sprache Spaniens."
+  },
+  "Aragonesisch": {
+    translation: "Te quiero",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Aragonesisch nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N Ñ O P Q R S T U V W X Y Z",
+    countries: ["🇪🇸 Spanien (Aragonien)"],
+    flags: "🇪🇸",
+    info: "Aragonesisch wird von etwa 10.000 Menschen in den Pyrenäentälern gesprochen. Es war im Mittelalter die Sprache des mächtigen Königreichs Aragonien und ist heute stark bedroht."
+  },
+  "Piemontesisch": {
+    translation: "It veuj bin",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Piemontesisch nutzt das lateinische Alphabet mit Sonderzeichen.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇮🇹 Italien (Piemont)"],
+    flags: "🇮🇹",
+    info: "Piemontesisch wird von über 2 Millionen Menschen im Piemont gesprochen. Es war die erste romanische Sprache Italiens mit einer eigenen Literatur nach dem Lateinischen."
+  },
+  "Lombardisch": {
+    translation: "Te vöi ben",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Lombardisch nutzt das lateinische Alphabet mit Sonderzeichen wie ö, ü.",
+    alphabet: "A B C D E F G H I J K L M N O Ö P Q R S T U Ü V W X Y Z",
+    countries: ["🇮🇹 Italien (Lombardei)", "🇨🇭 Schweiz (Tessin)"],
+    flags: "🇮🇹🇨🇭",
+    info: "Lombardisch wird von über 3,5 Millionen Menschen gesprochen. Mailand, die wirtschaftliche Hauptstadt Italiens, liegt im lombardischen Sprachgebiet."
+  },
+  "Venezianisch": {
+    translation: "Te vogio ben",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Venezianisch nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇮🇹 Italien (Venetien)"],
+    flags: "🇮🇹",
+    info: "Venezianisch wird von über 3 Millionen Menschen gesprochen. Es war die offizielle Sprache der Republik Venedig und eine wichtige Handelssprache im Mittelmeerraum."
+  },
+  "Neapolitanisch": {
+    translation: "T'amo",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Neapolitanisch nutzt das lateinische Alphabet mit Sonderzeichen.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇮🇹 Italien (Kampanien)"],
+    flags: "🇮🇹",
+    info: "Neapolitanisch wird von über 5 Millionen Menschen gesprochen. Es hat eine reiche musikalische Tradition – viele berühmte italienische Lieder sind eigentlich auf Neapolitanisch."
+  },
+  "Sizilianisch": {
+    translation: "T'amu",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Sizilianisch nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇮🇹 Italien (Sizilien)"],
+    flags: "🇮🇹",
+    info: "Sizilianisch wird von über 5 Millionen Menschen gesprochen. Die Scuola Siciliana am Hof Friedrichs II. begründete im 13. Jahrhundert die italienische Literatur."
+  },
+  "Korsisch": {
+    translation: "Ti tengu caru",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Korsisch nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇫🇷 Frankreich (Korsika)"],
+    flags: "🇫🇷",
+    info: "Korsisch wird von über 100.000 Menschen gesprochen und ist eng mit dem Toskanischen verwandt. Napoleon Bonaparte sprach als Muttersprache Korsisch."
+  },
+  "Lothringisch (Platt)": {
+    translation: "Ich hun dich gearn",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Lothringisch nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇫🇷 Frankreich (Lothringen)"],
+    flags: "🇫🇷",
+    info: "Lothringisch ist ein fränkischer Dialekt, der von wenigen tausend Menschen in Lothringen gesprochen wird. Es ist eng mit Luxemburgisch und Moselfränkisch verwandt."
+  },
+  "Limburgisch": {
+    translation: "Ich hald van dich",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Limburgisch nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇳🇱 Niederlande (Limburg)", "🇧🇪 Belgien (Limburg)", "🇩🇪 Deutschland"],
+    flags: "🇳🇱🇧🇪🇩🇪",
+    info: "Limburgisch wird von über 1,6 Millionen Menschen in den Grenzregionen gesprochen. Es hat ein tonales System – einzigartig für eine westgermanische Sprache."
+  },
+  "Niedersächsisch": {
+    translation: "Ik heb di leev",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Niedersächsisch nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇩🇪 Deutschland", "🇳🇱 Niederlande"],
+    flags: "🇩🇪🇳🇱",
+    info: "Niedersächsisch wird von über 6 Millionen Menschen gesprochen. Als Hansesprache war es im Mittelalter die Lingua franca des Ostseeraums und beeinflusste die skandinavischen Sprachen stark."
+  },
+  "Scots": {
+    translation: "A luve ye",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Scots nutzt das lateinische Alphabet mit eigener Orthographie.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇬🇧 Schottland"],
+    flags: "🇬🇧",
+    info: "Scots wird von über 1,5 Millionen Menschen in Schottland gesprochen. Robert Burns, Schottlands Nationaldichter, schrieb auf Scots. 'Auld Lang Syne' ist sein berühmtestes Werk."
+  },
+  "Karelisch": {
+    translation: "Minä armastan sinuo",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Karelisch nutzt das lateinische Alphabet mit Sonderzeichen wie š, ž, č, ö, ä, ü.",
+    alphabet: "A B C Č D E F G H I J K L M N O P R S Š T U V Y Z Ž Ä Ö Ü",
+    countries: ["🇷🇺 Russland (Karelien)", "🇫🇮 Finnland"],
+    flags: "🇷🇺🇫🇮",
+    info: "Karelisch wird von etwa 36.000 Menschen gesprochen. Das finnische Nationalepos Kalevala basiert auf karelischen Volksgedichten, die Elias Lönnrot im 19. Jahrhundert sammelte."
+  },
+  "Navajo": {
+    translation: "Ayóó anííníshní",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Navajo nutzt das lateinische Alphabet mit umfangreichen diakritischen Zeichen für Töne und Nasalierung.",
+    alphabet: "A Á B C D E É G H I Í J K L Ł M N O Ó R S Sh T Ts U V W X Y Z Zh",
+    countries: ["🇺🇸 USA (Navajo Nation)"],
+    flags: "🇺🇸",
+    info: "Navajo wird von über 170.000 Menschen gesprochen und ist die größte indigene Sprache Nordamerikas. Im Zweiten Weltkrieg wurde sie als unknackbarer militärischer Code eingesetzt (Code Talkers)."
+  },
+  "Cherokee": {
+    translation: "ᎬᎨᏳᎯ",
+    transliteration: "Gvgeyu'i",
+    script: "Cherokee-Silbenschrift",
+    scriptInfo: "Cherokee nutzt eine eigene Silbenschrift, die 1821 von Sequoyah erfunden wurde. Sie hat 85 Zeichen.",
+    alphabet: "Ꭰ Ꭱ Ꭲ Ꭳ Ꭴ Ꭵ Ꭶ Ꭷ Ꭸ Ꭹ Ꭺ Ꭻ Ꭼ Ꭽ Ꭾ Ꭿ Ꮀ Ꮁ Ꮂ Ꮃ Ꮄ Ꮅ Ꮆ Ꮇ Ꮈ Ꮉ Ꮊ Ꮋ Ꮌ Ꮍ Ꮎ Ꮏ Ꮐ Ꮑ Ꮒ Ꮓ Ꮔ Ꮕ Ꮖ Ꮗ Ꮘ Ꮙ Ꮚ",
+    countries: ["🇺🇸 USA (Oklahoma, North Carolina)"],
+    flags: "🇺🇸",
+    info: "Cherokee wird von etwa 2.000 Muttersprachlern gesprochen. Sequoyahs Silbenschrift ist die einzige bekannte Schrift, die von einer einzelnen Person ohne Kenntnis anderer Schriften erfunden wurde."
+  },
+  "Nahuatl": {
+    translation: "Nimitztlazohtla",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Nahuatl nutzt das lateinische Alphabet. Vor der Kolonisierung wurde eine Bilderschrift verwendet.",
+    alphabet: "A C E H I K L M N O P S T Tl Ts U W X Y Z",
+    countries: ["🇲🇽 Mexiko"],
+    flags: "🇲🇽",
+    info: "Nahuatl wird von über 1,7 Millionen Menschen in Mexiko gesprochen. Es war die Sprache der Azteken. Wörter wie Schokolade, Tomate, Avocado und Koyote stammen aus dem Nahuatl."
+  },
+  "Maya (Yucatec)": {
+    translation: "In k'aatech",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Yucatec Maya nutzt das lateinische Alphabet mit Apostrophen für glottalisierte Konsonanten.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇲🇽 Mexiko (Yucatán)", "🇧🇿 Belize", "🇬🇹 Guatemala"],
+    flags: "🇲🇽🇧🇿🇬🇹",
+    info: "Yucatec Maya wird von über 800.000 Menschen gesprochen. Die Maya entwickelten das einzige vollständige Schriftsystem im präkolumbischen Amerika und einen hochpräzisen Kalender."
+  },
+  "Mapudungun (Mapuche)": {
+    translation: "Ayüeyu",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Mapudungun nutzt das lateinische Alphabet mit verschiedenen Orthographien (Raguileo, Unificado, Azümchefe).",
+    alphabet: "A C D E F G I K L Ḻ M N Ñ Ŋ O P R S T Ṯ Ü U V W Y",
+    countries: ["🇨🇱 Chile", "🇦🇷 Argentinien"],
+    flags: "🇨🇱🇦🇷",
+    info: "Mapudungun wird von über 250.000 Menschen gesprochen. Die Mapuche widerstanden erfolgreich sowohl den Inkas als auch den Spaniern und bewahrten ihre Unabhängigkeit bis ins 19. Jahrhundert."
+  },
+  "Inuktitut": {
+    translation: "ᓇᒡᓕᒍᓱᒃᑐᑎᑦ",
+    transliteration: "Nagligosuktiit",
+    script: "Kanadische Silbenschrift (Inuktitut-Syllabics)",
+    scriptInfo: "Inuktitut nutzt eine eigene Silbenschrift mit Zeichen, deren Ausrichtung den Vokal bestimmt.",
+    alphabet: "ᐃ ᐄ ᐅ ᐆ ᐊ ᐋ ᐱ ᐲ ᐳ ᐴ ᐸ ᐹ ᑎ ᑏ ᑐ ᑑ ᑕ ᑖ ᑭ ᑮ ᑯ ᑰ ᑲ ᑳ ᒋ ᒌ ᒍ ᒎ ᒐ ᒑ ᒥ ᒦ ᒧ ᒨ ᒪ ᒫ ᓂ ᓃ ᓄ ᓅ ᓇ ᓈ",
+    countries: ["🇨🇦 Kanada (Nunavut)"],
+    flags: "🇨🇦",
+    info: "Inuktitut wird von über 35.000 Menschen in Kanada gesprochen. Es ist eine polysynthetische Sprache, in der ein einziges Wort einen ganzen Satz ausdrücken kann."
+  },
+  "Grönländisch (Kalaallisut)": {
+    translation: "Asavakkit",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Grönländisch nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V",
+    countries: ["🇬🇱 Grönland"],
+    flags: "🇬🇱",
+    info: "Grönländisch wird von über 50.000 Menschen gesprochen. Es hat extrem lange Wörter – ein einziges Wort kann einen ganzen englischen Satz ersetzen."
+  },
+  "Cree": {
+    translation: "ᑭᓵᑭᐦᐃᑎᐣ",
+    transliteration: "Kisâkihitin",
+    script: "Kanadische Silbenschrift / Lateinisch",
+    scriptInfo: "Cree nutzt die kanadische Silbenschrift oder das lateinische Alphabet, je nach Region.",
+    alphabet: "ᐁ ᐃ ᐅ ᐊ ᐯ ᐱ ᐳ ᐸ ᑌ ᑎ ᑐ ᑕ ᑫ ᑭ ᑯ ᑲ ᒉ ᒋ ᒍ ᒐ ᒣ ᒥ ᒧ ᒪ ᓀ ᓂ ᓄ ᓇ ᓭ ᓯ ᓱ ᓴ ᔦ ᔨ ᔪ ᔭ",
+    countries: ["🇨🇦 Kanada"],
+    flags: "🇨🇦",
+    info: "Cree wird von über 96.000 Menschen gesprochen und ist die meistgesprochene indigene Sprache Kanadas. Es erstreckt sich über ein riesiges Gebiet von Alberta bis Québec."
+  },
+  "Ojibwe": {
+    translation: "Gizaagi'in",
+    transliteration: "",
+    script: "Lateinisches Alphabet / Kanadische Silbenschrift",
+    scriptInfo: "Ojibwe nutzt das lateinische Alphabet oder die kanadische Silbenschrift.",
+    alphabet: "A B C D E F G H I J K L M N O P S Sh T W Y Z Zh",
+    countries: ["🇺🇸 USA", "🇨🇦 Kanada"],
+    flags: "🇺🇸🇨🇦",
+    info: "Ojibwe wird von über 50.000 Menschen in Kanada und den USA gesprochen. Die Ojibwe erfanden die Birkenrinden-Schriftrollen und sind bekannt für ihre Traumfänger-Tradition."
+  },
+  "Lakota (Sioux)": {
+    translation: "Thečhíȟila",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Lakota nutzt das lateinische Alphabet mit Sonderzeichen wie č, ǧ, ȟ, š, ž und Aspirationszeichen.",
+    alphabet: "A B C Č D E G Ǧ H Ȟ I J K L M N O P S Š T U V W Y Z Ž",
+    countries: ["🇺🇸 USA (North/South Dakota)"],
+    flags: "🇺🇸",
+    info: "Lakota wird von etwa 6.000 Menschen gesprochen. Die Lakota sind berühmt durch Sitting Bull und die Schlacht am Little Bighorn. Intensive Sprachrevitalisierung findet statt."
+  },
+  "Apache": {
+    translation: "Shi nizhóní niiłtsą́ą́",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Apache nutzt das lateinische Alphabet mit Tonzeichen und Sonderzeichen.",
+    alphabet: "A B C D E G H I J K L M N O S T U Y Z",
+    countries: ["🇺🇸 USA (Arizona, New Mexico)"],
+    flags: "🇺🇸",
+    info: "Apache wird von etwa 14.000 Menschen gesprochen. Die Apachen, angeführt von Geronimo, leisteten den längsten bewaffneten Widerstand gegen die US-Expansion."
+  },
+  "Hopi": {
+    translation: "Nu' umi unangwa'ta",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Hopi nutzt das lateinische Alphabet.",
+    alphabet: "A E G H I K L M N O P Q R S T U V W Y",
+    countries: ["🇺🇸 USA (Arizona)"],
+    flags: "🇺🇸",
+    info: "Hopi wird von etwa 6.800 Menschen gesprochen. Die Hopi-Sprache wurde durch Benjamin Lee Whorfs These berühmt, dass sie kein Zeitkonzept habe – was später widerlegt wurde."
+  },
+  "Zapotekisch": {
+    translation: "Nayeli",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Zapotekisch nutzt das lateinische Alphabet. Historisch hatten die Zapoteken eine eigene Hieroglyphenschrift.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇲🇽 Mexiko (Oaxaca)"],
+    flags: "🇲🇽",
+    info: "Zapotekische Sprachen werden von über 450.000 Menschen in Oaxaca gesprochen. Die Zapoteken entwickelten eines der ältesten Schriftsysteme Mesoamerikas in Monte Albán."
+  },
+  "Mixtekisch": {
+    translation: "Kúni yuí ndo'o",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Mixtekisch nutzt das lateinische Alphabet mit Tonzeichen.",
+    alphabet: "A B C D E F G H I J K L M N Ñ O P R S T U V X Y Z",
+    countries: ["🇲🇽 Mexiko (Oaxaca, Guerrero, Puebla)"],
+    flags: "🇲🇽",
+    info: "Mixtekische Sprachen werden von über 500.000 Menschen gesprochen. Die Mixteken schufen einige der schönsten präkolumbischen Codices und Goldschmiedearbeiten."
+  },
+  "K'iche' (Maya)": {
+    translation: "Kinloq'oj la",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "K'iche' nutzt das lateinische Alphabet mit Apostrophen für glottalisierte Konsonanten.",
+    alphabet: "A B C D E G H I J K L M N O P Q R S T Tz Tz' U V W X Y",
+    countries: ["🇬🇹 Guatemala"],
+    flags: "🇬🇹",
+    info: "K'iche' wird von über 1 Million Menschen in Guatemala gesprochen. Das Popol Vuh, die Schöpfungsgeschichte der K'iche'-Maya, gilt als wichtigstes literarisches Werk des präkolumbischen Amerika."
+  },
+  "Kaqchikel (Maya)": {
+    translation: "Yinloq'oj la",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Kaqchikel nutzt das lateinische Alphabet mit Apostrophen für glottalisierte Laute.",
+    alphabet: "A B C D E G H I J K L M N O P Q R S T Tz U V W X Y",
+    countries: ["🇬🇹 Guatemala"],
+    flags: "🇬🇹",
+    info: "Kaqchikel wird von über 500.000 Menschen in Guatemala gesprochen. Es war die Sprache des Kaqchikel-Königreichs, eines der mächtigsten Maya-Staaten zur Zeit der Eroberung."
+  },
+  "Wayuu": {
+    translation: "Taya aiyajaa pia",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Wayuu nutzt das lateinische Alphabet.",
+    alphabet: "A C E I J K L M N O P R S Sh T U Ü W Y",
+    countries: ["🇨🇴 Kolumbien", "🇻🇪 Venezuela"],
+    flags: "🇨🇴🇻🇪",
+    info: "Wayuu wird von über 400.000 Menschen auf der Guajira-Halbinsel gesprochen. Die Wayuu sind das größte indigene Volk Kolumbiens und bekannt für ihre farbenfrohen Mochilas (Taschen)."
+  },
+  "Wayampi": {
+    translation: "Ae roayã ne",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Wayampi nutzt das lateinische Alphabet.",
+    alphabet: "A E G I J K L M N O P R S T U W Y",
+    countries: ["🇧🇷 Brasilien", "🇬🇫 Französisch-Guayana"],
+    flags: "🇧🇷🇬🇫",
+    info: "Wayampi wird von etwa 2.000 Menschen im Amazonasgebiet gesprochen. Es gehört zur Tupí-Guaraní-Sprachfamilie und wird in entlegenen Regenwaldgebieten gesprochen."
+  },
+  "Nheengatu": {
+    translation: "Asaisú indé",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Nheengatu nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E G I J K L M N O P R S T U W X Y",
+    countries: ["🇧🇷 Brasilien (Amazonas)"],
+    flags: "🇧🇷",
+    info: "Nheengatu ist eine Tupí-basierte Lingua franca am oberen Rio Negro mit etwa 19.000 Sprechern. Es war bis ins 19. Jahrhundert die meistgesprochene Sprache Brasiliens, noch vor Portugiesisch."
+  },
+  "Bribri": {
+    translation: "Ye' alk skena be'",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Bribri nutzt das lateinische Alphabet mit Sonderzeichen.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U W Y",
+    countries: ["🇨🇷 Costa Rica"],
+    flags: "🇨🇷",
+    info: "Bribri wird von etwa 11.000 Menschen in Costa Rica gesprochen. Die Bribri-Gesellschaft ist matrilinear und ihr Kulturheld Sibö gilt als Schöpfer der Kakaopflanze."
+  },
+  "Kuna (Guna)": {
+    translation: "An be nue",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Guna nutzt das lateinische Alphabet.",
+    alphabet: "A B D E G I K L M N O P R S T U W Y",
+    countries: ["🇵🇦 Panama", "🇨🇴 Kolumbien"],
+    flags: "🇵🇦🇨🇴",
+    info: "Guna wird von über 60.000 Menschen gesprochen. Die Guna-Yala (San-Blas-Inseln) sind eines der ersten indigenen autonomen Gebiete Lateinamerikas seit der Revolution von 1925."
+  },
+  "Garifuna": {
+    translation: "Nawaniga bou",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Garifuna nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W Y",
+    countries: ["🇧🇿 Belize", "🇭🇳 Honduras", "🇬🇹 Guatemala"],
+    flags: "🇧🇿🇭🇳🇬🇹",
+    info: "Garifuna wird von über 100.000 Menschen in Zentralamerika gesprochen. Es ist eine einzigartige Mischung aus Arawak, Karibisch und Afrikanischem. 2001 wurde es UNESCO-Kulturerbe."
+  },
+  "Miskito": {
+    translation: "Yang man latwan kaikisna",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Miskito nutzt das lateinische Alphabet.",
+    alphabet: "A B D E F G H I J K L M N O P R S T U V W Y",
+    countries: ["🇳🇮 Nicaragua", "🇭🇳 Honduras"],
+    flags: "🇳🇮🇭🇳",
+    info: "Miskito wird von über 180.000 Menschen an der Karibikküste gesprochen. Die Miskito-Küste war ein autonomes Königreich, das von den Briten unterstützt wurde."
+  },
+  "Arawak": {
+    translation: "Da aima biana",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Arawak nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W Y",
+    countries: ["🇸🇷 Suriname", "🇬🇾 Guyana"],
+    flags: "🇸🇷🇬🇾",
+    info: "Arawak wird von etwa 2.500 Menschen gesprochen. Die Arawak-Sprachfamilie ist eine der größten Südamerikas – das Wort 'Karibik' stammt aus einer Arawak-verwandten Sprache."
+  },
+  "Sranan Tongo": {
+    translation: "Mi lobi yu",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Sranan Tongo nutzt das lateinische Alphabet mit phonetischer Schreibung.",
+    alphabet: "A B D E F G H I J K L M N O P R S T U V W Y",
+    countries: ["🇸🇷 Suriname"],
+    flags: "🇸🇷",
+    info: "Sranan Tongo ist eine englisch-basierte Kreolsprache und die Lingua franca Surinames mit über 500.000 Sprechern. Es verbindet englische, niederländische, portugiesische und afrikanische Elemente."
+  },
+  "Papiamento": {
+    translation: "Mi ta stima bo",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Papiamento nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W Y Z",
+    countries: ["🇨🇼 Curaçao", "🇦🇼 Aruba", "🇧🇶 Bonaire"],
+    flags: "🇨🇼🇦🇼",
+    info: "Papiamento wird von über 330.000 Menschen auf den ABC-Inseln gesprochen. Es ist eine Kreolsprache mit portugiesischen, spanischen, niederländischen und afrikanischen Elementen."
+  },
+  "Kapverdisches Kreol": {
+    translation: "N ta ama bo",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Kapverdisches Kreol nutzt das lateinische Alphabet mit der ALUPEC-Orthographie.",
+    alphabet: "A B D E F G H I J K L M N O P R S T U V X Z",
+    countries: ["🇨🇻 Kap Verde"],
+    flags: "🇨🇻",
+    info: "Kapverdisches Kreol wird von über 1 Million Menschen gesprochen. Die Sängerin Cesária Évora machte die kapverdische Musik und Sprache weltweit bekannt."
+  },
+  "Seychellen-Kreol": {
+    translation: "Mon kontan ou",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Seychellen-Kreol (Seselwa) nutzt das lateinische Alphabet mit phonetischer Schreibung.",
+    alphabet: "A B D E F G I J K L M N O P R S T U V W Y Z",
+    countries: ["🇸🇨 Seychellen"],
+    flags: "🇸🇨",
+    info: "Seselwa ist die Muttersprache fast aller Seychellois und basiert auf Französisch. Die Seychellen sind neben Mauritius einer der wenigen Orte, wo Kreol offizielle Landessprache ist."
+  },
+  "Mauritius-Kreol": {
+    translation: "Mo kontan twa",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Mauritius-Kreol nutzt das lateinische Alphabet mit phonetischer Schreibung.",
+    alphabet: "A B D E F G I J K L M N O P R S T U V W Y Z",
+    countries: ["🇲🇺 Mauritius"],
+    flags: "🇲🇺",
+    info: "Mauritius-Kreol (Morisien) wird von über 1 Million Menschen gesprochen und ist die Alltagssprache auf Mauritius. Es basiert auf Französisch mit Einflüssen aus indischen und afrikanischen Sprachen."
+  },
+  "Réunion-Kreol": {
+    translation: "Mi aim a ou",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Réunion-Kreol nutzt das lateinische Alphabet.",
+    alphabet: "A B D E F G I J K L M N O P R S T U V W Y Z",
+    countries: ["🇷🇪 Réunion"],
+    flags: "🇷🇪",
+    info: "Réunion-Kreol wird von über 600.000 Menschen gesprochen. Es basiert auf Französisch und wird auf der Vulkaninsel Réunion im Indischen Ozean gesprochen."
+  },
+  "Guadeloupe-Kreol": {
+    translation: "Mwen enmen-w",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Guadeloupe-Kreol nutzt das lateinische Alphabet mit phonetischer Schreibung.",
+    alphabet: "A B D E F G I J K L M N O P R S T U V W Y Z",
+    countries: ["🇬🇵 Guadeloupe"],
+    flags: "🇬🇵",
+    info: "Guadeloupe-Kreol wird von über 400.000 Menschen gesprochen. Es gehört zur Familie der antillischen Kreolsprachen und ist eng mit dem Kreol von Martinique verwandt."
+  },
+  "Martinique-Kreol": {
+    translation: "Mwen enmen-w",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Martinique-Kreol nutzt das lateinische Alphabet mit phonetischer Schreibung.",
+    alphabet: "A B D E F G I J K L M N O P R S T U V W Y Z",
+    countries: ["🇲🇶 Martinique"],
+    flags: "🇲🇶",
+    info: "Martinique-Kreol wird von über 400.000 Menschen gesprochen. Der Dichter Aimé Césaire und der Schriftsteller Patrick Chamoiseau haben die kreolische Literatur weltberühmt gemacht."
+  },
+  "Chavacano": {
+    translation: "Ta ama yo contigo",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Chavacano nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N Ñ O P Q R S T U V W X Y Z",
+    countries: ["🇵🇭 Philippinen (Zamboanga)"],
+    flags: "🇵🇭",
+    info: "Chavacano ist die einzige spanisch-basierte Kreolsprache Asiens mit über 400.000 Sprechern. Es entstand während der spanischen Kolonialherrschaft über die Philippinen."
+  },
+  "Sango": {
+    translation: "Mbi yê mo",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Sango nutzt das lateinische Alphabet.",
+    alphabet: "A B D E F G H I K L M Mb N Nd Ng O P R S T U V W Y Z",
+    countries: ["🇨🇫 Zentralafrikanische Republik"],
+    flags: "🇨🇫",
+    info: "Sango ist die nationale Lingua franca der Zentralafrikanischen Republik und neben Französisch die offizielle Sprache. Es wird von über 5 Millionen Menschen gesprochen."
+  },
+  "Kituba": {
+    translation: "Mono ke zola nge",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Kituba nutzt das lateinische Alphabet.",
+    alphabet: "A B D E F G I K L M N O P R S T U V W Y Z",
+    countries: ["🇨🇩 DR Kongo", "🇨🇬 Republik Kongo"],
+    flags: "🇨🇩🇨🇬",
+    info: "Kituba ist eine vereinfachte Form des Kikongo und dient als Lingua franca in der westlichen DR Kongo und der Republik Kongo mit über 4 Millionen Sprechern."
+  },
+  "Fanagalo": {
+    translation: "Mina tanda wena",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Fanagalo nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W Y Z",
+    countries: ["🇿🇦 Südafrika"],
+    flags: "🇿🇦",
+    info: "Fanagalo ist eine Zulu-basierte Pidginsprache, die in den südafrikanischen Bergwerken als Verständigungssprache zwischen Arbeitern verschiedener Sprachen entstand."
+  },
+  "Kriol (Australisch)": {
+    translation: "Ai labam yu",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Kriol nutzt das lateinische Alphabet mit phonetischer Schreibung.",
+    alphabet: "A B D E F G H I J K L M N O P R S T U V W Y",
+    countries: ["🇦🇺 Australien (Northern Territory)"],
+    flags: "🇦🇺",
+    info: "Kriol ist eine englisch-basierte Kreolsprache und wird von über 30.000 Aborigines in Nordaustralien gesprochen. Es ist die größte Kreolsprache Australiens."
+  },
+  "Hawai'i-Kreol": {
+    translation: "Ai lav yu",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Hawai'i-Kreol nutzt das lateinische Alphabet mit informeller Schreibung.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W Y Z",
+    countries: ["🇺🇸 USA (Hawaii)"],
+    flags: "🇺🇸",
+    info: "Hawai'i-Kreol (Pidgin) wird von über 600.000 Menschen auf Hawaii gesprochen. Es entstand auf den Zuckerrohrplantagen aus einer Mischung von Englisch, Hawaiianisch, Japanisch und Portugiesisch."
+  },
+  "Toki Pona": {
+    translation: "mi olin e sina",
+    transliteration: "",
+    script: "Lateinisches Alphabet / Sitelen Pona",
+    scriptInfo: "Toki Pona nutzt das lateinische Alphabet mit nur 14 Buchstaben oder die Sitelen-Pona-Logogramme.",
+    alphabet: "A E I J K L M N O P S T U W",
+    countries: ["🌍 Weltweit (Internet-Gemeinschaft)"],
+    flags: "🌍",
+    info: "Toki Pona wurde 2001 von Sonja Lang erfunden und hat nur ca. 120-137 Wörter. Es ist die minimalistischste Plansprache der Welt, inspiriert von Taoismus und Minimalismus."
+  },
+  "Interlingua": {
+    translation: "Io te ama",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Interlingua nutzt das lateinische Alphabet ohne Sonderzeichen.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🌍 Weltweit"],
+    flags: "🌍",
+    info: "Interlingua wurde 1951 von der International Auxiliary Language Association geschaffen. Es basiert auf dem Wortschatz romanischer Sprachen und ist ohne Studium für Romanen verständlich."
+  },
+  "Volapük": {
+    translation: "Löfob oli",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Volapük nutzt das lateinische Alphabet mit den Sonderzeichen ä, ö, ü.",
+    alphabet: "A Ä B C D E F G H I J K L M N O Ö P R S T U Ü V X Y Z",
+    countries: ["🌍 Weltweit"],
+    flags: "🌍",
+    info: "Volapük wurde 1879-1880 von Johann Martin Schleyer erfunden und war die erste erfolgreiche Plansprache. Der Name bedeutet 'Weltsprache'. Es wurde bald von Esperanto abgelöst."
+  },
+  "Ido": {
+    translation: "Me amoras tu",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Ido nutzt das lateinische Alphabet ohne Sonderzeichen.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🌍 Weltweit"],
+    flags: "🌍",
+    info: "Ido wurde 1907 als reformiertes Esperanto geschaffen. Der Name bedeutet 'Nachkomme' auf Esperanto. Es hat eine kleine aber aktive Sprechergemeinschaft."
+  },
+  "Lojban": {
+    translation: "mi do prami",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Lojban nutzt das lateinische Alphabet. Jeder Buchstabe hat genau eine Aussprache.",
+    alphabet: "a b c d e f g i j k l m n o p r s t u v x y z",
+    countries: ["🌍 Weltweit"],
+    flags: "🌍",
+    info: "Lojban wurde als logische Sprache entwickelt, basierend auf Prädikatenlogik. Es ist syntaktisch eindeutig – jeder Satz kann nur auf eine Weise geparst werden."
+  },
+  "Altgriechisch": {
+    translation: "Φιλῶ σε",
+    transliteration: "Philō se",
+    script: "Griechisches Alphabet",
+    scriptInfo: "Altgriechisch nutzt das griechische Alphabet mit Akzenten und Hauchzeichen (Spiritus asper und lenis).",
+    alphabet: "Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω",
+    countries: ["🇬🇷 Antikes Griechenland"],
+    flags: "🇬🇷",
+    info: "Altgriechisch war die Sprache von Homer, Platon und Aristoteles. Die gesamte westliche Philosophie, Wissenschaft und Demokratie hat ihre sprachlichen Wurzeln im Altgriechischen."
+  },
+  "Altnordisch": {
+    translation: "Ek elska þik",
+    transliteration: "",
+    script: "Runenschrift / Lateinisches Alphabet",
+    scriptInfo: "Altnordisch wurde in Runen und später in lateinischer Schrift geschrieben. Die Runenschrift hat 16 Zeichen (Jüngeres Futhark).",
+    alphabet: "ᚠ ᚢ ᚦ ᚬ ᚱ ᚴ ᚼ ᚾ ᛁ ᛅ ᛋ ᛏ ᛒ ᛘ ᛚ ᛦ",
+    countries: ["🇳🇴 Norwegen", "🇮🇸 Island", "🇸🇪 Schweden", "🇩🇰 Dänemark"],
+    flags: "🇳🇴🇮🇸🇸🇪🇩🇰",
+    info: "Altnordisch war die Sprache der Wikinger (800-1350 n.Chr.). Die Edda und die Sagas gehören zur bedeutendsten mittelalterlichen Literatur Europas."
+  },
+  "Altägyptisch (hieroglyphisch)": {
+    translation: "𓇋𓏏𓂋𓈖𓂧𓂦𓂡𓀁",
+    transliteration: "Mrit-i tu",
+    script: "Hieroglyphen",
+    scriptInfo: "Altägyptische Hieroglyphen sind eine Kombination aus Logogrammen, Phonogrammen und Determinativen. Sie wurden erst 1822 von Champollion entschlüsselt.",
+    alphabet: "𓀀 𓁀 𓂀 𓃀 𓄀 𓅀 𓆀 𓇀 𓈀 𓉀 𓊀 𓋀 𓌀 𓍀 𓎀 𓏀",
+    countries: ["🇪🇬 Antikes Ägypten"],
+    flags: "🇪🇬",
+    info: "Altägyptisch wurde über 3.000 Jahre geschrieben und ist eine der ältesten dokumentierten Sprachen. Der Stein von Rosetta ermöglichte 1822 die Entschlüsselung der Hieroglyphen."
+  },
+  "Sumerisch": {
+    translation: "Za-e ki-ag₂-ĝu₁₀-me-en",
+    transliteration: "",
+    script: "Keilschrift",
+    scriptInfo: "Sumerisch wurde in Keilschrift geschrieben, dem ältesten bekannten Schriftsystem der Welt (ab ca. 3400 v.Chr.).",
+    alphabet: "𒀀 𒀁 𒀂 𒀃 𒀄 𒀅 𒀆 𒀇 𒀈 𒀉 𒀊 𒀋 𒀌 𒀍 𒀎 𒀏",
+    countries: ["🇮🇶 Antikes Mesopotamien"],
+    flags: "🇮🇶",
+    info: "Sumerisch ist die älteste schriftlich dokumentierte Sprache und eine Sprachisolat – sie ist mit keiner bekannten Sprache verwandt. Die Sumerer erfanden Schrift, Rad und Stadtstaaten."
+  },
+  "Akkadisch": {
+    translation: "Arāmki",
+    transliteration: "",
+    script: "Keilschrift",
+    scriptInfo: "Akkadisch übernahm die sumerische Keilschrift und passte sie an seine semitische Struktur an.",
+    alphabet: "𒀀 𒁀 𒂵 𒁕 𒂊 𒄭 𒆠 𒇻 𒈠 𒈾 𒊭 𒌅 𒉡 𒊒 𒋫 𒉈 𒀝",
+    countries: ["🇮🇶 Antikes Mesopotamien"],
+    flags: "🇮🇶",
+    info: "Akkadisch war über 2.000 Jahre die Lingua franca des Nahen Ostens. Das Gilgamesch-Epos, eines der ältesten literarischen Werke der Menschheit, wurde auf Akkadisch verfasst."
+  },
+  "Gotisch": {
+    translation: "𐍆𐍂𐌹𐌾𐍉𐌸𐌿𐌺",
+    transliteration: "Frijothuk",
+    script: "Gotisches Alphabet",
+    scriptInfo: "Das gotische Alphabet wurde im 4. Jahrhundert von Bischof Wulfila geschaffen, basierend auf griechischen, lateinischen und Runenbuchstaben.",
+    alphabet: "𐌰 𐌱 𐌲 𐌳 𐌴 𐌵 𐌶 𐌷 𐌸 𐌹 𐌺 𐌻 𐌼 𐌽 𐌾 𐌿 𐍀 𐍁 𐍂 𐍃 𐍄 𐍅 𐍆 𐍇 𐍈 𐍉",
+    countries: ["🇪🇺 Ostgotisches/Westgotisches Reich"],
+    flags: "🇪🇺",
+    info: "Gotisch ist die älteste umfangreich dokumentierte germanische Sprache. Wulfilas Bibelübersetzung (ca. 360 n.Chr.) ist das älteste erhaltene germanische Textdokument."
+  },
+  "Altirisch": {
+    translation: "No-t-cara(im)",
+    transliteration: "",
+    script: "Ogham / Lateinisches Alphabet",
+    scriptInfo: "Altirisch wurde in Ogham-Schrift (Steininschriften) und lateinischer Schrift geschrieben. Ogham besteht aus Strichen auf einer Mittellinie.",
+    alphabet: "ᚁ ᚂ ᚃ ᚄ ᚅ ᚆ ᚇ ᚈ ᚉ ᚊ ᚋ ᚌ ᚍ ᚎ ᚏ ᚐ ᚑ ᚒ ᚓ ᚔ",
+    countries: ["🇮🇪 Irland (6.-10. Jh.)"],
+    flags: "🇮🇪",
+    info: "Altirisch (600-900 n.Chr.) hat eine der ältesten Literaturtraditionen Europas. Die Ogham-Schrift auf Steinen ist einzigartig und diente möglicherweise als Geheimschrift."
+  },
+  "Mittelhochdeutsch": {
+    translation: "Ich minne dich",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Mittelhochdeutsch wurde in lateinischer Schrift mit mittelalterlichen Konventionen geschrieben.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇩🇪 Heiliges Römisches Reich"],
+    flags: "🇩🇪",
+    info: "Mittelhochdeutsch (1050-1350) war die Sprache der Minnesänger und der höfischen Literatur. Das Nibelungenlied und die Dichtungen Walthers von der Vogelweide sind seine Meisterwerke."
+  },
+  "Altenglisch": {
+    translation: "Ic lufie þe",
+    transliteration: "",
+    script: "Lateinisches Alphabet / Runen",
+    scriptInfo: "Altenglisch nutzte das lateinische Alphabet mit Sonderzeichen wie þ (thorn), ð (eth), æ (ash), ƿ (wynn).",
+    alphabet: "A Æ B C D Ð E F G H I K L M N O P R S T Þ U Ƿ X Y",
+    countries: ["🇬🇧 England (5.-12. Jh.)"],
+    flags: "🇬🇧",
+    info: "Altenglisch (450-1100) ist die Sprache von Beowulf und Alfred dem Großen. Es ist für moderne Englischsprecher unverständlich und dem Friesischen ähnlicher als dem heutigen Englisch."
+  },
+  "Gebärdensprache (International Sign)": {
+    translation: "[Zeichen: Hand aufs Herz, dann auf den anderen zeigen]",
+    transliteration: "ILY (I-Love-You Handzeichen)",
+    script: "Visuell-gestische Sprache",
+    scriptInfo: "International Sign ist ein Pidgin-System aus verschiedenen nationalen Gebärdensprachen. Es hat keine Schriftform, wird aber durch Notation (HamNoSys, SignWriting) beschrieben.",
+    alphabet: "🤟 👋 ✋ 👆 👇 👈 👉 ☝️ 🤝 🫶",
+    countries: ["🌍 Weltweit"],
+    flags: "🌍",
+    info: "International Sign wird bei internationalen Gehörlosenkonferenzen verwendet. Das ILY-Zeichen (ausgestreckte Daumen, Zeige- und kleine Finger) bedeutet weltweit 'Ich liebe dich'."
+  },
+  "Zazaisch": {
+    translation: "Ez tora hes kena",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Zazaisch nutzt das lateinische Alphabet mit türkischen Sonderzeichen.",
+    alphabet: "A B C Ç D E Ê F G H I İ J K L M N O P Q R S Ş T U Ü V W X Y Z",
+    countries: ["🇹🇷 Türkei (Ostanatolien)"],
+    flags: "🇹🇷",
+    info: "Zazaisch wird von über 2 Millionen Menschen in der Türkei gesprochen. Es ist keine türkische, sondern eine iranische Sprache, verwandt mit Kurdisch und Persisch."
+  },
+  "Luri": {
+    translation: "من تنه دوست دارم",
+    transliteration: "Men tene dust dârem",
+    script: "Arabisches Alphabet",
+    scriptInfo: "Luri nutzt das persisch-arabische Alphabet.",
+    alphabet: "ا ب پ ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن و ه ی",
+    countries: ["🇮🇷 Iran"],
+    flags: "🇮🇷",
+    info: "Luri wird von über 5 Millionen Menschen in Westiran gesprochen. Die Luren sind traditionell nomadische Viehzüchter im Zagros-Gebirge."
+  },
+  "Belutschi": {
+    translation: "من ترا دوست دارین",
+    transliteration: "Man tera dost darin",
+    script: "Arabisches Alphabet",
+    scriptInfo: "Belutschi nutzt das arabische Alphabet mit zusätzlichen Zeichen.",
+    alphabet: "ا ب پ ت ٹ ث ج چ ح خ د ڈ ذ ر ڑ ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن و ه ی",
+    countries: ["🇵🇰 Pakistan", "🇮🇷 Iran", "🇦🇫 Afghanistan"],
+    flags: "🇵🇰🇮🇷🇦🇫",
+    info: "Belutschi wird von über 8 Millionen Menschen in Belutschistan gesprochen, einer Region die sich über drei Länder erstreckt. Es ist eine nordwestiranische Sprache."
+  },
+  "Gilaki": {
+    translation: "من تره دوس دارم",
+    transliteration: "Man tere dus darem",
+    script: "Arabisches Alphabet",
+    scriptInfo: "Gilaki nutzt das persisch-arabische Alphabet.",
+    alphabet: "ا ب پ ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن و ه ی",
+    countries: ["🇮🇷 Iran (Gilan)"],
+    flags: "🇮🇷",
+    info: "Gilaki wird von über 3 Millionen Menschen in der iranischen Provinz Gilan am Kaspischen Meer gesprochen. Die Region ist bekannt für ihre üppige Vegetation und den Reisanbau."
+  },
+  "Mazandarani": {
+    translation: "من تره دوس دارمه",
+    transliteration: "Men tere dus dareme",
+    script: "Arabisches Alphabet",
+    scriptInfo: "Mazandarani nutzt das persisch-arabische Alphabet.",
+    alphabet: "ا ب پ ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن و ه ی",
+    countries: ["🇮🇷 Iran (Mazandaran)"],
+    flags: "🇮🇷",
+    info: "Mazandarani wird von über 3 Millionen Menschen an der Südküste des Kaspischen Meeres gesprochen. Die Mazandarani widerstanden jahrhundertelang der arabischen Eroberung."
+  },
+  "Talysch": {
+    translation: "Əz tıne piyə doxdəm",
+    transliteration: "",
+    script: "Lateinisches / Kyrillisches Alphabet",
+    scriptInfo: "Talysch nutzt das lateinische oder kyrillische Alphabet, je nach Land.",
+    alphabet: "A B C Ç D E Ə F G Ğ H X I İ J K L M N O Ö P R S Ş T U Ü V Y Z",
+    countries: ["🇦🇿 Aserbaidschan", "🇮🇷 Iran"],
+    flags: "🇦🇿🇮🇷",
+    info: "Talysch wird von über 1 Million Menschen in Aserbaidschan und Iran gesprochen. Es ist eine nordwestiranische Sprache, die in den Bergen entlang des Kaspischen Meeres gesprochen wird."
+  },
+  "Tat": {
+    translation: "Мəн туна сəвирюм",
+    transliteration: "Man tuna seviryum",
+    script: "Kyrillisches Alphabet",
+    scriptInfo: "Tat nutzt das kyrillische Alphabet mit Sonderzeichen.",
+    alphabet: "А Б В Г Д Е Ж З И Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я Ə",
+    countries: ["🇦🇿 Aserbaidschan", "🇷🇺 Russland (Dagestan)"],
+    flags: "🇦🇿🇷🇺",
+    info: "Tat wird von etwa 30.000 Menschen gesprochen. Die Bergjuden (Juhuro) sprechen eine Variante des Tat. Es ist eine südwestiranische Sprache am Kaspischen Meer."
+  },
+  "Mingrelisch": {
+    translation: "მა სი მითინძი",
+    transliteration: "Ma si mitindzi",
+    script: "Georgische Schrift (Mchedruli)",
+    scriptInfo: "Mingrelisch nutzt die georgische Mchedruli-Schrift.",
+    alphabet: "ა ბ გ დ ე ვ ზ თ ი კ ლ მ ნ ო პ ჟ რ ს ტ უ ფ ქ ღ ყ შ ჩ ც ძ წ ჭ ხ ჯ ჰ ჸ ჷ",
+    countries: ["🇬🇪 Georgien (Mingrelien)"],
+    flags: "🇬🇪",
+    info: "Mingrelisch wird von über 300.000 Menschen in Westgeorgien gesprochen. Es gehört zur südkaukasischen Sprachfamilie, ist aber nicht gegenseitig verständlich mit Georgisch."
+  },
+  "Swanisch": {
+    translation: "მინ სი მიყუარ",
+    transliteration: "Min si miyuar",
+    script: "Georgische Schrift (Mchedruli)",
+    scriptInfo: "Swanisch nutzt die georgische Mchedruli-Schrift mit dem zusätzlichen Buchstaben ჸ.",
+    alphabet: "ა ბ გ დ ე ვ ზ თ ი კ ლ მ ნ ო პ ჟ რ ს ტ უ ფ ქ ღ ყ შ ჩ ც ძ წ ჭ ხ ჯ ჰ ჸ",
+    countries: ["🇬🇪 Georgien (Swanetien)"],
+    flags: "🇬🇪",
+    info: "Swanisch wird von etwa 14.000 Menschen in den Hochgebirgsregionen Georgiens gesprochen. Swanetien mit seinen mittelalterlichen Wehrtürmen ist UNESCO-Welterbe."
+  },
+  "Lasisch": {
+    translation: "Ma si miyonun",
+    transliteration: "",
+    script: "Lateinisches / Georgische Schrift",
+    scriptInfo: "Lasisch wird in der Türkei in lateinischer Schrift und in Georgien in georgischer Schrift geschrieben.",
+    alphabet: "A B C Ç D E F G Ğ H I J K L M N O P Q R S Ş T U V X Y Z",
+    countries: ["🇹🇷 Türkei (Ostschwarzmeerküste)", "🇬🇪 Georgien"],
+    flags: "🇹🇷🇬🇪",
+    info: "Lasisch wird von etwa 20.000 Menschen an der Schwarzmeerküste gesprochen. Es ist eng mit Mingrelisch verwandt und gehört zur südkaukasischen Sprachfamilie."
+  },
+  "Tscham": {
+    translation: "ꨆꨥꩀ ꨕꨥꩆ ꨆꨭ",
+    transliteration: "Kau dom ku",
+    script: "Cham-Schrift / Lateinisches Alphabet",
+    scriptInfo: "Die Cham-Schrift ist eine indische Brahmi-basierte Schrift. Heute wird auch das lateinische Alphabet verwendet.",
+    alphabet: "A B C D E G H I J K L M N O P R S T U W Y",
+    countries: ["🇻🇳 Vietnam", "🇰🇭 Kambodscha"],
+    flags: "🇻🇳🇰🇭",
+    info: "Cham wird von über 300.000 Menschen in Vietnam und Kambodscha gesprochen. Die Cham gründeten das Königreich Champa, das über 1.000 Jahre bestand."
+  },
+  "Jarai": {
+    translation: "Kâo khăp ih",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Jarai nutzt das lateinische Alphabet mit Sonderzeichen und Diakritika.",
+    alphabet: "A Ă Â B C D Đ E Ê G H I J K L M N O Ô Ơ P R S T U Ư V W Y",
+    countries: ["🇻🇳 Vietnam", "🇰🇭 Kambodscha"],
+    flags: "🇻🇳🇰🇭",
+    info: "Jarai wird von über 400.000 Menschen in den Zentralhochländern Vietnams und Kambodscha gesprochen. Es ist eine austronesische Sprache auf dem Festland – eine seltene Besonderheit."
+  },
+  "Rade": {
+    translation: "Kâo khăp ih",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Rade nutzt das lateinische Alphabet mit vietnamesischen Sonderzeichen.",
+    alphabet: "A Ă Â B C D Đ E Ê G H I J K L M N O Ô Ơ P R S T U Ư V W Y",
+    countries: ["🇻🇳 Vietnam"],
+    flags: "🇻🇳",
+    info: "Rade wird von über 300.000 Menschen in den Zentralhochländern Vietnams gesprochen. Wie Jarai ist es eine festland-austronesische Sprache."
+  },
+  "Koho": {
+    translation: "Ai klach may",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Koho nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E G H I J K L M N O P R S T U V W Y",
+    countries: ["🇻🇳 Vietnam"],
+    flags: "🇻🇳",
+    info: "Koho wird von über 160.000 Menschen in den südlichen Zentralhochländern Vietnams gesprochen. Es gehört zur mon-khmer Sprachfamilie."
+  },
+  "Mnong": {
+    translation: "Gâp rnhang may",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Mnong nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E G H I J K L M N O P R S T U V W Y",
+    countries: ["🇻🇳 Vietnam", "🇰🇭 Kambodscha"],
+    flags: "🇻🇳🇰🇭",
+    info: "Mnong wird von über 100.000 Menschen gesprochen. Die Mnong sind bekannt für ihre Tradition der Elefantenzähmung in den Hochländern Vietnams."
+  },
+  "Bahnar": {
+    translation: "Kâo khăp ih",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Bahnar nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E G H I J K L M N O P R S T U V W Y",
+    countries: ["🇻🇳 Vietnam"],
+    flags: "🇻🇳",
+    info: "Bahnar wird von über 200.000 Menschen in den Zentralhochländern Vietnams gesprochen. Die Bahnar sind bekannt für ihre beeindruckenden Gemeinschaftshäuser (Rong)."
+  },
+  "Sedang": {
+    translation: "A hai bo",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Sedang nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E G H I J K L M N O P R S T U V W Y",
+    countries: ["🇻🇳 Vietnam"],
+    flags: "🇻🇳",
+    info: "Sedang wird von über 100.000 Menschen in den Zentralhochländern Vietnams gesprochen. Es gehört zur Nord-Bahnar-Gruppe der mon-khmer Sprachen."
+  },
+  "Pacoh": {
+    translation: "Âq do héq",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Pacoh nutzt das lateinische Alphabet mit Tonzeichen.",
+    alphabet: "A B C D E G H I J K L M N O P Q R S T U V",
+    countries: ["🇻🇳 Vietnam", "🇱🇦 Laos"],
+    flags: "🇻🇳🇱🇦",
+    info: "Pacoh wird von etwa 30.000 Menschen im Grenzgebiet zwischen Vietnam und Laos gesprochen. Es ist eine katuische Sprache der mon-khmer Familie."
+  },
+  "Bru": {
+    translation: "Ku khăp may",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Bru nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E G H I J K L M N O P R S T U V W Y",
+    countries: ["🇻🇳 Vietnam", "🇱🇦 Laos", "🇹🇭 Thailand"],
+    flags: "🇻🇳🇱🇦🇹🇭",
+    info: "Bru wird von über 100.000 Menschen in drei Ländern gesprochen. Es ist eine katuische Sprache, deren Sprecher traditionell in den Bergen der Annamitenkette leben."
+  },
+  "Khmu": {
+    translation: "Oh mak mɛh",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Khmu nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E G H I J K L M N O P R S T U V W Y",
+    countries: ["🇱🇦 Laos", "🇻🇳 Vietnam", "🇹🇭 Thailand"],
+    flags: "🇱🇦🇻🇳🇹🇭",
+    info: "Khmu wird von über 600.000 Menschen gesprochen und ist die größte mon-khmer Minderheitensprache in Laos. Die Khmu gelten als Ureinwohner von Laos."
+  },
+  "Lahu": {
+    translation: "Ngà nò chi meh ve",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Lahu nutzt das lateinische Alphabet mit Tonbuchstaben.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y",
+    countries: ["🇨🇳 China (Yunnan)", "🇲🇲 Myanmar", "🇹🇭 Thailand"],
+    flags: "🇨🇳🇲🇲🇹🇭",
+    info: "Lahu wird von über 700.000 Menschen in Südostasien und China gesprochen. Es gehört zur tibeto-birmanischen Sprachfamilie."
+  },
+  "Akha": {
+    translation: "Ngah aw ni jaw myah oh",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Akha nutzt das lateinische Alphabet mit Tonbuchstaben.",
+    alphabet: "A B C D E G H I J K L M N O P R S T U V W Y Z",
+    countries: ["🇨🇳 China", "🇲🇲 Myanmar", "🇱🇦 Laos", "🇹🇭 Thailand"],
+    flags: "🇨🇳🇲🇲🇱🇦🇹🇭",
+    info: "Akha wird von über 600.000 Menschen in vier Ländern gesprochen. Die Akha sind bekannt für ihre aufwändigen Silberkopfbedeckungen und ihr Schwingtor-Festival."
+  },
+  "Lisu": {
+    translation: "ꓠꓳ ꓠꓽ ꓡꓶ ꓦꓲꓼ",
+    transliteration: "Ngua ngua liu vi",
+    script: "Fraser-Lisu-Schrift",
+    scriptInfo: "Lisu nutzt die Fraser-Lisu-Schrift, eine Alphabetschrift die 1915 von dem Missionar James O. Fraser erfunden wurde.",
+    alphabet: "ꓐ ꓑ ꓒ ꓓ ꓔ ꓕ ꓖ ꓗ ꓘ ꓙ ꓚ ꓛ ꓜ ꓝ ꓞ ꓟ ꓠ ꓡ ꓢ ꓣ ꓤ ꓥ ꓦ ꓧ ꓨ ꓩ ꓪ ꓫ ꓬ ꓭ ꓮ ꓯ ꓰ ꓱ ꓲ ꓳ ꓴ ꓵ ꓶ ꓷ",
+    countries: ["🇨🇳 China (Yunnan)", "🇲🇲 Myanmar", "🇹🇭 Thailand"],
+    flags: "🇨🇳🇲🇲🇹🇭",
+    info: "Lisu wird von über 900.000 Menschen gesprochen. Die Fraser-Lisu-Schrift besteht aus gedrehten und gespiegelten Großbuchstaben – ein einzigartiges Designprinzip."
+  },
+  "Naxi": {
+    translation: "Ggeq bbei sse",
+    transliteration: "",
+    script: "Lateinisches Alphabet / Dongba-Piktogramme",
+    scriptInfo: "Naxi hat eine einzigartige Piktogrammschrift namens Dongba, die letzte noch verwendete Piktogrammschrift der Welt.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W X Y Z",
+    countries: ["🇨🇳 China (Yunnan)"],
+    flags: "🇨🇳",
+    info: "Naxi wird von über 300.000 Menschen in Yunnan gesprochen. Die Dongba-Piktogrammschrift der Naxi ist die letzte lebendige Piktogrammschrift der Welt und UNESCO-Kulturerbe."
+  },
+  "Bai": {
+    translation: "Ngo ai nung",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Bai nutzt das lateinische Alphabet. Historisch wurde eine chinesische Zeichenvariant verwendet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇨🇳 China (Yunnan)"],
+    flags: "🇨🇳",
+    info: "Bai wird von über 1,3 Millionen Menschen in Yunnan, China gesprochen. Die Bai leben hauptsächlich am Erhai-See bei Dali, einst Hauptstadt des mächtigen Nanzhao-Königreichs."
+  },
+  "Yi (Nuosu)": {
+    translation: "ꉢ ꆏ ꉆꐥꌠ",
+    transliteration: "Nga nip hxat mu su",
+    script: "Yi-Schrift (Nuosu-Silbenschrift)",
+    scriptInfo: "Yi nutzt eine eigene Silbenschrift mit 819 standardisierten Zeichen. Sie ist eine der wenigen unabhängig entwickelten Schriften der Welt.",
+    alphabet: "ꀀ ꀁ ꀂ ꀃ ꀄ ꀅ ꀆ ꀇ ꀈ ꀉ ꀊ ꀋ ꀌ ꀍ ꀎ ꀏ ꀐ ꀑ ꀒ ꀓ ꀔ ꀕ ꀖ ꀗ ꀘ ꀙ ꀚ ꀛ ꀜ ꀝ",
+    countries: ["🇨🇳 China (Sichuan, Yunnan)"],
+    flags: "🇨🇳",
+    info: "Yi wird von über 2 Millionen Menschen in Südwestchina gesprochen. Die Yi-Schrift hat sich unabhängig von der chinesischen Schrift entwickelt und ist über 500 Jahre alt."
+  },
+  "Zhuang": {
+    translation: "Gou gyaez mwngz",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Zhuang nutzt seit 1957 das lateinische Alphabet. Historisch wurde eine auf chinesischen Zeichen basierende Schrift (Sawndip) verwendet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇨🇳 China (Guangxi)"],
+    flags: "🇨🇳",
+    info: "Zhuang ist mit über 16 Millionen Sprechern die größte Minderheitensprache Chinas. Die Zhuang sind bekannt für ihre terrassenförmigen Reisfelder und das Singen-Festival."
+  },
+  "Dong": {
+    translation: "Yac nyiec menl",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Dong nutzt das lateinische Alphabet seit 1958.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇨🇳 China (Guizhou, Hunan, Guangxi)"],
+    flags: "🇨🇳",
+    info: "Dong wird von über 3 Millionen Menschen gesprochen. Die Dong sind berühmt für ihre Wind-und-Regen-Brücken und ihren einzigartigen polyphonen Chorgesang, der UNESCO-Kulturerbe ist."
+  },
+  "Miao": {
+    translation: "Kuv hlub koj",
+    transliteration: "",
+    script: "Pollard-Schrift / Lateinisches Alphabet",
+    scriptInfo: "Miao-Sprachen nutzen verschiedene Schriften, darunter die Pollard-Schrift und das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇨🇳 China", "🇻🇳 Vietnam", "🇱🇦 Laos"],
+    flags: "🇨🇳🇻🇳🇱🇦",
+    info: "Miao-Sprachen werden von über 9 Millionen Menschen gesprochen. Die Miao sind bekannt für ihre aufwändigen Silberschmuckarbeiten und das farbenfrohe Schwestern-Mahl-Festival."
+  },
+  "Yao": {
+    translation: "Yie nyei hnyouv",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Yao (Mien) nutzt das lateinische Alphabet mit Tonbuchstaben.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇨🇳 China", "🇻🇳 Vietnam", "🇱🇦 Laos", "🇹🇭 Thailand"],
+    flags: "🇨🇳🇻🇳🇱🇦🇹🇭",
+    info: "Yao (Iu Mien) wird von über 3 Millionen Menschen gesprochen. Die Yao haben eine einzigartige daoistische religiöse Tradition und sind bekannt für ihre Stickereien."
+  },
+  "Li": {
+    translation: "Aeu moix mwngz",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Li nutzt das lateinische Alphabet seit 1957.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W X Y Z",
+    countries: ["🇨🇳 China (Hainan)"],
+    flags: "🇨🇳",
+    info: "Li wird von über 1,2 Millionen Menschen auf Hainan gesprochen. Die Li sind die Ureinwohner Hainans und bekannt für ihre Ikat-Webtechnik, die UNESCO-Kulturerbe ist."
+  },
+  "Va": {
+    translation: "A maw gu",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Va nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W X Y",
+    countries: ["🇨🇳 China (Yunnan)", "🇲🇲 Myanmar"],
+    flags: "🇨🇳🇲🇲",
+    info: "Va wird von über 400.000 Menschen in China und Myanmar gesprochen. Die Va-Kultur ist bekannt für ihr Kopfjäger-Vergangenheit und die Holztrommel-Zeremonien."
+  },
+  "Jingpo": {
+    translation: "Ngai nang hpe tsawra ai",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Jingpo nutzt das lateinische Alphabet, eingeführt von Missionaren.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W Y Z",
+    countries: ["🇲🇲 Myanmar", "🇨🇳 China (Yunnan)"],
+    flags: "🇲🇲🇨🇳",
+    info: "Jingpo wird von über 900.000 Menschen in Myanmar und China gesprochen. Die Kachin/Jingpo sind bekannt für ihr Manau-Festival mit rituellen Tänzen."
+  },
+  "Rawang": {
+    translation: "Ngai nang shvngoe ra",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Rawang nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W Y",
+    countries: ["🇲🇲 Myanmar"],
+    flags: "🇲🇲",
+    info: "Rawang wird von über 60.000 Menschen in der Kachin-Region Myanmars gesprochen. Die Rawang leben in einigen der abgelegensten Regionen Südostasiens."
+  },
+  "Dulong": {
+    translation: "Ngai nung ai bu",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Dulong nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W Y Z",
+    countries: ["🇨🇳 China (Yunnan)"],
+    flags: "🇨🇳",
+    info: "Dulong wird von etwa 14.000 Menschen im abgelegenen Dulong-Tal in Yunnan gesprochen. Das Tal war bis 1999 im Winter vollständig von der Außenwelt abgeschnitten."
+  },
+  "Qiang": {
+    translation: "Ji ne guah",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Qiang nutzt das lateinische Alphabet. Es hat keine eigene historische Schrift.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇨🇳 China (Sichuan)"],
+    flags: "🇨🇳",
+    info: "Qiang wird von über 100.000 Menschen in Sichuan gesprochen. Die Qiang gelten als eines der ältesten Völker Chinas und werden in den frühesten chinesischen Schriften erwähnt."
+  },
+  "Pumi": {
+    translation: "A ne dua",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Pumi nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+    countries: ["🇨🇳 China (Yunnan, Sichuan)"],
+    flags: "🇨🇳",
+    info: "Pumi wird von etwa 34.000 Menschen in Yunnan und Sichuan gesprochen. Die Pumi praktizieren eine Mischung aus tibetischem Buddhismus und Schamanismus."
+  },
+  "Derung": {
+    translation: "Ngai nung ai sa",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Derung nutzt das lateinische Alphabet.",
+    alphabet: "A B C D E F G H I J K L M N O P R S T U V W Y Z",
+    countries: ["🇨🇳 China (Yunnan)"],
+    flags: "🇨🇳",
+    info: "Derung (auch Drung) wird von etwa 6.000 Menschen gesprochen und ist eine der kleinsten Minderheitengruppen Chinas. Die Derung-Frauen trugen traditionell Gesichtstätowierungen."
+  },
+  "Tajik (Afghan Dari variety)": {
+    translation: "من تو را دوست دارم",
+    transliteration: "Man tora dust daram",
+    script: "Arabisches Alphabet",
+    scriptInfo: "Dari nutzt das persisch-arabische Alphabet.",
+    alphabet: "ا ب پ ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن و ه ی",
+    countries: ["🇦🇫 Afghanistan"],
+    flags: "🇦🇫",
+    info: "Dari ist die afghanische Variante des Persischen und eine der beiden offiziellen Sprachen Afghanistans. Es wird von über 12 Millionen Menschen als Muttersprache gesprochen."
+  },
+  "Hazaragi": {
+    translation: "مو تو ره دوست دارُم",
+    transliteration: "Mu tora dust darum",
+    script: "Arabisches Alphabet",
+    scriptInfo: "Hazaragi nutzt das persisch-arabische Alphabet.",
+    alphabet: "ا ب پ ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن و ه ی",
+    countries: ["🇦🇫 Afghanistan"],
+    flags: "🇦🇫",
+    info: "Hazaragi wird von über 3 Millionen Hazara in Afghanistan gesprochen. Die Hazara haben mongolische Gesichtszüge und gelten als Nachfahren von Dschingis Khans Armeen."
+  },
+  "Aimaq": {
+    translation: "مه تره دوست دارم",
+    transliteration: "Me tera dust darem",
+    script: "Arabisches Alphabet",
+    scriptInfo: "Aimaq nutzt das persisch-arabische Alphabet.",
+    alphabet: "ا ب پ ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن و ه ی",
+    countries: ["🇦🇫 Afghanistan"],
+    flags: "🇦🇫",
+    info: "Aimaq wird von über 1,5 Millionen halbnomadischen Menschen in Westafghanistan gesprochen. Die Aimaq bestehen aus vier Hauptstämmen und leben in Jurten."
+  },
+  "Pashai": {
+    translation: "Ma ta sara meherba",
+    transliteration: "",
+    script: "Arabisches Alphabet",
+    scriptInfo: "Pashai nutzt das arabische Alphabet.",
+    alphabet: "ا ب پ ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن و ه ی ټ ډ ړ",
+    countries: ["🇦🇫 Afghanistan"],
+    flags: "🇦🇫",
+    info: "Pashai wird von über 400.000 Menschen in Ostafghanistan gesprochen. Es ist eine dardische Sprache und damit entfernt mit Hindi und Sanskrit verwandt."
+  },
+  "Nuristani (Kati)": {
+    translation: "Ia tusht biyum",
+    transliteration: "",
+    script: "Arabisches Alphabet",
+    scriptInfo: "Kati nutzt das arabische Alphabet mit zusätzlichen Zeichen.",
+    alphabet: "ا ب پ ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن و ه ی",
+    countries: ["🇦🇫 Afghanistan (Nuristan)"],
+    flags: "🇦🇫",
+    info: "Kati wird von über 40.000 Menschen in Nuristan gesprochen. Die Nuristani waren die letzten Heiden Afghanistans und wurden erst 1896 zum Islam zwangsbekehrt."
+  },
+  "Burushaski": {
+    translation: "Ja ne gushinguman",
+    transliteration: "",
+    script: "Lateinisches / Arabisches Alphabet",
+    scriptInfo: "Burushaski hat keine standardisierte Schrift und wird in lateinischer oder arabischer Schrift geschrieben.",
+    alphabet: "A B C D E F G Gh H I J K Kh L M N O P Q R S Sh T Th U V W X Y Z",
+    countries: ["🇵🇰 Pakistan (Hunza, Nagar)"],
+    flags: "🇵🇰",
+    info: "Burushaski ist ein Sprachisolat – es ist mit keiner anderen bekannten Sprache verwandt. Es wird von etwa 100.000 Menschen im Hunza-Tal gesprochen, einem der schönsten Orte der Welt."
+  },
+  "Brahui": {
+    translation: "I na en khosht kanth",
+    transliteration: "",
+    script: "Arabisches Alphabet",
+    scriptInfo: "Brahui nutzt das arabische Alphabet.",
+    alphabet: "ا ب پ ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن و ه ی",
+    countries: ["🇵🇰 Pakistan (Belutschistan)"],
+    flags: "🇵🇰",
+    info: "Brahui ist eine dravidische Sprache in Pakistan – über 2.000 km von den nächsten verwandten dravidischen Sprachen in Südindien entfernt. Es wird von über 4 Millionen Menschen gesprochen."
+  },
+  "Wakhi": {
+    translation: "Wuz taw dust ditəm",
+    transliteration: "",
+    script: "Lateinisches / Arabisches Alphabet",
+    scriptInfo: "Wakhi nutzt je nach Land das lateinische, kyrillische oder arabische Alphabet.",
+    alphabet: "A B C D E F G Gh H I J K Kh L M N O P Q R S Sh T U V W X Y Z Zh",
+    countries: ["🇵🇰 Pakistan", "🇦🇫 Afghanistan", "🇹🇯 Tadschikistan", "🇨🇳 China"],
+    flags: "🇵🇰🇦🇫🇹🇯🇨🇳",
+    info: "Wakhi wird von über 60.000 Menschen im Pamir-Gebirge und im Wakhan-Korridor gesprochen – eine der abgelegensten bewohnten Regionen der Welt auf über 4.000 Metern Höhe."
+  },
+  "Saterfriesisch": {
+    translation: "Iek hould fon die",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Saterfriesisch nutzt das lateinische Alphabet mit Sonderzeichen.",
+    alphabet: "A Ä B C D E F G H I J K L M N O Ö P Q R S T U Ü V W X Y Z",
+    countries: ["🇩🇪 Deutschland (Niedersachsen)"],
+    flags: "🇩🇪",
+    info: "Saterfriesisch ist die letzte verbliebene ostfriesische Sprache und wird von nur etwa 2.000 Menschen im Saterland gesprochen. Es ist Deutschlands am stärksten bedrohte Minderheitensprache."
+  },
+  "Livisch": {
+    translation: "Ma armastab sindab",
+    transliteration: "",
+    script: "Lateinisches Alphabet",
+    scriptInfo: "Livisch nutzt das lateinische Alphabet mit Sonderzeichen wie ā, ē, ī, ō, ū, ä, ö, ü, š, ž, ț, ḑ, ņ, ļ, ŗ.",
+    alphabet: "A Ā Ä B D Ḑ E Ē F G H I Ī J K L Ļ M N Ņ O Ō Ö P R Ŗ S Š T Ț U Ū Ü V Z Ž",
+    countries: ["🇱🇻 Lettland"],
+    flags: "🇱🇻",
+    info: "Livisch ist eine finno-ugrische Sprache, die fast ausgestorben ist – der letzte Muttersprachler starb 2013. Revitalisierungsbemühungen versuchen, die Sprache wiederzubeleben."
   }
 };
+
 
 // ===== STATE =====
 let entries = [];
