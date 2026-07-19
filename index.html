@@ -4974,6 +4974,31 @@ function init() {
 
     existing = rebuilt;
 
+    // ── Step 1b: de-duplicate languages (fixes stray leftovers from older,
+    // pre-canonical versions of this file that may have already written
+    // duplicate entries to Firebase, e.g. the same language on two dates) ──
+    const seenLanguages = new Map();
+    const deduped = [];
+    // Canonical-range entries are authoritative and always kept first
+    existing.forEach(e => {
+      if (e.date && canonicalDates.has(e.date)) {
+        seenLanguages.set(e.language, e.date);
+        deduped.push(e);
+      }
+    });
+    // Non-canonical entries: keep only the first occurrence of each language
+    existing.forEach(e => {
+      if (!e.date || !canonicalDates.has(e.date)) {
+        if (!seenLanguages.has(e.language)) {
+          seenLanguages.set(e.language, e.date);
+          deduped.push(e);
+        } else {
+          healed = true; // a duplicate was dropped -> needs saving
+        }
+      }
+    });
+    existing = deduped;
+
     // ── Step 2: continue the 279-language auto-fill from 30.04.2026 onward ──
     const usedLanguages = new Set();
     existing.forEach(e => {
