@@ -307,10 +307,14 @@
     letter-spacing: 3px;
   }
 
-  .delete-btn {
-    position: absolute;
-    bottom: 10px;
-    right: 12px;
+  .card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 0 20px 16px;
+  }
+  .edit-btn, .delete-btn {
+    position: static;
     background: none;
     border: none;
     color: #ccc;
@@ -320,6 +324,7 @@
     border-radius: 6px;
     transition: all 0.2s;
   }
+  .edit-btn:hover { color: var(--gold); background: #fdf3e7; }
   .delete-btn:hover { color: var(--rose); background: var(--rose-light); }
 
   /* SPEAK BUTTON */
@@ -1122,6 +1127,96 @@ const ALREADY_ENTERED_ALIASES = {
   "Chinesisch (traditionell)": "Chinesisch (Mandarin)",
   "Portugiesisch (Portugal)": "Portugiesisch"
 };
+
+// ===== CANONICAL DAY PLAN (fixed date -> language for the already-planned range) =====
+const CANONICAL_PLAN = [
+  ["2026-02-03", "Deutsch"],
+  ["2026-02-04", "Englisch"],
+  ["2026-02-05", "(Harry Potter) Runen (englisch)"],
+  ["2026-02-06", "Spanisch"],
+  ["2026-02-07", "Französisch"],
+  ["2026-02-08", "Italienisch"],
+  ["2026-02-09", "Portugiesisch (Portugal)"],
+  ["2026-02-10", "Niederländisch"],
+  ["2026-02-11", "Dänisch"],
+  ["2026-02-12", "Kölsch"],
+  ["2026-02-13", "Griechisch"],
+  ["2026-02-14", "Schottisch-Gälisch"],
+  ["2026-02-15", "Tschechisch"],
+  ["2026-02-16", "Faröisch"],
+  ["2026-02-17", "Indonesisch"],
+  ["2026-02-18", "Walisisch"],
+  ["2026-02-19", "Luxemburgisch"],
+  ["2026-02-20", "Hawaiisch"],
+  ["2026-02-21", "Irisch"],
+  ["2026-02-22", "Ukrainisch"],
+  ["2026-02-23", "Afrikaans"],
+  ["2026-02-24", "Filipino"],
+  ["2026-02-25", "Türkisch"],
+  ["2026-02-26", "Sizilianisch"],
+  ["2026-02-27", "Albansich"],
+  ["2026-02-28", "Fidschianisch"],
+  ["2026-03-01", "Inuktut (Silbenschrift)"],
+  ["2026-03-02", "Katalanisch"],
+  ["2026-03-03", "Lettisch"],
+  ["2026-03-04", "Bosnisch"],
+  ["2026-03-05", "Somali"],
+  ["2026-03-06", "Baskisch"],
+  ["2026-03-07", "Isländisch"],
+  ["2026-03-08", "Jamaikanisches Kreolisch"],
+  ["2026-03-09", "Haitianisch"],
+  ["2026-03-10", "Kreolisch (Mauritius)"],
+  ["2026-03-11", "Maori"],
+  ["2026-03-12", "Samoanisch"],
+  ["2026-03-13", "Chinesisch (traditionell)"],
+  ["2026-03-14", "Vietnamesisch"],
+  ["2026-03-15", "Thailiändisch"],
+  ["2026-03-16", "Seychellenkreol"],
+  ["2026-03-17", "Friesisch"],
+  ["2026-03-18", "Xhosa"],
+  ["2026-03-19", "Kannada"],
+  ["2026-03-20", "Abchasisch"],
+  ["2026-03-21", "Schlesisch"],
+  ["2026-03-22", "Tahitianisch"],
+  ["2026-03-23", "Quechua"],
+  ["2026-03-24", "Lettgallisch"],
+  ["2026-03-25", "Jiddisch"],
+  ["2026-03-26", "Kroatisch"],
+  ["2026-03-27", "Romani"],
+  ["2026-03-28", "Maltesisch"],
+  ["2026-03-29", "Finnisch"],
+  ["2026-03-30", "Georgisch"],
+  ["2026-03-31", "Zulu"],
+  ["2026-04-01", "Estnisch"],
+  ["2026-04-02", "Malaiisch"],
+  ["2026-04-03", "Rumänisch"],
+  ["2026-04-04", "Aserbaidschanisch"],
+  ["2026-04-05", "Armenisch"],
+  ["2026-04-06", "Bulgarisch"],
+  ["2026-04-07", "Suaheli"],
+  ["2026-04-08", "Nepalesisch"],
+  ["2026-04-09", "Polnisch"],
+  ["2026-04-10", "Esperanto"],
+  ["2026-04-11", "Mongolisch"],
+  ["2026-04-12", "Gujarati"],
+  ["2026-04-13", "Norwegisch"],
+  ["2026-04-14", "Serbisch"],
+  ["2026-04-15", "Litauisch"],
+  ["2026-04-16", "Lateinisch"],
+  ["2026-04-17", "Slowenisch"],
+  ["2026-04-18", "Schwedisch"],
+  ["2026-04-19", "Birmanisch"],
+  ["2026-04-20", "Kasachisch"],
+  ["2026-04-21", "Usbekisch"],
+  ["2026-04-22", "Kirgisisch"],
+  ["2026-04-23", "Laotisch"],
+  ["2026-04-24", "Igbo"],
+  ["2026-04-25", "Yoruba"],
+  ["2026-04-26", "Hausa"],
+  ["2026-04-27", "Koreanisch"],
+  ["2026-04-28", "Hindi"],
+  ["2026-04-29", "Shona"]
+];
 
 // ===== LANGUAGE DATABASE =====
 const LANGUAGES = {
@@ -4803,17 +4898,87 @@ function init() {
     select.appendChild(opt);
   });
 
-  // First: one-time prefill check, then set up real-time listener
+  // Resolve a language name to its LANGUAGES DB entry (direct or via alias)
+  function resolveLangData(name) {
+    if (LANGUAGES[name]) return LANGUAGES[name];
+    if (ALREADY_ENTERED_ALIASES[name] && LANGUAGES[ALREADY_ENTERED_ALIASES[name]]) {
+      return LANGUAGES[ALREADY_ENTERED_ALIASES[name]];
+    }
+    return null;
+  }
+
+  function buildEntry(date, language, preserveImage) {
+    const data = resolveLangData(language);
+    const entry = data ? {
+      date, language,
+      translation: data.translation,
+      transliteration: data.transliteration,
+      script: data.script,
+      scriptInfo: data.scriptInfo,
+      alphabet: data.alphabet,
+      countries: data.countries,
+      flags: data.flags,
+      info: data.info
+    } : {
+      date, language,
+      translation: '(bitte manuell eintragen)',
+      transliteration: '',
+      script: 'Manuell einzutragen',
+      scriptInfo: '',
+      alphabet: '',
+      countries: [],
+      flags: '🌍',
+      info: '',
+      manual: true
+    };
+    if (preserveImage) entry.image = preserveImage;
+    return entry;
+  }
+
+  // First: one-time integrity check + prefill, then set up real-time listener
   entriesRef.once('value').then(snapshot => {
     const data = snapshot.val();
-    const existing = data ? Object.values(data) : [];
+    let existing = data ? Object.values(data) : [];
 
-    // Build used-languages set with alias support
+    // ── Step 1: enforce the canonical day plan (03.02.-29.04.2026) ──
+    // Any date in this range must hold the correct language. Fix wrong ones,
+    // add missing ones, leave correct ones (incl. custom manual entries) untouched.
+    const byDate = {};
+    existing.forEach(e => { if (e.date) byDate[e.date] = e; });
+
+    let healed = false;
+    CANONICAL_PLAN.forEach(([date, language]) => {
+      const current = byDate[date];
+      if (!current) {
+        // Missing entirely -> add it
+        const fresh = buildEntry(date, language, null);
+        byDate[date] = fresh;
+        healed = true;
+      } else if (current.language !== language) {
+        // Wrong language for this date -> fix it, keep image if present
+        const fresh = buildEntry(date, language, current.image || null);
+        byDate[date] = fresh;
+        healed = true;
+      }
+      // else: already correct, leave completely untouched (preserves images & custom text)
+    });
+
+    // Rebuild the full entries array: canonical range (sorted by date) + anything else
+    const canonicalDates = new Set(CANONICAL_PLAN.map(p => p[0]));
+    const rebuilt = [];
+    CANONICAL_PLAN.forEach(([date]) => rebuilt.push(byDate[date]));
+    // Keep any additional existing entries outside the canonical date range as-is
+    existing.forEach(e => {
+      if (e.date && !canonicalDates.has(e.date)) rebuilt.push(e);
+    });
+
+    existing = rebuilt;
+
+    // ── Step 2: continue the 279-language auto-fill from 30.04.2026 onward ──
     const usedLanguages = new Set();
     existing.forEach(e => {
       if (e.language) {
         usedLanguages.add(e.language);
-        // Also mark DB-equivalent names as used
         if (ALREADY_ENTERED_ALIASES[e.language]) {
           usedLanguages.add(ALREADY_ENTERED_ALIASES[e.language]);
         }
@@ -4822,9 +4987,10 @@ function init() {
 
     const missing = PREFILL_ORDER.filter(lang => !usedLanguages.has(lang) && LANGUAGES[lang]);
 
-    if (missing.length > 20) {
-      // Find the latest date among existing entries
-      let lastDate = new Date('2026-01-01');
+    if (missing.length > 20 || healed) {
+      // Anchor continuation date: day after the last canonical day (29.04.2026),
+      // or the latest existing date beyond that if entries already extend further.
+      let lastDate = new Date('2026-04-29');
       existing.forEach(e => {
         if (e.date) {
           const d = new Date(e.date);
@@ -4832,7 +4998,6 @@ function init() {
         }
       });
 
-      // Add missing entries with sequential dates
       const newEntries = [...existing];
       missing.forEach((lang, i) => {
         const nextDate = new Date(lastDate);
@@ -4841,20 +5006,7 @@ function init() {
         const m = String(nextDate.getMonth() + 1).padStart(2, '0');
         const dd = String(nextDate.getDate()).padStart(2, '0');
         const dateStr = y + '-' + m + '-' + dd;
-
-        const langData = LANGUAGES[lang];
-        newEntries.push({
-          date: dateStr,
-          language: lang,
-          translation: langData.translation,
-          transliteration: langData.transliteration,
-          script: langData.script,
-          scriptInfo: langData.scriptInfo,
-          alphabet: langData.alphabet,
-          countries: langData.countries,
-          flags: langData.flags,
-          info: langData.info
-        });
+        newEntries.push(buildEntry(dateStr, lang, null));
       });
 
       entriesRef.set(newEntries).then(() => {
